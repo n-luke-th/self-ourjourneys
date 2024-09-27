@@ -11,20 +11,21 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:xiaokeai/firebase_options.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/helpers/get_platform_service.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/services/configs/appearance/lang/language_provider.dart';
 import 'package:xiaokeai/services/configs/settings_service.dart';
 import 'package:xiaokeai/services/notifications/notification_manager.dart';
 import 'package:xiaokeai/services/package/package_info_provider.dart';
+import 'package:xiaokeai/services/package/package_info_service.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
+
+late LanguageProvider languageProvider;
 
 Future<void> _configureServices() async {
   setupLogger();
   await _configureFirebaseService();
-  final Logger logger = locator<Logger>();
   await setupDependencies();
-  SharedPreferencesService prefs = getIt<SharedPreferencesService>();
-  logger.d(prefs.toString()); // TODO: log debug all key-value pairs
 }
 
 Future<FirebaseApp> _configureFirebaseService() async {
@@ -37,7 +38,7 @@ void _main() async {
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
     await _configureServices();
-    final languageProvider = LanguageProvider();
+    languageProvider = LanguageProvider();
     await languageProvider.loadFromPrefs();
     FlutterNativeSplash.remove();
     LoadingAnimationWidget.fourRotatingDots(
@@ -45,6 +46,7 @@ void _main() async {
       size: 30,
     );
     final settingsService = SettingsService(languageProvider: languageProvider);
+    await logSettingsConfig();
     runApp(
       MultiProvider(
         providers: [
@@ -69,12 +71,29 @@ void _main() async {
 }
 
 void main() {
-  final Logger logger = locator<Logger>();
   runZonedGuarded(() {
     _main();
   }, (error, stackTrace) {
+    final Logger logger = locator<Logger>();
     logger.e(error.toString(), error: error, stackTrace: stackTrace);
   });
+}
+
+Future<void> logSettingsConfig() async {
+  final Logger logger = locator<Logger>();
+  SharedPreferencesService prefs = getIt<SharedPreferencesService>();
+  final platformService = getIt<PlatformDetectionService>();
+  final packageInfoService = getIt<PackageInfoService>();
+  final packageInfo = await packageInfoService.getPackageInfo();
+  logger.d("Xiaokeai:\n"
+      ">> Platform: '${platformService.readableCurrentPlatform}'\n"
+      ">> Version '${packageInfo.version}'");
+  logger.d("User Preferences:\n"
+      ">> Language Code: '${prefs.getString('languageCode')}'\n"
+      ">> Is System Default Language: '${prefs.getBool('isSystemDefault')}'");
+  logger.d("Applied Settings:\n"
+      ">> Language: '${languageProvider.currentLocale.languageCode}'\n"
+      ">> Is System Default Language: '${languageProvider.isSystemDefault}'");
 }
 
 class Xiaokeai extends StatelessWidget {

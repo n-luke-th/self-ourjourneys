@@ -108,7 +108,7 @@ class LanguageProvider with ChangeNotifier {
     await _prefs.setBool('isSystemDefault', _isSystemDefault);
     final String? languageCode = _prefs.getString('languageCode');
     final bool? isSystemDefault = _prefs.getBool('isSystemDefault');
-    _logger.i(
-        "\t New Prefs: Language code: $languageCode | Is system default lang: $isSystemDefault");
+    _logger.d(
+        "\t New Prefs: Language code: '$languageCode' | Is system default lang: '$isSystemDefault'");
   }
 }

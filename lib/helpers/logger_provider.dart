@@ -4,7 +4,7 @@
 import 'package:logger/logger.dart';
 import 'package:get_it/get_it.dart';
 
-final locator = GetIt.instance;
+final GetIt locator = GetIt.instance;
 
 void setupLogger() {
   locator.registerSingleton<Logger>(Logger());
