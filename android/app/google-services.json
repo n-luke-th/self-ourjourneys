@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "852585975159",
+    "project_id": "surprise-xiaokeai",
+    "storage_bucket": "surprise-xiaokeai.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852585975159:android:ebbd31281bc2f85ff5e572",
+        "android_client_info": {
+          "package_name": "com.lukecreated.xiaokeai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsQYj2NyJPZ_ziCkBhQXzEhW26wRRBG9E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,7 @@
 /// lib/services/configs/appearance/theme_collections.dart
 /// Theme collections
 /// Config how the application theme will be here
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, constant_identifier_names
 
 import 'dart:ui';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -26,7 +26,7 @@ class ThemeCollections {
   );
   static const _blendLevel = 8;
   static const _surfaceMode = FlexSurfaceMode.levelSurfacesLowScaffold;
-  static const FlexSchemeColor _ThaiTuneLightThemeColors = FlexSchemeColor(
+  static const FlexSchemeColor _LightThemeColors = FlexSchemeColor(
     primary: Color(0xffF2BE22),
     primaryContainer: Color(0xffFFFCAF), //
     secondary: Color(0xffFF6600), //
@@ -36,7 +36,7 @@ class ThemeCollections {
     // appBarColor: Color(0xff8ec5bf),
     error: Color(0xFFB1384E),
   );
-  static const FlexSchemeColor _ThaiTuneDarkThemeColors = FlexSchemeColor(
+  static const FlexSchemeColor _DarkThemeColors = FlexSchemeColor(
     primary: Color(0xfff87c50),
     primaryContainer: Color.fromARGB(255, 54, 49, 47), //
     secondary: Color(0xffFF6600),
@@ -47,8 +47,8 @@ class ThemeCollections {
     error: Color(0xFFB1384E),
   );
 
-  static final ThaiTuneLightTheme = FlexThemeData.light(
-    colors: _ThaiTuneLightThemeColors,
+  static final LightTheme = FlexThemeData.light(
+    colors: _LightThemeColors,
     surfaceMode: _surfaceMode,
     blendLevel: _blendLevel,
     subThemesData: _subThemesData,
@@ -59,8 +59,8 @@ class ThemeCollections {
     fontFamilyFallback: _fallbackFonts,
   );
 
-  static final ThaiTuneDarkTheme = FlexThemeData.dark(
-    colors: _ThaiTuneDarkThemeColors,
+  static final DarkTheme = FlexThemeData.dark(
+    colors: _DarkThemeColors,
     surfaceMode: _surfaceMode,
     blendLevel: _blendLevel,
     subThemesData: _subThemesData,

@@ -5,10 +5,11 @@ import 'package:logger/logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 
 class LanguageProvider with ChangeNotifier {
-  final Logger _logger = Logger();
+  final Logger _logger = locator<Logger>();
   static const Locale defaultAppLocale = Locale('en');
   late Locale _currentLocale;
   final SharedPreferencesService _prefs = getIt<SharedPreferencesService>();
