@@ -8,12 +8,10 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ThemeCollections {
-  // TODO: finalize the app theme settings
   ThemeCollections._();
-  static final _defaultFont = GoogleFonts.roboto().fontFamily;
+  static final _defaultFont = GoogleFonts.itim().fontFamily;
   static final _fallbackFonts = <String>[
-    GoogleFonts.sarabun().fontFamily!,
-    GoogleFonts.montserrat().fontFamily!,
+    GoogleFonts.longCang().fontFamily!,
   ];
   static final _visualDensity = FlexColorScheme.comfortablePlatformDensity;
   static const _subThemesData = FlexSubThemesData(
@@ -27,24 +25,18 @@ class ThemeCollections {
   static const _blendLevel = 8;
   static const _surfaceMode = FlexSurfaceMode.levelSurfacesLowScaffold;
   static const FlexSchemeColor _LightThemeColors = FlexSchemeColor(
-    primary: Color(0xffF2BE22),
-    primaryContainer: Color(0xffFFFCAF), //
-    secondary: Color(0xffFF6600), //
-    secondaryContainer: Color.fromARGB(255, 199, 223, 201), //
-    tertiary: Color(0xfffbbc66),
-    tertiaryContainer: Color.fromARGB(255, 227, 164, 141), //
-    // appBarColor: Color(0xff8ec5bf),
-    error: Color(0xFFB1384E),
+    primary: Color(0xFFD1FF9D), //
+    secondary: Color(0xFFFFF88F), //
+    tertiary: Color(0xFFFFB1D6), //
+    appBarColor: Color(0xFF8FE8FF), //
+    error: Color(0xFFD11414), //
   );
   static const FlexSchemeColor _DarkThemeColors = FlexSchemeColor(
-    primary: Color(0xfff87c50),
-    primaryContainer: Color.fromARGB(255, 54, 49, 47), //
-    secondary: Color(0xffFF6600),
-    secondaryContainer: Color(0xff3a5444), //
-    tertiary: Color(0xfffbbc66),
-    tertiaryContainer: Color(0xff34553e), //
-    // appBarColor: Color(0xff8ec5bf),
-    error: Color(0xFFB1384E),
+    primary: Color(0xFF1A9B1A), //
+    secondary: Color(0xFF414100), //
+    tertiary: Color(0xFF41002F), //
+    appBarColor: Color(0xFF00212F), //
+    error: Color(0xFFA30909), //
   );
 
   static final LightTheme = FlexThemeData.light(
