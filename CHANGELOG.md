@@ -8,3 +8,4 @@
 - Initial Development: Added launch screen, and other improvements on September 28, 2024 -> **0.0.3** by Luke
 - Initial Development: Added Theme and l10n in actions, and other improvements on September 28, 2024 -> **0.0.4** by Luke
 - Initial Development: Setup the underlying global error exceptions, added local auth service file, and other improvements on September 28, 2024 -> **0.0.5** by Luke
+- Initial Development: Added the navigation and navbar as well as simple placeholder pages, and other improvements on September 28, 2024 -> **0.0.6** by Luke

@@ -17,6 +17,7 @@ import 'package:xiaokeai/firebase_options.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/get_platform_service.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
+import 'package:xiaokeai/navigation/page_router.dart';
 import 'package:xiaokeai/services/configs/appearance/lang/language_provider.dart';
 import 'package:xiaokeai/services/configs/appearance/theme/theme_provider.dart';
 import 'package:xiaokeai/services/configs/settings_service.dart';
@@ -115,7 +116,7 @@ class Xiaokeai extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingsService>(builder: (context, settings, child) {
       return GlobalLoaderOverlay(
-        child: MaterialApp(
+        child: MaterialApp.router(
           title: 'Xiaokeai',
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -128,60 +129,12 @@ class Xiaokeai extends StatelessWidget {
           locale: settings.currentLocale,
           theme: themeProvider.lightTheme,
           darkTheme: themeProvider.darkTheme,
-          home: const MyHomePage(title: 'Xiaokeai'),
+          routerConfig: router,
           builder: (context, child) {
             return child ?? const SizedBox.shrink();
           },
         ),
       );
     });
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
   }
 }
