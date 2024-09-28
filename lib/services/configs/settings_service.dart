@@ -19,7 +19,7 @@ class SettingsService with ChangeNotifier {
     _init();
   }
 
-  Future<void> _init() async {
+  void _init() {
     languageProvider.addListener(notifyListeners);
     themeProvider.addListener(notifyListeners);
   }
@@ -56,5 +56,6 @@ class SettingsService with ChangeNotifier {
   void dispose() {
     super.dispose();
     languageProvider.removeListener(notifyListeners);
+    themeProvider.removeListener(notifyListeners);
   }
 }
