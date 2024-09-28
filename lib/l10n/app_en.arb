@@ -4,5 +4,60 @@
   "@helloWorld": {
     "description": "The conventional newborn programmer greeting"
   },
-  "heading_systemDefault": "System Default"
+  "systemDefault": "System Default",
+  "@systemDefault": {
+    "description": "System Default"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home"
+  },
+  "memories": "Memories",
+  "@memories": {
+    "description": "Memories"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings"
+  },
+  "albums": "Albums",
+  "@albums": {
+    "description": "Albums"
+  },
+  "addNewMemory": "Add new memory",
+  "@addNewMemory": {
+    "description": "A tooltips for the floating btn"
+  },
+  "themeMode": "Theme mode",
+  "@themeMode": {
+    "description": "Theme mode: light or dark"
+  },
+  "capitalize": "Capitalize",
+  "@capitalize": {
+    "description": "Capitalize"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language"
+  },
+  "logout": "LOGOUT",
+  "@logout": {
+    "description": "Logout confirm text"
+  },
+  "logoutConfirmationTitle": "Are you sure to logout?",
+  "@logoutConfirmationTitle": {
+    "description": "Confirmation title text to the dialog for logout"
+  },
+  "logoutConfirmationMessage": "You may have to login to the system again.",
+  "@logoutConfirmationMessage": {
+    "description": "Confirmation details text to the dialog for logout"
+  },
+  "newChangeApplied": "New change is applied!",
+  "@newChangeApplied": {
+    "description": "inform user that new change is now applied."
+  },
+  "errorOccurred": "Unexpected error occurred.",
+  "@errorOccurred": {
+    "description": "inform user that something went wrong."
+  }
 }

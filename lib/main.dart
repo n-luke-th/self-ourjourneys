@@ -26,9 +26,6 @@ import 'package:xiaokeai/services/package/package_info_provider.dart';
 import 'package:xiaokeai/services/package/package_info_service.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 
-late LanguageProvider languageProvider;
-late ThemeProvider themeProvider;
-
 Future<void> _configureServices() async {
   setupLogger();
   await _configureFirebaseService();
@@ -45,8 +42,8 @@ void _main() async {
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
     await _configureServices();
-    languageProvider = LanguageProvider();
-    themeProvider = ThemeProvider();
+    final LanguageProvider languageProvider = LanguageProvider();
+    final ThemeProvider themeProvider = ThemeProvider();
     await languageProvider.loadFromPrefs();
     await themeProvider.loadFromPrefs();
     FlutterNativeSplash.remove();
@@ -56,7 +53,8 @@ void _main() async {
     );
     final settingsService = SettingsService(
         languageProvider: languageProvider, themeProvider: themeProvider);
-    await logSettingsConfig();
+    await logSettingsConfig(
+        themeProvider: themeProvider, languageProvider: languageProvider);
     runApp(
       MultiProvider(
         providers: [
@@ -72,7 +70,7 @@ void _main() async {
             dispose: (_, manager) => manager.dispose(),
           ),
         ],
-        child: const Xiaokeai(),
+        child: Xiaokeai(),
       ),
     );
   } on Exception catch (e) {
@@ -89,7 +87,9 @@ void main() {
   });
 }
 
-Future<void> logSettingsConfig() async {
+Future<void> logSettingsConfig(
+    {required ThemeProvider themeProvider,
+    required LanguageProvider languageProvider}) async {
   final Logger logger = locator<Logger>();
   SharedPreferencesService prefs = getIt<SharedPreferencesService>();
   final platformService = getIt<PlatformDetectionService>();
@@ -117,6 +117,7 @@ class Xiaokeai extends StatelessWidget {
     return Consumer<SettingsService>(builder: (context, settings, child) {
       return GlobalLoaderOverlay(
         child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
           title: 'Xiaokeai',
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -127,8 +128,9 @@ class Xiaokeai extends StatelessWidget {
           ],
           supportedLocales: settings.supportedLocales,
           locale: settings.currentLocale,
-          theme: themeProvider.lightTheme,
-          darkTheme: themeProvider.darkTheme,
+          themeMode: settings.themeMode,
+          theme: settings.themeProvider.lightTheme,
+          darkTheme: settings.themeProvider.darkTheme,
           routerConfig: router,
           builder: (context, child) {
             return child ?? const SizedBox.shrink();

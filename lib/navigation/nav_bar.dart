@@ -26,33 +26,29 @@ class _NavBarState extends State<NavBar> {
         onDestinationSelected: (int idx) => _onItemTapped(idx, context),
         destinations: [
           NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
-              selectedIcon: const Icon(Icons.home),
-              label: 'Home' // AppLocalizations.of(context)!.heading_home,
-              ),
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: AppLocalizations.of(context)!.home,
+          ),
           NavigationDestination(
-              icon: const Icon(Icons.receipt_outlined),
-              selectedIcon: const Icon(Icons.receipt),
-              label:
-                  'Memories' // AppLocalizations.of(context)!.heading_records,
-              ),
+            icon: const Icon(Icons.favorite_outline_rounded),
+            selectedIcon: const Icon(Icons.favorite_rounded),
+            label: AppLocalizations.of(context)!.memories,
+          ),
           NavigationDestination(
-              icon: const Icon(Icons.analytics_outlined),
-              selectedIcon: const Icon(Icons.analytics),
-              label:
-                  'Albums' // AppLocalizations.of(context)!.heading_analytics,
-              ),
+            icon: const Icon(Icons.auto_awesome_mosaic_outlined),
+            selectedIcon: const Icon(Icons.auto_awesome_mosaic_rounded),
+            label: AppLocalizations.of(context)!.albums,
+          ),
           NavigationDestination(
-              icon: const Icon(Icons.settings_outlined),
-              selectedIcon: const Icon(Icons.settings),
-              label:
-                  'Settings' // AppLocalizations.of(context)!.heading_settings,
-              ),
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings),
+            label: AppLocalizations.of(context)!.settings,
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip:
-            'Add new memory', // AppLocalizations.of(context)!.heading_addNewTransaction,
+        tooltip: AppLocalizations.of(context)!.addNewMemory,
         onPressed: () => context.pushNamed('NewMemory'),
         child: const Icon(Icons.add),
       ),

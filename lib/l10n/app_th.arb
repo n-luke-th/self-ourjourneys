@@ -1,3 +1,27 @@
 {
-  "@@locale": "th"
+  "@@locale": "th",
+  "systemDefault": "ค่าเริ่มต้นระบบ",
+  "@systemDefault": {
+    "description": "System Default"
+  },
+  "home": "หน้าหลัก",
+  "@home": {
+    "description": "Home"
+  },
+  "memories": "ความทรงจำ",
+  "@memories": {
+    "description": "Memories"
+  },
+  "settings": "ตั้งค่า",
+  "@settings": {
+    "description": "Settings"
+  },
+  "albums": "อัลบั้ม",
+  "@albums": {
+    "description": "Albums"
+  },
+  "addNewMemory": "เพิ่มความทรงจำ",
+  "@addNewMemory": {
+    "description": "A tooltips for the floating btn"
+  }
 }

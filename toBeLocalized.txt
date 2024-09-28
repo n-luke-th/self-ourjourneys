@@ -1,6 +1,13 @@
 {
   "th": [
     "helloWorld",
-    "heading_systemDefault"
+    "themeMode",
+    "capitalize",
+    "language",
+    "logout",
+    "logoutConfirmationTitle",
+    "logoutConfirmationMessage",
+    "newChangeApplied",
+    "errorOccurred"
   ]
 }

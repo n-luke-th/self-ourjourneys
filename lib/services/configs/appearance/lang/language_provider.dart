@@ -43,8 +43,8 @@ class LanguageProvider with ChangeNotifier {
         return 'English'; // English
       case 'th':
         return 'ไทย'; // Thai
-      case 'zh':
-        return '中文'; // Chinese
+      // case 'zh':
+      //   return '中文'; // Chinese
       default:
         return Intl.canonicalizedLocale(localeInstance.languageCode);
     }
@@ -52,7 +52,7 @@ class LanguageProvider with ChangeNotifier {
 
   String getLanguageName(Locale? locale, BuildContext context) {
     if (locale == null) {
-      String defaultText = AppLocalizations.of(context)!.heading_systemDefault;
+      String defaultText = AppLocalizations.of(context)!.systemDefault;
       String defaultLangText =
           getLanguageNameByLocaleString(aLocale: systemDefaultLocale);
       return "$defaultText ($defaultLangText)";

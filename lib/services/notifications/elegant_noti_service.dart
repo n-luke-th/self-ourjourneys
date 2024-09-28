@@ -15,8 +15,14 @@ class ElegantNotificationService implements NotificationService {
     NotificationData data,
   ) {
     ElegantNotification(
-            title: Text(data.title),
-            description: Text(data.message),
+            title: Text(
+              data.title,
+              style:
+                  TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+            ),
+            description: Text(data.message,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary)),
             icon: Icon(_getIcon(data.type), color: _getColor(data.type)),
             toastDuration: data.duration,
             animationDuration: const Duration(milliseconds: 300),
@@ -42,18 +48,18 @@ class ElegantNotificationService implements NotificationService {
     }
   }
 
-  String _getTitle(CustomNotificationType type) {
-    switch (type) {
-      case CustomNotificationType.success:
-        return 'Success';
-      case CustomNotificationType.error:
-        return 'Error';
-      case CustomNotificationType.info:
-        return 'Information';
-      case CustomNotificationType.warning:
-        return "Warning";
-    }
-  }
+  // String _getTitle(CustomNotificationType type) {
+  //   switch (type) {
+  //     case CustomNotificationType.success:
+  //       return 'Success';
+  //     case CustomNotificationType.error:
+  //       return 'Error';
+  //     case CustomNotificationType.info:
+  //       return 'Information';
+  //     case CustomNotificationType.warning:
+  //       return "Warning";
+  //   }
+  // }
 
   IconData _getIcon(CustomNotificationType type) {
     switch (type) {

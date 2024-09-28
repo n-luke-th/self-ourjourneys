@@ -29,7 +29,7 @@ final router = GoRouter(
         GoRoute(
           path: '/settings',
           name: 'SettingsPage',
-          builder: (context, state) => const SettingsPage(),
+          builder: (context, state) => SettingsPage(),
         ),
         GoRoute(
           path: '/memories',
