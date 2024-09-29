@@ -23,5 +23,9 @@
   "addNewMemory": "เพิ่มความทรงจำ",
   "@addNewMemory": {
     "description": "A tooltips for the floating btn"
+  },
+  "underDevelopment": "กำลังพัฒนา",
+  "@underDevelopment": {
+    "description": "indicates that this is under development"
   }
 }

@@ -8,7 +8,8 @@ Scaffold mainView(BuildContext context,
     {String? appBarTitle = 'changeMe',
     required Widget body,
     List<Widget>? appbarActions = const [],
-    Color? appBarBackgroundColor}) {
+    Color? appBarBackgroundColor,
+    bool? extendBodyBehindAppBar = false}) {
   return Scaffold(
       appBar: AppBar(
         foregroundColor: Theme.of(context).appBarTheme.foregroundColor,

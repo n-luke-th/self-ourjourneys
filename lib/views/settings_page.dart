@@ -10,6 +10,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
@@ -18,6 +19,7 @@ import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:xiaokeai/services/bottom_sheet/bottom_sheet_service.dart';
 import 'package:xiaokeai/services/configs/settings_service.dart';
+import 'package:xiaokeai/services/configs/utils/permission_service.dart';
 import 'package:xiaokeai/services/dialog/dialog_service.dart';
 import 'package:xiaokeai/services/notifications/notification_manager.dart';
 import 'package:xiaokeai/services/notifications/notification_service.dart';
@@ -34,12 +36,16 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final _auth = getIt<AuthService>();
   late PackageInfo packageInfo;
+  final PermissionsService _permissionsService = getIt<PermissionsService>();
+  late Future<Map<Permission, PermissionStatus>> _statuses;
 
   @override
   void initState() {
     super.initState();
     Future.microtask(
         () => context.read<PackageInfoProvider>().loadPackageInfo());
+
+    _statuses = _permissionsService.checkPermissions();
   }
 
   @override
@@ -98,45 +104,155 @@ class _SettingsPageState extends State<SettingsPage> {
             builder: (context, settings, child) {
               return ListView(
                 children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: UiConsts.PaddingAll_large,
-                      child: Text(
-                        "Appearance",
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                    ),
-                  ),
-                  SettingDropdown<ThemeMode>(
-                    title: AppLocalizations.of(context)!.themeMode,
-                    value: settings.themeMode,
-                    items: ThemeMode.values,
-                    onChanged: (newValue) => _updateSetting(
-                      context,
-                      () => settings.setThemeMode(newValue),
-                    ),
-                    itemBuilder: (mode) =>
-                        Text(mode.toString().split('.').last.toUpperCase()),
-                  ),
-                  SettingDropdown<Locale?>(
-                    title: AppLocalizations.of(context)!.language,
-                    value: settings.currentLocaleOrNull,
-                    items: settings.supportedLocalesWithDefault,
-                    onChanged: (newValue) => _updateSetting(
-                      context,
-                      () => settings.setLocale(newValue),
-                    ),
-                    itemBuilder: (locale) =>
-                        Text(settings.getLanguageName(locale, context)),
-                  ),
+                  _accountSection(context),
+                  _appearanceSection(context, settings),
+                  _permissionSection(context)
                 ],
               );
             },
           ),
         ),
-        Expanded(flex: 2, child: SizedBox.expand(child: Text("About")))
+        // Expanded(flex: 2, child: SizedBox.expand(child: Text("About")))
+      ],
+    );
+  }
+
+  Column _accountSection(BuildContext context) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: UiConsts.PaddingAll_large,
+            child: Text(
+              "Account",
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontSize:
+                      Theme.of(context).textTheme.headlineMedium!.fontSize),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Column _appearanceSection(BuildContext context, SettingsService settings) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: UiConsts.PaddingAll_large,
+            child: Text(
+              "Appearance",
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontSize:
+                      Theme.of(context).textTheme.headlineMedium!.fontSize),
+            ),
+          ),
+        ),
+        SettingDropdown<ThemeMode>(
+          title: AppLocalizations.of(context)!.themeMode,
+          value: settings.themeMode,
+          items: ThemeMode.values,
+          onChanged: (newValue) => _updateSetting(
+            context,
+            () => settings.setThemeMode(newValue),
+          ),
+          itemBuilder: (mode) =>
+              Text(mode.toString().split('.').last.toUpperCase()),
+        ),
+        SettingDropdown<Locale?>(
+          title: AppLocalizations.of(context)!.language,
+          value: settings.currentLocaleOrNull,
+          items: settings.supportedLocalesWithDefault,
+          onChanged: (newValue) => _updateSetting(
+            context,
+            () => settings.setLocale(newValue),
+          ),
+          itemBuilder: (locale) =>
+              Text(settings.getLanguageName(locale, context)),
+        ),
+      ],
+    );
+  }
+
+  Column _permissionSection(BuildContext context) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: UiConsts.PaddingAll_large,
+            child: Text(
+              "Permission",
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontSize:
+                      Theme.of(context).textTheme.headlineMedium!.fontSize),
+            ),
+          ),
+        ),
+        ListTile(
+          title: Text("Current Permission"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              UiConsts.spaceForTextAndElement,
+              const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+            ],
+          ),
+          onTap: () => BottomSheetService.showCustomBottomSheet(
+            context: context,
+            builder: (context, scrollController) {
+              return Column(
+                children: [
+                  Text(
+                    'Current Permissions',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const Divider(),
+                  StreamBuilder(
+                    stream: _statuses.asStream(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<Map<Permission, PermissionStatus>>
+                            snapshot) {
+                      context.loaderOverlay.show();
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        context.loaderOverlay.hide();
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _permissionsService.permissionsList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            Permission permission =
+                                _permissionsService.permissionsList[index];
+                            PermissionStatus status =
+                                snapshot.data![permission] ??
+                                    PermissionStatus.permanentlyDenied;
+                            String statusText =
+                                _permissionsService.getStatusText(status);
+
+                            return ListTile(
+                              title: Text(permission.toString()),
+                              subtitle: Text(statusText),
+                            );
+                          },
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                  ),
+                ],
+              );
+            },
+            isDraggable: true,
+            isDismissible: true,
+            snapAnimationDuration: const Duration(milliseconds: 500),
+          ),
+        ),
       ],
     );
   }
@@ -297,7 +413,7 @@ class SettingBottomSheet<T> extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: UiConsts.BorderRadiusCircular_standard,
             ),
           ),
           Text(
@@ -315,6 +431,64 @@ class SettingBottomSheet<T> extends StatelessWidget {
               )),
         ],
       ),
+    );
+  }
+}
+
+class SettingDropdownStream<T> extends StatelessWidget {
+  final String title;
+  final Stream<Map<dynamic, dynamic>> stream;
+
+  const SettingDropdownStream({
+    super.key,
+    required this.title,
+    required this.stream,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Map<dynamic, dynamic>>(
+      stream: stream,
+      builder: (BuildContext context,
+          AsyncSnapshot<Map<dynamic, dynamic>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return ListTile(
+            title: Text(title),
+            trailing: Center(
+              child: LoadingAnimationWidget.fourRotatingDots(
+                color: Color(0xFF8FE8FF),
+                size: 35,
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          Map<dynamic, dynamic> data = snapshot.data!;
+          return ListTile(
+            title: Text(title),
+            trailing: DropdownButton<dynamic>(
+              value:
+                  data.keys.first, // Set the first value as the selected value
+              items: data.keys.map((value) {
+                return DropdownMenuItem<dynamic>(
+                  value: value,
+                  child: Text(value.toString()),
+                );
+              }).toList(),
+              onChanged: (dynamic newValue) {
+                // Handle change if needed
+              },
+            ),
+          );
+        }
+
+        return ListTile(
+          title: Text(title),
+          trailing: const Text('No data available'),
+        );
+      },
     );
   }
 }

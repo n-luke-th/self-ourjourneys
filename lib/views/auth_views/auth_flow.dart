@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/services/auth/acc/auth_service.dart';
+import 'package:xiaokeai/views/auth_views/login_page.dart';
 
 class AuthFlow extends StatelessWidget {
   AuthFlow({super.key});
@@ -51,13 +52,12 @@ class AuthFlow extends StatelessWidget {
 
             if (user == null) {
               context.loaderOverlay.hide();
-              // TODO: show login page
-              return const Text("login page");
+              return LoginPage();
             } else {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 try {
                   context.loaderOverlay.hide();
-                  return context.goNamed("ThaiTune");
+                  return context.goNamed("HomePage");
                 } catch (e) {
                   context.loaderOverlay.hide();
                   logger.d('-Navigation error: $e');

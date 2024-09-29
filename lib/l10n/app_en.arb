@@ -59,5 +59,9 @@
   "errorOccurred": "Unexpected error occurred.",
   "@errorOccurred": {
     "description": "inform user that something went wrong."
+  },
+  "underDevelopment": "Under development",
+  "@underDevelopment": {
+    "description": "indicates that this is under development"
   }
 }

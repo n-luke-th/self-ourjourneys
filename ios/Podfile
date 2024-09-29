@@ -48,7 +48,7 @@ post_install do |installer|
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
 
-        # Please make sure to config `thai_tune_ui/ios/Runner/Info.plist` as well
+        # Please make sure to config `ios/Runner/Info.plist` as well
         # for more information, see: https://pub.dev/packages/permission_handler
 
         ## dart: PermissionGroup.calendar

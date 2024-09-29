@@ -4,10 +4,12 @@
 /// e.g. padding style, padding amount, font size, etc.
 ///
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
-
+/// TODO: edit this page
 import 'package:flutter/widgets.dart';
 
 class UiConsts {
+  UiConsts._();
+
   /// EdgeInsets.all(8);
   static const PaddingAll_standard = EdgeInsets.all(8);
 
@@ -21,27 +23,29 @@ class UiConsts {
   static const PaddingVertical_standard = EdgeInsets.symmetric(vertical: 8);
 
   /// EdgeInsets.symmetric(vertical: 16.0)
-  static const PaddingVertical_largeSmall2 =
-      EdgeInsets.symmetric(vertical: 16.0);
+  static const PaddingVertical_large = EdgeInsets.symmetric(vertical: 16.0);
 
-  /// SizedBox(height: 10);
+  /// EdgeInsets.symmetric(horizontal: 16.0)
+  static const PaddingHorizontal_large = EdgeInsets.symmetric(horizontal: 16.0);
+
+  /// SizedBox(height: 8);
   static const SizedBoxGapVertical_standard = SizedBox(
-    height: 10,
+    height: 8,
   );
 
-  /// SizedBox(height: 20);
+  /// SizedBox(height: 16);
   static const SizedBoxGapVertical_large = SizedBox(
-    height: 20,
+    height: 16,
   );
 
-  /// SizedBox(width: 20);
+  /// SizedBox(width: 16);
   static const SizedBoxGapHorizontal_large = SizedBox(
-    width: 20,
+    width: 16,
   );
 
-  /// SizedBox(width: 10);
+  /// SizedBox(width: 8);
   static const SizedBoxGapHorizontal_standard = SizedBox(
-    width: 10,
+    width: 8,
   );
 
   /// BorderRadius.circular(20)
