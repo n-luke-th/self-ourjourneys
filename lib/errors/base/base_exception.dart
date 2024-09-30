@@ -2,25 +2,26 @@
 ///
 /// base class for global error exception
 import 'package:logger/logger.dart';
+import 'package:xiaokeai/errors/base/base_error_enum.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
 
 class BaseException implements Exception {
-  final String code;
-  final String message;
+  final ErrorType errorEnum;
+  // final String message;
   final Logger _logger = locator<Logger>();
   final String? errorDetailsFromDependency;
   final Object? error;
   final StackTrace? st;
 
   BaseException(
-      {required this.code,
-      required this.message,
+      {required this.errorEnum,
+      // required this.message,
       this.error,
       this.st,
       this.errorDetailsFromDependency}) {
     _logError(
-      code: code,
-      message: message,
+      code: errorEnum.code,
+      message: errorEnum.message,
       extDetails: errorDetailsFromDependency,
       error: error,
       st: st ?? StackTrace.current,
@@ -29,7 +30,7 @@ class BaseException implements Exception {
 
   @override
   String toString() {
-    return "${runtimeType.toString().split('.').last}:\n $code: $message";
+    return "${runtimeType.toString().split('.').last}:\n ${errorEnum.code}: ${errorEnum.message}";
   }
 
   void _logError(

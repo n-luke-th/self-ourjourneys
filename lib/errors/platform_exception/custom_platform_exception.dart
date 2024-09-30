@@ -2,14 +2,13 @@
 ///
 ///
 /// Platform-related exceptions
-import 'package:xiaokeai/errors/base_exception.dart';
+import 'package:xiaokeai/errors/base/base_exception.dart';
 
 class CustomPlatformException extends BaseException {
   CustomPlatformException({
-    required super.code,
-    required super.message,
     super.error,
     super.st,
     super.errorDetailsFromDependency,
+    required super.errorEnum,
   });
 }

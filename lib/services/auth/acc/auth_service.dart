@@ -3,13 +3,18 @@
 /// the authentication service of the app with the help of Firebase Auth
 ///
 
+// TODO: edit this auth service file
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
+import 'package:xiaokeai/errors/auth_exception/auth_exception.dart';
 import 'package:xiaokeai/helpers/rate_limiter.dart';
+import 'package:xiaokeai/shared/errors_code_and_msg/auth_errors.dart';
 // import 'package:flutter/foundation.dart'
 // show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-class AuthService {
+class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Logger _logger = Logger();
   final RateLimiter _rateLimiter = RateLimiter();
@@ -17,7 +22,7 @@ class AuthService {
   FirebaseAuth? get authInstance => _auth;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  static String getReadableErrorMessage(FirebaseAuthException e) {
+  static String getReadableFirebaseAuthErrorMessage(FirebaseAuthException e) {
     switch (e.code) {
       /// below are shared cases
       case 'invalid-email':
@@ -77,10 +82,7 @@ class AuthService {
   Future<UserCredential?> signInWithEmailAndPassword(
       String email, String password) async {
     if (!_rateLimiter.canAttempt(email)) {
-      throw FirebaseAuthException(
-        code: 'too-many-requests',
-        message: 'Too many sign-in attempts. Please try again later.',
-      );
+      throw AuthException(errorEnum: AuthErrors.AUTH_C07);
     }
 
     try {
@@ -119,57 +121,6 @@ class AuthService {
       rethrow;
     }
   }
-
-  // /// Continue with Google (Works both register and login)
-  // Future<UserCredential?> continueWithGoogle() async {
-  //   // if current platform is web
-  //   if (kIsWeb) {
-  //     try {
-  //       GoogleAuthProvider googleProvider = GoogleAuthProvider();
-  //       googleProvider
-  //           .addScope('https://www.googleapis.com/auth/contacts.readonly');
-  //       googleProvider
-  //           .setCustomParameters({'login_hint': 'user@thai-tune.com'});
-  //       return await _auth.signInWithPopup(googleProvider);
-  //     } on Exception catch (e) {
-  //       _logger.e(
-  //           'Unexpected error during continue with Google: ${e.toString()}',
-  //           error: e,
-  //           stackTrace: StackTrace.current);
-  //       rethrow;
-  //     }
-  //   }
-  //   // if current platform is mobile or other
-  //   switch (defaultTargetPlatform) {
-  //     case TargetPlatform.android || TargetPlatform.iOS:
-  //       try {
-  //         final googleUser = await GoogleSignIn().signIn();
-  //         final googleAuth = await googleUser?.authentication;
-  //         final credential = GoogleAuthProvider.credential(
-  //             idToken: googleAuth?.idToken,
-  //             accessToken: googleAuth?.accessToken);
-  //         return await _auth.signInWithCredential(credential);
-  //       } on FirebaseAuthException catch (e) {
-  //         _logger.e("Failed to continue with Google: ${e.message}",
-  //             error: e, stackTrace: StackTrace.current);
-  //         rethrow;
-  //       } catch (e) {
-  //         _logger.e(
-  //             "Unexpected error during continue with Google: ${e.toString()}",
-  //             error: e,
-  //             stackTrace: StackTrace.current);
-  //         rethrow;
-  //       }
-  //     default:
-  //       throw UnsupportedError(
-  //         'Sorry, we currently have no support for this platform: $defaultTargetPlatform',
-  //       );
-  //   }
-  // }
-
-  // Future<UserCredential?> continueWithApple(){
-
-  // }
 
   /// sign user out from the system
   Future<void> signOut() async {

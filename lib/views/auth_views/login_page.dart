@@ -293,7 +293,7 @@ class _LoginPage extends State<LoginPage> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      // Implement Firebase login logic here
+      // TODO: Implement Firebase login logic here
       FirebaseAuth.instance
           .signInWithEmailAndPassword(
         email: _emailController.text,

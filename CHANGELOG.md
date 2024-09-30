@@ -16,3 +16,4 @@
 - Initial Development: Attempted to fix launcher icon for Android on September 30, 2024 -> **0.1.0+1** by Luke
 - Initial Development: Launcher icon works on all platform on September 30, 2024 -> **0.1.0+2** by Luke
 - Initial Development: Updated launch screen on all platform on September 30, 2024 -> **0.1.0+3** by Luke
+- Initial Development: Setup the underlying authentication + cloud object storage service and their wrappers, improved the global error system + added auth error code and msg, and other improvements on October 1, 2024 -> **0.1.1** by Luke

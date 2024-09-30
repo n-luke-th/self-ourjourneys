@@ -5,7 +5,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
@@ -15,12 +14,11 @@ import 'package:provider/provider.dart';
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
-import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/services/bottom_sheet/bottom_sheet_service.dart';
 import 'package:xiaokeai/services/configs/settings_service.dart';
 import 'package:xiaokeai/services/configs/utils/permission_service.dart';
-import 'package:xiaokeai/services/dialog/dialog_service.dart';
 import 'package:xiaokeai/services/notifications/notification_manager.dart';
 import 'package:xiaokeai/services/notifications/notification_service.dart';
 import 'package:xiaokeai/services/package/package_info_provider.dart';
@@ -34,7 +32,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final _auth = getIt<AuthService>();
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   late PackageInfo packageInfo;
   final PermissionsService _permissionsService = getIt<PermissionsService>();
   late Future<Map<Permission, PermissionStatus>> _statuses;
@@ -267,19 +265,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _showLogoutConfirmation(BuildContext context) async {
-    final bool? confirmed = await DialogService.showConfirmationDialog(
-      context: context,
-      title: AppLocalizations.of(context)!.logoutConfirmationTitle,
-      message: AppLocalizations.of(context)!.logoutConfirmationMessage,
-      confirmText: AppLocalizations.of(context)!.logout,
-    );
-
-    if (confirmed == true) {
-      context.loaderOverlay.show();
-      await _auth.signOut();
-      context.goNamed('AuthFlow');
-      context.loaderOverlay.hide();
-    }
+    await _authWrapper.handleLogout(context);
   }
 }
 
@@ -431,64 +417,6 @@ class SettingBottomSheet<T> extends StatelessWidget {
               )),
         ],
       ),
-    );
-  }
-}
-
-class SettingDropdownStream<T> extends StatelessWidget {
-  final String title;
-  final Stream<Map<dynamic, dynamic>> stream;
-
-  const SettingDropdownStream({
-    super.key,
-    required this.title,
-    required this.stream,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<Map<dynamic, dynamic>>(
-      stream: stream,
-      builder: (BuildContext context,
-          AsyncSnapshot<Map<dynamic, dynamic>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return ListTile(
-            title: Text(title),
-            trailing: Center(
-              child: LoadingAnimationWidget.fourRotatingDots(
-                color: Color(0xFF8FE8FF),
-                size: 35,
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          Map<dynamic, dynamic> data = snapshot.data!;
-          return ListTile(
-            title: Text(title),
-            trailing: DropdownButton<dynamic>(
-              value:
-                  data.keys.first, // Set the first value as the selected value
-              items: data.keys.map((value) {
-                return DropdownMenuItem<dynamic>(
-                  value: value,
-                  child: Text(value.toString()),
-                );
-              }).toList(),
-              onChanged: (dynamic newValue) {
-                // Handle change if needed
-              },
-            ),
-          );
-        }
-
-        return ListTile(
-          title: Text(title),
-          trailing: const Text('No data available'),
-        );
-      },
     );
   }
 }
