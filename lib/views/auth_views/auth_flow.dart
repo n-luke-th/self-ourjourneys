@@ -8,12 +8,13 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/views/auth_views/login_page.dart';
 
 class AuthFlow extends StatelessWidget {
   AuthFlow({super.key});
-  final logger = Logger();
+  final Logger _logger = locator<Logger>();
 
   final AuthService _auth = getIt<AuthService>();
 
@@ -26,7 +27,7 @@ class AuthFlow extends StatelessWidget {
           context.loaderOverlay.show();
           if (snapshot.hasError) {
             context.loaderOverlay.hide();
-            logger.e("Authentication inilization error: ${snapshot.error}",
+            _logger.e("Authentication inilization error: ${snapshot.error}",
                 error: snapshot.error, stackTrace: StackTrace.current);
             return Center(
               child: Column(
@@ -43,10 +44,10 @@ class AuthFlow extends StatelessWidget {
             );
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            logger.i('waiting internal interaction with Firebase Auth.');
+            _logger.i('waiting internal interaction with Firebase Auth.');
             Future.delayed(Durations.short1);
           } else if (snapshot.connectionState == ConnectionState.done) {
-            logger.i('connected to Firebase Auth server');
+            _logger.i('connected to Firebase Auth server');
           } else if (snapshot.connectionState == ConnectionState.active) {
             User? user = snapshot.data;
 
@@ -60,7 +61,7 @@ class AuthFlow extends StatelessWidget {
                   return context.goNamed("HomePage");
                 } catch (e) {
                   context.loaderOverlay.hide();
-                  logger.d('-Navigation error: $e');
+                  _logger.d('-Navigation error: $e');
                 }
               });
             }

@@ -8,6 +8,10 @@
     "logoutConfirmationTitle",
     "logoutConfirmationMessage",
     "newChangeApplied",
-    "errorOccurred"
+    "errorOccurred",
+    "login",
+    "resetPassword",
+    "email",
+    "password"
   ]
 }

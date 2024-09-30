@@ -58,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
           onPressed: () async => _showLogoutConfirmation(context),
           icon: Icon(
             Icons.logout_outlined,
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         )
       ],

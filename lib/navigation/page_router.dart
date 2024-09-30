@@ -8,19 +8,21 @@ import 'package:xiaokeai/navigation/nav_bar.dart';
 import 'package:xiaokeai/views/albums/albums_page.dart';
 import 'package:xiaokeai/views/auth_views/auth_flow.dart';
 import 'package:xiaokeai/views/auth_views/login_page.dart';
+import 'package:xiaokeai/views/auth_views/reset_password_page.dart';
 import 'package:xiaokeai/views/home_page.dart';
 import 'package:xiaokeai/views/memories/memories_page.dart';
+import 'package:xiaokeai/views/memories/new_memory_page.dart';
 import 'package:xiaokeai/views/settings_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
-final _shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
+final _navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
 
 final router = GoRouter(
   initialLocation: '/',
   navigatorKey: _rootNavigatorKey,
   routes: [
     ShellRoute(
-      navigatorKey: _shellNavigatorKey,
+      navigatorKey: _navbarNavigatorKey,
       builder: (context, state, child) {
         return NavBar(child: child);
       },
@@ -36,10 +38,16 @@ final router = GoRouter(
           builder: (context, state) => SettingsPage(),
         ),
         GoRoute(
-          path: '/memories',
-          name: 'MemoriesPage',
-          builder: (context, state) => MemoriesPage(),
-        ),
+            path: '/memories',
+            name: 'MemoriesPage',
+            builder: (context, state) => MemoriesPage(),
+            routes: [
+              GoRoute(
+                path: 'new/memory',
+                name: 'NewMemory',
+                builder: (context, state) => NewMemoryPage(),
+              ),
+            ]),
         GoRoute(
           path: '/albums',
           name: 'AlbumsPage',
@@ -59,18 +67,11 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => LoginPage(),
     ),
-    // GoRoute(
-    //   path: '/reset-password',
-    //   name: 'ResetPasswordPage',
-    //   parentNavigatorKey: _rootNavigatorKey,
-    //   builder: (context, state) => const ResetPasswordPage(),
-    // ),
-
     GoRoute(
-      path: '/new/memory',
-      name: 'NewMemory',
-      // parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => const Text("NewMemory"),
+      path: '/reset-password',
+      name: 'ResetPasswordPage',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const ResetPasswordPage(),
     ),
   ],
 );

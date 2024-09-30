@@ -11,3 +11,4 @@
 - Initial Development: Added the navigation and navbar as well as simple placeholder pages, and other improvements on September 28, 2024 -> **0.0.6** by Luke
 - Initial Development: Added router system, added setting page draft, and other improvements on September 29, 2024 -> **0.0.7** by Luke
 - Initial Development: Added a placeholder for auth and memories and album pages, improved settings page, improved navbar, and other improvements on September 29, 2024 -> **0.0.8** by Luke
+- Initial Development: Redesigned ui of reset password and login page, and other improvements on September 29, 2024 -> **0.0.9** by Luke

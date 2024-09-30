@@ -63,5 +63,21 @@
   "underDevelopment": "Under development",
   "@underDevelopment": {
     "description": "indicates that this is under development"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login"
+  },
+  "resetPassword": "Reset Password",
+  "@resetPassword": {
+    "description": "Reset Password"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password"
   }
 }

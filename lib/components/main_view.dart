@@ -11,13 +11,14 @@ Scaffold mainView(BuildContext context,
     Color? appBarBackgroundColor,
     bool? extendBodyBehindAppBar = false}) {
   return Scaffold(
+      extendBodyBehindAppBar: extendBodyBehindAppBar!,
       appBar: AppBar(
         foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
         backgroundColor: appBarBackgroundColor ??
             Theme.of(context).appBarTheme.backgroundColor,
         title: Text(
           appBarTitle!,
-          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: appbarActions,
       ),

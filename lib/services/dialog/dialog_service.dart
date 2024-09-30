@@ -97,21 +97,21 @@ class DialogService {
     return button.isDestructive
         ? ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(
                   borderRadius: UiConsts.BorderRadiusCircular_standard),
             ),
             onPressed: button.onPressed,
             child: Text(
               button.text,
-              style: TextStyle(color: Theme.of(context).colorScheme.onError),
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             ),
           )
         : TextButton(
             onPressed: button.onPressed,
             child: Text(
               button.text,
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           );
   }
