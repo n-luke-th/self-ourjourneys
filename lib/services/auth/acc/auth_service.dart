@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:xiaokeai/errors/auth_exception/auth_exception.dart';
+import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/helpers/rate_limiter.dart';
 import 'package:xiaokeai/shared/errors_code_and_msg/auth_errors.dart';
 // import 'package:flutter/foundation.dart'
@@ -16,7 +17,7 @@ import 'package:xiaokeai/shared/errors_code_and_msg/auth_errors.dart';
 
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final Logger _logger = Logger();
+  final Logger _logger = locator<Logger>();
   final RateLimiter _rateLimiter = RateLimiter();
 
   FirebaseAuth? get authInstance => _auth;

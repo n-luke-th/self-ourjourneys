@@ -16,6 +16,11 @@ import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 final GetIt getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
+  // getIt.registerLazySingleton(() => AuthService());
+  // getIt.registerLazySingleton(() => AuthWrapper());
+
+  // getIt.registerLazySingleton(() => CloudObjectStorageService());
+  // getIt.registerLazySingleton(() => CloudObjectStorageWrapper());
   setupAuthServices();
   setupCloudObjectStorageServices();
   // getIt.registerLazySingleton(() => FirestoreService());

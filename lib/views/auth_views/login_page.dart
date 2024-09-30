@@ -126,7 +126,7 @@ class _LoginPage extends State<LoginPage> {
                               hoverColor: fillColorEmail,
                               floatingLabelStyle:
                                   TextStyle(color: labelTextColorEmail),
-                              labelStyle: TextStyle(color: labelTextColorEmail),
+                              // labelStyle: TextStyle(color: labelTextColorEmail),
                               errorStyle: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme
@@ -206,8 +206,8 @@ class _LoginPage extends State<LoginPage> {
                               hoverColor: fillColorPassword,
                               floatingLabelStyle:
                                   TextStyle(color: labelTextColorPassword),
-                              labelStyle:
-                                  TextStyle(color: labelTextColorPassword),
+                              // labelStyle:
+                              //     TextStyle(color: labelTextColorPassword),
                               errorStyle: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme

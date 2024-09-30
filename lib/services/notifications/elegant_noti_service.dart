@@ -4,9 +4,11 @@
 /// config how elegant noti will look here
 
 import 'package:elegant_notification/resources/arrays.dart';
+import 'package:elegant_notification/resources/stacked_options.dart';
 import 'package:flutter/material.dart';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:xiaokeai/services/notifications/notification_service.dart';
+import 'package:xiaokeai/shared/views/ui_consts.dart';
 
 class ElegantNotificationService implements NotificationService {
   @override
@@ -23,12 +25,22 @@ class ElegantNotificationService implements NotificationService {
             description: Text(data.message,
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onSecondary)),
+            borderRadius: UiConsts.BorderRadiusCircular_standard,
             icon: Icon(_getIcon(data.type), color: _getColor(data.type)),
             toastDuration: data.duration,
             animationDuration: const Duration(milliseconds: 300),
-            position: Alignment.topCenter,
+            position: data.position,
             animation: AnimationType.fromTop,
             displayCloseButton: data.showCloseBtn,
+            progressBarPadding: UiConsts.PaddingAll_standard,
+            shadow: BoxShadow(
+                color: Theme.of(context).dialogBackgroundColor,
+                blurRadius: UiConsts.borderRadius),
+            stackedOptions: StackedOptions(
+                scaleFactor: BorderSide.strokeAlignCenter, key: 'stack_'),
+            progressIndicatorBackground:
+                Theme.of(context).colorScheme.secondary,
+            progressIndicatorColor: Theme.of(context).colorScheme.onSecondary,
             background: data.backgroundColor == null
                 ? Theme.of(context).colorScheme.secondaryContainer
                 : data.backgroundColor!)

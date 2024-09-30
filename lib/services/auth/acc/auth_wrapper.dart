@@ -13,6 +13,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/services/dialog/dialog_service.dart';
 import 'package:xiaokeai/services/notifications/notification_manager.dart';
@@ -22,7 +23,7 @@ import 'package:xiaokeai/services/object_storage/cloud_object_storage_wrapper.da
 import 'package:xiaokeai/shared/services/firebase_storage_enum.dart';
 
 class AuthWrapper {
-  final Logger _logger = Logger();
+  final Logger _logger = locator<Logger>();
   final AuthService _auth = getIt<AuthService>();
   final CloudObjectStorageWrapper _cloudObjectStorageWrapper =
       getIt<CloudObjectStorageWrapper>();

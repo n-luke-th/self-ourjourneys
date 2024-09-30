@@ -80,7 +80,8 @@ class _SettingsPageState extends State<SettingsPage> {
             if (packageInfo == null) {
               return const Center(child: Text("No version found!"));
             }
-            _logger.i("version: ${packageInfo.version}");
+            _logger.i(
+                "version: ${packageInfo.version} | build num: ${packageInfo.buildNumber}");
             return Padding(
               padding: UiConsts.PaddingAll_large,
               child: Center(

@@ -11,7 +11,7 @@ import 'package:logger/logger.dart';
 import 'package:universal_io/io.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
-import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
+import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 import 'package:xiaokeai/shared/common/file_picker_enum.dart';
 import 'package:xiaokeai/shared/services/firebase_storage_enum.dart';
@@ -20,7 +20,7 @@ class CloudObjectStorageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final int _defaultUploadLimit = 10 * 1024 * 1024; // 10 MB
   final SharedPreferencesService _prefs = getIt<SharedPreferencesService>();
-  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
+  final AuthService _auth = getIt<AuthService>();
   final Logger _logger = locator<Logger>();
 
   CloudObjectStorageService();
@@ -66,7 +66,7 @@ class CloudObjectStorageService {
       _logger.d(firebaseStoragePath!.value);
       final ref = _storage
           .ref(
-              "/${firebaseStoragePath.value}/${_authWrapper.getCurrentUserAttributes()!['uid']}/")
+              "/${firebaseStoragePath.value}/${_auth.getCurrentUserAttributes()!['uid']}/")
           .child(path);
       UploadTask uploadTask;
 
@@ -126,7 +126,7 @@ class CloudObjectStorageService {
 
       final ref = _storage
           .ref(
-              "/${firebaseStoragePath!.value}/${_authWrapper.getCurrentUserAttributes()!['uid']}/")
+              "/${firebaseStoragePath!.value}/${_auth.getCurrentUserAttributes()!['uid']}/")
           .child(path);
       final url = await ref.getDownloadURL();
       await _cacheFileMetadata(path, url);
@@ -147,7 +147,7 @@ class CloudObjectStorageService {
     try {
       ref = _storage
           .ref(
-              "/${firebaseStoragePath.value}/${_authWrapper.getCurrentUserAttributes()!['uid']}/")
+              "/${firebaseStoragePath.value}/${_auth.getCurrentUserAttributes()!['uid']}/")
           .child(path);
       await ref.delete();
       await _deleteCachedFileMetadata(path);
@@ -163,7 +163,7 @@ class CloudObjectStorageService {
       {FirebaseStoragePaths? firebaseStoragePath =
           FirebaseStoragePaths.userContent}) async {
     final storageRef = _storage.ref(
-        "/${firebaseStoragePath!.value}/${_authWrapper.getCurrentUserAttributes()!['uid']}/");
+        "/${firebaseStoragePath!.value}/${_auth.getCurrentUserAttributes()!['uid']}/");
     final folderRef = storageRef.child("uploads");
 
     try {
@@ -190,7 +190,7 @@ class CloudObjectStorageService {
     try {
       final ref = _storage
           .ref(
-              "/${firebaseStoragePath.value}/${_authWrapper.getCurrentUserAttributes()!['uid']}/")
+              "/${firebaseStoragePath.value}/${_auth.getCurrentUserAttributes()!['uid']}/")
           .child(path);
       final metadata = await ref.getMetadata();
       final lastModified = metadata.updated ?? metadata.timeCreated;

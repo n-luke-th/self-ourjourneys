@@ -79,6 +79,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
+                              floatingLabelStyle: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
                               errorStyle: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme
