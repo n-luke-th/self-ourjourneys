@@ -116,6 +116,14 @@ class Xiaokeai extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingsService>(builder: (context, settings, child) {
       return GlobalLoaderOverlay(
+        overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        overlayWidgetBuilder: (progress) => Center(
+          child: LoadingAnimationWidget.beat(
+            // color: Color(0xFF8FE8FF),
+            color: Theme.of(context).colorScheme.primary,
+            size: 56,
+          ),
+        ),
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'Xiaokeai',

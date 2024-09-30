@@ -5,6 +5,7 @@
 
 // ignore_for_file: use_build_context_synchronously
 // TODO: edit this auth wrapper
+// TODO: localize this file
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:xiaokeai/errors/auth_exception/auth_exception.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/services/auth/acc/auth_service.dart';
@@ -89,8 +91,6 @@ class AuthWrapper {
         emailController.text.trim(),
         passwordController.text,
       );
-
-      // TODO: localize this
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
@@ -98,18 +98,9 @@ class AuthWrapper {
                 message: 'Registration successful, you may now login!',
                 type: CustomNotificationType.success),
           );
-      _logger.i('register success!');
+      _logger.d('register success!');
       context.pushNamed("Login");
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = AuthService.getReadableFirebaseAuthErrorMessage(e);
-      context.read<NotificationManager>().showNotification(
-            context,
-            NotificationData(
-                title: 'Failed',
-                message: _errorMessage,
-                type: CustomNotificationType.error),
-          );
-    } catch (e) {
+    } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
             context,
@@ -164,7 +155,7 @@ class AuthWrapper {
       BuildContext context,
       TextEditingController emailController,
       TextEditingController passwordController) async {
-    _logger.i("user selected to login with native provider");
+    _logger.d("user selected to login with native provider");
     try {
       await _auth.signInWithEmailAndPassword(
         emailController.text.trim(),
@@ -178,20 +169,11 @@ class AuthWrapper {
                 message: "Welcome back, $_displayName",
                 type: CustomNotificationType.success),
           );
-      _logger.i("user: '$_displayName' login success!");
+      _logger.d("user: '$_displayName' login success!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
       context.pushReplacementNamed('AuthFlow');
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = AuthService.getReadableFirebaseAuthErrorMessage(e);
-      context.read<NotificationManager>().showNotification(
-            context,
-            NotificationData(
-                title: 'Failed',
-                message: _errorMessage,
-                type: CustomNotificationType.error),
-          );
-    } catch (e) {
+    } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
             context,

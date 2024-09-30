@@ -7,7 +7,7 @@
 /// and `3` is `error term` that can divided into 2 parts where
 /// first letter is where error is likely originated.
 ///
-/// (`C` for client side error, `S` for server side error, `U` for unknown/unsure origin)
+/// (`C` for client side error, `S` for server side error, `U` for unknown/unsure/uncategorized origin)
 ///
 /// while another part is just a number (00 - 99) indicates different errors
 ///

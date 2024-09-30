@@ -80,24 +80,144 @@ class AuthService with ChangeNotifier {
     }
   }
 
+  void _mapFirebaseErrorsAndThrowsError(FirebaseAuthException e) {
+    switch (e.code) {
+      /// below are shared cases
+      case 'invalid-email':
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C01,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "operation-not-allowed":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S01,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case 'weak-password':
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C02,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "user-disabled":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S02,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case 'email-already-in-use':
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C03,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "invalid-credential":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C04,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+
+      /// below are sign in related
+      case 'user-not-found':
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C05,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case 'wrong-password':
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C06,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case 'too-many-requests':
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C07,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "invalid-verification-code":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C08,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+
+      /// below are forgot password related
+      case "auth/invalid-email":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C01,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "auth/missing-android-pkg-name":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S03,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "auth/missing-continue-uri":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S04,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "auth/missing-ios-bundle-id":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S05,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "auth/invalid-continue-uri":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S06,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "auth/unauthorized-continue-uri":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S07,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "auth/user-not-found":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C10,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "expired-action-code":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S08,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "invalid-action-code":
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S09,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+
+      /// others
+      case "requires-recent-login":
+        // TODO: make sure to handle the redirection and identity verification
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_C11,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+
+      /// default error
+      default:
+        throw AuthException(
+            errorEnum: AuthErrors.AUTH_S00,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+    }
+  }
+
   Future<UserCredential?> signInWithEmailAndPassword(
       String email, String password) async {
     if (!_rateLimiter.canAttempt(email)) {
       throw AuthException(errorEnum: AuthErrors.AUTH_C07);
     }
-
     try {
       return await _auth.signInWithEmailAndPassword(
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      _logger.e('Sign in failed: ${e.message}',
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e);
     } catch (e) {
-      _logger.e('Unexpected error during sign in: ${e.toString()}',
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
+    return null;
   }
 
   Future<UserCredential?> registerWithEmailAndPassword(

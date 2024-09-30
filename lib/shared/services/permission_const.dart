@@ -3,4 +3,11 @@
 /// we will define the consts or enum for Permission that might be reusable here
 ///
 
-enum PermissionConst { photos }
+enum PermissionConst {
+  photos,
+  locationWhenInUse,
+  calendarFullAccess,
+  calendarWriteOnly,
+  notifications,
+  accessNotificationPolicy
+}

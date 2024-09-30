@@ -3,11 +3,12 @@
 /// login page
 /// TODO: edit this page
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 import 'package:xiaokeai/shared/views/ui_consts.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -20,6 +21,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPage extends State<LoginPage> {
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final SharedPreferencesService _prefs = getIt<SharedPreferencesService>();
   final _formKey = GlobalKey<FormState>();
   final _emailKey = GlobalKey<FormFieldState>();
@@ -291,19 +293,16 @@ class _LoginPage extends State<LoginPage> {
     );
   }
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Implement Firebase login logic here
-      FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      )
-          .then((userCredential) {
-        // Navigate to home page or show success message
-      }).catchError((error) {
-        // Show error message
-      });
+  Future<void> _login() async {
+    try {
+      context.loaderOverlay.show();
+      if (_formKey.currentState!.validate()) {
+        await _authWrapper.handleSignIn(
+            context, _emailController, _passwordController);
+      }
+    } finally {
+      // ignore: use_build_context_synchronously
+      context.loaderOverlay.hide();
     }
   }
 }

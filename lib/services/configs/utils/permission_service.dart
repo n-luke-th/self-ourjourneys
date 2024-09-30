@@ -8,6 +8,11 @@ import 'package:xiaokeai/shared/services/permission_const.dart';
 class PermissionsService {
   final List<Permission> _permissions = [
     if (Platform.isAndroid || Platform.isIOS) Permission.photos,
+    if (Platform.isAndroid || Platform.isIOS) Permission.locationWhenInUse,
+    if (Platform.isAndroid || Platform.isIOS) Permission.calendarFullAccess,
+    if (Platform.isAndroid || Platform.isIOS) Permission.calendarWriteOnly,
+    Permission.notification,
+    // if (Platform.isAndroid) Permission.accessNotificationPolicy
   ];
 
   List<Permission> get permissionsList => _permissions;
@@ -42,6 +47,26 @@ class PermissionsService {
               'Unsupported on web for permission : $permission');
         }
         return await Permission.photos.status;
+      case PermissionConst.locationWhenInUse:
+        if (kIsWeb) {
+          throw UnsupportedError(
+              'Unsupported on web for permission : $permission');
+        }
+        return await Permission.locationWhenInUse.status;
+      case PermissionConst.calendarFullAccess:
+        if (kIsWeb) {
+          throw UnsupportedError(
+              'Unsupported on web for permission : $permission');
+        }
+        return await Permission.calendarFullAccess.status;
+      case PermissionConst.calendarWriteOnly:
+        if (kIsWeb) {
+          throw UnsupportedError(
+              'Unsupported on web for permission : $permission');
+        }
+        return await Permission.calendarWriteOnly.status;
+      case PermissionConst.notifications:
+        return await Permission.notification.status;
       default:
         throw ArgumentError('Unsupported permission: $permission');
     }

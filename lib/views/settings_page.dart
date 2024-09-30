@@ -329,7 +329,7 @@ class _SettingDropdownState<T> extends State<SettingDropdown<T>> {
       title: Text(widget.title),
       trailing: _isChanging
           ? LoadingAnimationWidget.twoRotatingArc(
-              color: Theme.of(context).colorScheme.onSurface, size: 20)
+              color: Theme.of(context).colorScheme.onSurface, size: 22)
           : Row(
               mainAxisSize: MainAxisSize.min,
               children: [

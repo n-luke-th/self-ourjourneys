@@ -5,7 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:xiaokeai/errors/base/base_error_enum.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
 
-class BaseException implements Exception {
+abstract class BaseException implements Exception {
   final ErrorType errorEnum;
   // final String message;
   final Logger _logger = locator<Logger>();
@@ -28,9 +28,18 @@ class BaseException implements Exception {
     );
   }
 
+  /// returns the full error string with useful details that possibly get
+  String getFullErrorString() {
+    return "Error thrown from '${runtimeType.toString().split('.').last}' -> '${errorEnum.code}' : '${errorEnum.message}'\n [Extended details: '${errorDetailsFromDependency ?? 'Null'}']";
+  }
+
   @override
+
+  /// returns the code and its msg in the following format
+  ///
+  /// `${code}: ${msg}`
   String toString() {
-    return "${runtimeType.toString().split('.').last}:\n ${errorEnum.code}: ${errorEnum.message}";
+    return "${errorEnum.code}: ${errorEnum.message}";
   }
 
   void _logError(
@@ -40,7 +49,7 @@ class BaseException implements Exception {
       required Object? error,
       required StackTrace? st}) {
     _logger.e(
-        "Error thrown from '${runtimeType.toString().split('.').last}' -> '$code' : '${message ?? ''}'\n [Extended details: '${extDetails ?? 'null'}']",
+        "Error thrown from '${runtimeType.toString().split('.').last}' -> '$code' : '${message ?? ''}'\n [Extended details: '${error.runtimeType.toString().split('.').lastOrNull}' -> '${extDetails ?? 'Null'}']",
         error: error,
         stackTrace: st ?? StackTrace.current);
   }

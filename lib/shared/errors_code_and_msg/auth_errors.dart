@@ -37,7 +37,7 @@ enum AuthErrors implements ErrorType {
   /// The verification code of the credential is not valid.
   AUTH_C08('The verification code of the credential is not valid.'),
 
-  /// The provided email address is not valid (alternative message).
+  /// The provided email address is not valid.
   AUTH_C09('The provided email address is not valid.'),
 
   /// No user account found that is associated with the provided email address.
@@ -48,6 +48,9 @@ enum AuthErrors implements ErrorType {
   AUTH_C11('You are required to verify your identity before process.'),
 
   // Server-side errors (AUTH_S)
+
+  /// Something went wrong with our backend service, please try again. (error thrown from backend service but don't know what it is)
+  AUTH_S00('Something went wrong with our backend service, please try again.'),
 
   /// The requested operation is not allowed.
   AUTH_S01('The requested operation is not allowed'),
