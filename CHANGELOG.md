@@ -13,4 +13,5 @@
 - Initial Development: Added a placeholder for auth and memories and album pages, improved settings page, improved navbar, and other improvements on September 29, 2024 -> **0.0.8** by Luke
 - Initial Development: Redesigned ui of reset password and login page, and other improvements on September 30, 2024 -> **0.0.9** by Luke
 - Initial Development: Added launcher icon on September 30, 2024 -> **0.1.0** by Luke
-- Initial Development: Attempted to fix laucher icon for Android on September 30, 2024 -> **0.1.0+1** by Luke
+- Initial Development: Attempted to fix launcher icon for Android on September 30, 2024 -> **0.1.0+1** by Luke
+- Initial Development: Launcher icon works on all platform on September 30, 2024 -> **0.1.0+2** by Luke

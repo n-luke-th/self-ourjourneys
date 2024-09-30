@@ -18,7 +18,7 @@
 ### Launcher icon
 
 - config the [`launcher_icons.yaml`](launcher_icons.yaml) file then
-- (everytime after changes were made) regenerate the launcher icon based on the [`launcher_icons.yaml`](launcher_icons.yaml) file by run command: `dart run flutter_launcher_icons -f launcher_icons.yaml`
+- (everytime after changes were made) regenerate the launcher icon based on the [`launcher_icons.yaml`](launcher_icons.yaml) file by run command: `dart run icons_launcher:create --path launcher_icons.yaml`
 
 ### l10n
 
