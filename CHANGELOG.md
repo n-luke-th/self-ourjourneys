@@ -15,3 +15,4 @@
 - Initial Development: Added launcher icon on September 30, 2024 -> **0.1.0** by Luke
 - Initial Development: Attempted to fix launcher icon for Android on September 30, 2024 -> **0.1.0+1** by Luke
 - Initial Development: Launcher icon works on all platform on September 30, 2024 -> **0.1.0+2** by Luke
+- Initial Development: Updated launch screen on all platform on September 30, 2024 -> **0.1.0+3** by Luke
