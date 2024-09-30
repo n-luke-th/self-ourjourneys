@@ -11,22 +11,21 @@
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Requires access to the photo library for features such as Memories and Albums.</string>
 		<!-- Permission options for the `calendar` group -->
-    	<key>NSCalendarsUsageDescription</key>
-    	<string>Calendars</string>
-    	<key>NSCalendarsFullAccessUsageDescription</key>
-    	<string>Calendar full access</string>
+		<key>NSCalendarsUsageDescription</key>
+		<string>Calendars</string>
+		<key>NSCalendarsFullAccessUsageDescription</key>
+		<string>Calendar full access</string>
 		<!-- Permission options for the `location` group -->
-    	<key>NSLocationWhenInUseUsageDescription</key>
-    	<string>Need location when in use</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Need location when in use</string>
 		<!-- Permission options for the `mediaLibrary` group -->
-    	<key>NSAppleMusicUsageDescription</key>
-    	<string>Music!</string>
-    	<key>kTCCServiceMediaLibrary</key>
-   	 	<string>media</string>
+		<key>NSAppleMusicUsageDescription</key>
+		<string>Music!</string>
+		<key>kTCCServiceMediaLibrary</key>
+		<string>media</string>
 		<key>NSUserNotificationsUsageDescription</key>
 		<string>notification</string>
 		<!-- end of the permission list -->
-
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
