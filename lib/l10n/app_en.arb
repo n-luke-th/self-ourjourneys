@@ -79,5 +79,37 @@
   "password": "Password",
   "@password": {
     "description": "Password"
+  },
+  "loggedIn": "Logged in!",
+  "@loggedIn": {
+    "description": "A pop up notification to user that he/she is now logged in to the system"
+  },
+  "welcomeBackWithDisplayNameNext": "Welcome back, ",
+  "@welcomeBackWithDisplayNameNext": {
+    "description": "A welcoming pop up notification to user that he/she is now logged in to the system"
+  },
+  "askForUserEmail": "Please submit your email in order to process the operation.",
+  "@askForUserEmail": {
+    "description": "A sentence to asking user that his/her email is required to perform the requested operation such as reset accound password."
+  },
+  "accPasswordIsUpdated": "Your account password has been updated!",
+  "@accPasswordIsUpdated": {
+    "description": "A sentence inform user that his/her acc password is updated."
+  },
+  "success": "Success!",
+  "@success": {
+    "description": "Success!"
+  },
+  "warning": "Warning!",
+  "@warning": {
+    "description": "Warning!"
+  },
+  "failed": "Failed!",
+  "@failed": {
+    "description": "Failed!"
+  },
+  "reauthenticated": "Reauthenticated!",
+  "@reauthenticated": {
+    "description": "Reauthenticated!"
   }
 }

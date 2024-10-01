@@ -19,3 +19,4 @@
 - Initial Development: Setup the underlying authentication + cloud object storage service and their wrappers, improved the global error system + added auth error code and msg, and other improvements on October 1, 2024 -> **0.1.1** by Luke
 - Initial Development: Fixed the dead lock for dependencies creation with getIt, and other improvements on October 1, 2024 -> **0.1.2** by Luke
 - Initial Development: Made progress on authentication process, and other improvements on October 1, 2024 -> **0.1.3** by Luke
+- Initial Development: Login + logout and reset password seems working, and other improvements on October 2, 2024 -> **0.1.4** by Luke

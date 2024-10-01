@@ -3,10 +3,11 @@
 /// reset password page
 /// TODO: edit this page
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/shared/views/ui_consts.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -17,8 +18,15 @@ class ResetPasswordPage extends StatefulWidget {
 }
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _emailController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +68,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       ),
                       SizedBox(height: 30),
                       Text(
-                        'Enter your email to reset your password',
+                        AppLocalizations.of(context)!.askForUserEmail,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18),
@@ -145,23 +153,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   void _resetPassword() {
     if (_formKey.currentState!.validate()) {
-      // Implement Firebase password reset logic here
-      FirebaseAuth.instance
-          .sendPasswordResetEmail(
-        email: _emailController.text,
-      )
-          .then((_) {
-        // Show success message and navigate back
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Password reset email sent')),
-        );
-        Navigator.of(context).pop();
-      }).catchError((error) {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send password reset email')),
-        );
-      });
+      _authWrapper.handleSubmittedPasswordResetEmail(context, _emailController);
     }
   }
 }

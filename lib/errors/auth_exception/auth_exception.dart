@@ -7,5 +7,6 @@ class AuthException extends BaseException {
       {super.error,
       super.st,
       super.errorDetailsFromDependency,
+      super.process,
       required super.errorEnum});
 }

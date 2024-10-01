@@ -12,6 +12,14 @@
     "login",
     "resetPassword",
     "email",
-    "password"
+    "password",
+    "loggedIn",
+    "welcomeBackWithDisplayNameNext",
+    "askForUserEmail",
+    "accPasswordIsUpdated",
+    "success",
+    "warning",
+    "failed",
+    "reauthenticated"
   ]
 }

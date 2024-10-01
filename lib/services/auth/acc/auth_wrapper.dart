@@ -82,35 +82,35 @@ class AuthWrapper {
     }
   }
 
-  Future<void> handleRegister(
-      BuildContext context,
-      TextEditingController emailController,
-      TextEditingController passwordController) async {
-    try {
-      await _auth.registerWithEmailAndPassword(
-        emailController.text.trim(),
-        passwordController.text,
-      );
-      context.read<NotificationManager>().showNotification(
-            context,
-            NotificationData(
-                title: 'Success',
-                message: 'Registration successful, you may now login!',
-                type: CustomNotificationType.success),
-          );
-      _logger.d('register success!');
-      context.pushNamed("Login");
-    } on AuthException catch (e) {
-      _errorMessage = e.toString();
-      context.read<NotificationManager>().showNotification(
-            context,
-            NotificationData(
-                title: 'Failed',
-                message: _errorMessage,
-                type: CustomNotificationType.error),
-          );
-    }
-  }
+  // Future<void> handleRegister(
+  //     BuildContext context,
+  //     TextEditingController emailController,
+  //     TextEditingController passwordController) async {
+  //   try {
+  //     await _auth.registerWithEmailAndPassword(
+  //       emailController.text.trim(),
+  //       passwordController.text,
+  //     );
+  //     context.read<NotificationManager>().showNotification(
+  //           context,
+  //           NotificationData(
+  //               title: 'Success',
+  //               message: 'Registration successful, you may now login!',
+  //               type: CustomNotificationType.success),
+  //         );
+  //     _logger.d('register success!');
+  //     context.pushNamed("Login");
+  //   } on AuthException catch (e) {
+  //     _errorMessage = e.toString();
+  //     context.read<NotificationManager>().showNotification(
+  //           context,
+  //           NotificationData(
+  //               title: 'Failed',
+  //               message: _errorMessage,
+  //               type: CustomNotificationType.error),
+  //         );
+  //   }
+  // }
 
   // Future<void> handleContinueWithGG(BuildContext context) async {
   //   _logger.i("user selected to continue with Google");
@@ -165,8 +165,9 @@ class AuthWrapper {
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Logged in!',
-                message: "Welcome back, $_displayName",
+                title: AppLocalizations.of(context)!.loggedIn,
+                message:
+                    "${AppLocalizations.of(context)!.welcomeBackWithDisplayNameNext}$_displayName",
                 type: CustomNotificationType.success),
           );
       _logger.d("user: '$_displayName' login success!");
@@ -178,7 +179,7 @@ class AuthWrapper {
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Failed',
+                title: AppLocalizations.of(context)!.failed,
                 message: _errorMessage,
                 type: CustomNotificationType.error),
           );
@@ -193,7 +194,7 @@ class AuthWrapper {
   //     context.read<NotificationManager>().showNotification(
   //           context,
   //           NotificationData(
-  //               title: 'Reauthenticated!',
+  //               title: AppLocalizations.of(context)!.reauthenticated,
   //               message: "Identity for '$_displayName' has been verified!",
   //               type: CustomNotificationType.success),
   //         );
@@ -245,7 +246,7 @@ class AuthWrapper {
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Reauthenticated!',
+                title: AppLocalizations.of(context)!.reauthenticated,
                 message: "Identity for '$_displayName' has been verified!",
                 type: CustomNotificationType.success),
           );
@@ -265,7 +266,7 @@ class AuthWrapper {
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Failed',
+                title: AppLocalizations.of(context)!.failed,
                 message: _errorMessage,
                 type: CustomNotificationType.error),
           );
@@ -285,18 +286,18 @@ class AuthWrapper {
     BuildContext context,
     TextEditingController newPasswordController,
   ) async {
-    _logger.i("user submitted a request to change password");
+    _logger.d("user submitted a request to change password");
     try {
       await _auth.updateUserAccountPassword(newPasswordController.text);
 
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Updated',
-                message: "Your account password has been updated!",
+                title: AppLocalizations.of(context)!.newChangeApplied,
+                message: AppLocalizations.of(context)!.accPasswordIsUpdated,
                 type: CustomNotificationType.success),
           );
-      _logger.i("user account password is updated!");
+      _logger.d("user account password is updated!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
       context.goNamed('Settings');
@@ -305,7 +306,7 @@ class AuthWrapper {
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Failed',
+                title: AppLocalizations.of(context)!.failed,
                 message: _errorMessage,
                 type: CustomNotificationType.error),
           );
@@ -314,7 +315,7 @@ class AuthWrapper {
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Failed',
+                title: AppLocalizations.of(context)!.failed,
                 message: _errorMessage,
                 type: CustomNotificationType.error),
           );
@@ -325,8 +326,9 @@ class AuthWrapper {
     BuildContext context,
     TextEditingController emailController,
   ) async {
-    _logger.i(
-        "trying to send the password reset email to ${emailController.text.trim()}");
+    // TODO: edit this method
+    _logger.d(
+        "trying to send the password reset email to '${emailController.text.trim()}'");
     try {
       await _auth.resetPassword(emailController.text.trim());
       context.read<NotificationManager>().showNotification(
@@ -335,6 +337,7 @@ class AuthWrapper {
               title: "Password reset email has been sent to your mailbox!",
               message: "Please checkout the email we have sent you.",
               type: CustomNotificationType.success));
+      context.pushReplacementNamed("LoginPage");
       // TODO: handle email sent page
       // Navigator.push(
       //   context,
@@ -342,28 +345,15 @@ class AuthWrapper {
       //       builder: (context) =>
       //           EmailSentPage(email: emailController.text.trim())),
       // );
-    } on FirebaseAuthException catch (e) {
-      _logger.e(
-          "error occured during sending the password reset email: ${AuthService.getReadableFirebaseAuthErrorMessage(e)}",
-          error: e,
-          stackTrace: StackTrace.current);
+    } on AuthException catch (e) {
+      _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
-          context,
-          NotificationData(
-              title: "Failed",
-              message: AuthService.getReadableFirebaseAuthErrorMessage(e),
-              type: CustomNotificationType.error));
-    } catch (e) {
-      _logger.e(
-          "error occured during sending the password reset email: ${e.toString()}",
-          error: e,
-          stackTrace: StackTrace.current);
-      context.read<NotificationManager>().showNotification(
-          context,
-          NotificationData(
-              title: "Failed",
-              message: "Something went wrong, please try again.",
-              type: CustomNotificationType.error));
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.failed,
+                message: _errorMessage,
+                type: CustomNotificationType.error),
+          );
     }
   }
 

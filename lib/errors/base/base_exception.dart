@@ -7,7 +7,7 @@ import 'package:xiaokeai/helpers/logger_provider.dart';
 
 abstract class BaseException implements Exception {
   final ErrorType errorEnum;
-  // final String message;
+  final String? process;
   final Logger _logger = locator<Logger>();
   final String? errorDetailsFromDependency;
   final Object? error;
@@ -15,7 +15,7 @@ abstract class BaseException implements Exception {
 
   BaseException(
       {required this.errorEnum,
-      // required this.message,
+      this.process,
       this.error,
       this.st,
       this.errorDetailsFromDependency}) {
@@ -30,7 +30,13 @@ abstract class BaseException implements Exception {
 
   /// returns the full error string with useful details that possibly get
   String getFullErrorString() {
-    return "Error thrown from '${runtimeType.toString().split('.').last}' -> '${errorEnum.code}' : '${errorEnum.message}'\n [Extended details: '${errorDetailsFromDependency ?? 'Null'}']";
+    String returnedString =
+        "Error thrown from '${runtimeType.toString().split('.').last}' -> '${errorEnum.code}' : '${errorEnum.message}'\n [Extended details: '${errorDetailsFromDependency ?? 'Null'}']";
+    if (process != null) {
+      returnedString = "During '$process process' attempt, $returnedString";
+    }
+
+    return returnedString;
   }
 
   @override
@@ -48,9 +54,12 @@ abstract class BaseException implements Exception {
       String? extDetails,
       required Object? error,
       required StackTrace? st}) {
-    _logger.e(
-        "Error thrown from '${runtimeType.toString().split('.').last}' -> '$code' : '${message ?? ''}'\n [Extended details: '${error.runtimeType.toString().split('.').lastOrNull}' -> '${extDetails ?? 'Null'}']",
-        error: error,
-        stackTrace: st ?? StackTrace.current);
+    String logString =
+        "Error thrown from '${runtimeType.toString().split('.').last}' -> '$code' : '${message ?? ''}'\n [Extended details: '${error.runtimeType.toString().split('.').lastOrNull}' -> '${extDetails ?? 'Null'}']";
+    if (process != null) {
+      logString = "During '$process process' attempt, $logString";
+    }
+
+    _logger.e(logString, error: error, stackTrace: st ?? StackTrace.current);
   }
 }

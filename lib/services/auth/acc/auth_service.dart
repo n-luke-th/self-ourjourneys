@@ -80,36 +80,43 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  void _mapFirebaseErrorsAndThrowsError(FirebaseAuthException e) {
+  void _mapFirebaseErrorsAndThrowsError(
+      FirebaseAuthException e, String process) {
     switch (e.code) {
       /// below are shared cases
       case 'invalid-email':
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C01,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "operation-not-allowed":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S01,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case 'weak-password':
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C02,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "user-disabled":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S02,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case 'email-already-in-use':
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C03,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "invalid-credential":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C04,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
@@ -117,21 +124,25 @@ class AuthService with ChangeNotifier {
       /// below are sign in related
       case 'user-not-found':
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C05,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case 'wrong-password':
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C06,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case 'too-many-requests':
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C07,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "invalid-verification-code":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C08,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
@@ -139,46 +150,55 @@ class AuthService with ChangeNotifier {
       /// below are forgot password related
       case "auth/invalid-email":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C01,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "auth/missing-android-pkg-name":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S03,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "auth/missing-continue-uri":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S04,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "auth/missing-ios-bundle-id":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S05,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "auth/invalid-continue-uri":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S06,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "auth/unauthorized-continue-uri":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S07,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "auth/user-not-found":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C10,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "expired-action-code":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S08,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
       case "invalid-action-code":
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S09,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
@@ -187,6 +207,7 @@ class AuthService with ChangeNotifier {
       case "requires-recent-login":
         // TODO: make sure to handle the redirection and identity verification
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_C11,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
@@ -194,6 +215,7 @@ class AuthService with ChangeNotifier {
       /// default error
       default:
         throw AuthException(
+            process: process,
             errorEnum: AuthErrors.AUTH_S00,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
@@ -203,15 +225,16 @@ class AuthService with ChangeNotifier {
   Future<UserCredential?> signInWithEmailAndPassword(
       String email, String password) async {
     if (!_rateLimiter.canAttempt(email)) {
-      throw AuthException(errorEnum: AuthErrors.AUTH_C07);
+      throw AuthException(errorEnum: AuthErrors.AUTH_C07, process: 'login');
     }
     try {
       return await _auth.signInWithEmailAndPassword(
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e);
+      _mapFirebaseErrorsAndThrowsError(e, 'login');
     } catch (e) {
       throw AuthException(
+          process: "login",
           errorEnum: AuthErrors.AUTH_U00,
           st: StackTrace.current,
           errorDetailsFromDependency: e.toString(),
@@ -223,24 +246,23 @@ class AuthService with ChangeNotifier {
   Future<UserCredential?> registerWithEmailAndPassword(
       String email, String password) async {
     if (!_rateLimiter.canAttempt(email)) {
-      throw FirebaseAuthException(
-        code: 'too-many-requests',
-        message: 'Too many registration attempts. Please try again later.',
-      );
+      throw AuthException(errorEnum: AuthErrors.AUTH_C07, process: 'register');
     }
 
     try {
       return await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      _logger.e('Registration failed: ${e.message}',
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, 'register');
     } catch (e) {
-      _logger.e('Unexpected error during registration: ${e.toString()}',
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "register",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
+    return null;
   }
 
   /// sign user out from the system
@@ -249,13 +271,14 @@ class AuthService with ChangeNotifier {
       await _auth.signOut();
       _logger.i("logout success");
     } on FirebaseAuthException catch (e) {
-      _logger.e("Failed to logout: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, 'signout');
     } catch (e) {
-      _logger.e('Sign out failed: ${e.toString()}',
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "signout",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
@@ -264,17 +287,18 @@ class AuthService with ChangeNotifier {
   /// must call `completePasswordReset` after
   Future<void> resetPassword(String email) async {
     try {
-      await _auth.setLanguageCode("th"); // set the locale to THAI
+      // await _auth.setLanguageCode("th"); // TODO: set the locale to current locale
       await _auth.sendPasswordResetEmail(email: email);
-      _logger.i("reset password email has been sent to email: $email");
+      _logger.d("reset password email has been sent to email: $email");
     } on FirebaseAuthException catch (e) {
-      _logger.e('Password reset failed: ${e.message}',
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, 'reset user account password');
     } catch (e) {
-      _logger.e('Unexpected error during password reset: ${e.toString()}',
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "reset user account password",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
@@ -285,13 +309,14 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.confirmPasswordReset(code: code, newPassword: newPassword);
     } on FirebaseAuthException catch (e) {
-      _logger.e("Reset password failed: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, 'reset user account password');
     } catch (e) {
-      _logger.e('Unexpected error during password reset: ${e.toString()}',
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "reset user account password",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
@@ -303,13 +328,14 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.currentUser?.delete();
     } on FirebaseAuthException catch (e) {
-      _logger.e("failed to delete user account: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, 'delete user account');
     } catch (e) {
-      _logger.e("failed to delete user account: ${e.toString()}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "delete user account",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
@@ -318,13 +344,14 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.currentUser?.updateDisplayName(newDisplayName);
     } on FirebaseAuthException catch (e) {
-      _logger.e("failed to update user's display name: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, "update user's display name");
     } catch (e) {
-      _logger.e("failed to update user's display name: ${e.toString()}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "update user's display name",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
@@ -333,13 +360,14 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.currentUser?.updatePhotoURL(newProfilePicURL);
     } on FirebaseAuthException catch (e) {
-      _logger.e("failed to update user's profile pic: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, "update user's profile pic");
     } catch (e) {
-      _logger.e("failed to update user's profile pic: ${e.toString()}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "update user's profile pic",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
@@ -348,13 +376,14 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.currentUser?.updatePassword(newPassword);
     } on FirebaseAuthException catch (e) {
-      _logger.e("failed to update user's account password: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, "update user's account password");
     } catch (e) {
-      _logger.e("failed to update user's account password: ${e.toString()}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "update user's account password",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
