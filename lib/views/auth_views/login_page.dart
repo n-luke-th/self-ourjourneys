@@ -267,7 +267,7 @@ class _LoginPage extends State<LoginPage> {
                       ),
                       UiConsts.SizedBoxGapVertical_large,
                       ElevatedButton(
-                        onPressed: _login,
+                        onPressed: () async => _login(),
                         style: ElevatedButton.styleFrom(
                           foregroundColor:
                               Theme.of(context).colorScheme.onPrimaryContainer,
@@ -299,6 +299,7 @@ class _LoginPage extends State<LoginPage> {
       if (_formKey.currentState!.validate()) {
         await _authWrapper.handleSignIn(
             context, _emailController, _passwordController);
+        _passwordController.clear();
       }
     } finally {
       // ignore: use_build_context_synchronously

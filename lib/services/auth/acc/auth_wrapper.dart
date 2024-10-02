@@ -94,7 +94,7 @@ class AuthWrapper {
   //     context.read<NotificationManager>().showNotification(
   //           context,
   //           NotificationData(
-  //               title: 'Success',
+  //               title: AppLocalizations.of(context)!.success,
   //               message: 'Registration successful, you may now login!',
   //               type: CustomNotificationType.success),
   //         );
@@ -105,7 +105,7 @@ class AuthWrapper {
   //     context.read<NotificationManager>().showNotification(
   //           context,
   //           NotificationData(
-  //               title: 'Failed',
+  //               title: AppLocalizations.of(context)!.failed,
   //               message: _errorMessage,
   //               type: CustomNotificationType.error),
   //         );
@@ -124,30 +124,19 @@ class AuthWrapper {
   //               message: "Welcome back, $_displayName",
   //               type: CustomNotificationType.success),
   //         );
-  //     _logger.i("continue with Google success!");
+  //     _logger.d("continue with Google success!");
   //     _logger
   //         .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
   //     context.pushReplacementNamed('AuthFlow');
-  //   } on FirebaseAuthException catch (e) {
-  //     _errorMessage = AuthService.getReadableErrorMessage(e);
-  //     context.read<NotificationManager>().showNotification(
-  //           context,
-  //           NotificationData(
-  //               title: 'Failed',
-  //               message: _errorMessage,
-  //               type: CustomNotificationType.error),
-  //         );
-  //     rethrow;
-  //   } catch (e) {
+  //   } on AuthException catch (e) {
   //     _errorMessage = e.toString();
   //     context.read<NotificationManager>().showNotification(
   //           context,
   //           NotificationData(
-  //               title: 'Failed',
+  //               title: AppLocalizations.of(context)!.failed,
   //               message: _errorMessage,
   //               type: CustomNotificationType.error),
   //         );
-  //     rethrow;
   //   }
   // }
 
@@ -187,7 +176,7 @@ class AuthWrapper {
   }
 
   // Future<void> handleReauthWithGG(BuildContext context) async {
-  //   _logger.i("user selected to reauth with Google");
+  //   _logger.d("user selected to reauth with Google");
   //   try {
   //     await _auth.reauthenticateUserWithGoogle();
   //     refreshAttributes();
@@ -198,7 +187,7 @@ class AuthWrapper {
   //               message: "Identity for '$_displayName' has been verified!",
   //               type: CustomNotificationType.success),
   //         );
-  //     _logger.i("reauth with Google success!");
+  //     _logger.d("reauth with Google success!");
   //     _logger
   //         .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
 
@@ -209,21 +198,12 @@ class AuthWrapper {
   //               emailAddress: _emailAddress,
   //               profilePicURL: _profilePicURL)),
   //     );
-  //   } on FirebaseAuthException catch (e) {
-  //     _errorMessage = AuthService.getReadableErrorMessage(e);
-  //     context.read<NotificationManager>().showNotification(
-  //           context,
-  //           NotificationData(
-  //               title: 'Failed',
-  //               message: _errorMessage,
-  //               type: CustomNotificationType.error),
-  //         );
-  //   } catch (e) {
+  //   } on AuthException catch (e) {
   //     _errorMessage = e.toString();
   //     context.read<NotificationManager>().showNotification(
   //           context,
   //           NotificationData(
-  //               title: 'Failed',
+  //               title: AppLocalizations.of(context)!.failed,
   //               message: _errorMessage,
   //               type: CustomNotificationType.error),
   //         );
@@ -250,7 +230,7 @@ class AuthWrapper {
                 message: "Identity for '$_displayName' has been verified!",
                 type: CustomNotificationType.success),
           );
-      _logger.i("user: '$_displayName' reauth with native provider success!");
+      _logger.d("user: '$_displayName' reauth with native provider success!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
       // TODO: handle push to profile page
@@ -261,21 +241,12 @@ class AuthWrapper {
       //           emailAddress: _emailAddress,
       //           profilePicURL: _profilePicURL)),
       // );
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = AuthService.getReadableFirebaseAuthErrorMessage(e);
-      context.read<NotificationManager>().showNotification(
-            context,
-            NotificationData(
-                title: AppLocalizations.of(context)!.failed,
-                message: _errorMessage,
-                type: CustomNotificationType.error),
-          );
-    } catch (e) {
+    } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Failed',
+                title: AppLocalizations.of(context)!.failed,
                 message: _errorMessage,
                 type: CustomNotificationType.error),
           );
@@ -301,16 +272,7 @@ class AuthWrapper {
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
       context.goNamed('Settings');
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = AuthService.getReadableFirebaseAuthErrorMessage(e);
-      context.read<NotificationManager>().showNotification(
-            context,
-            NotificationData(
-                title: AppLocalizations.of(context)!.failed,
-                message: _errorMessage,
-                type: CustomNotificationType.error),
-          );
-    } catch (e) {
+    } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
             context,
@@ -380,29 +342,20 @@ class AuthWrapper {
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Updated',
-                message: "Your account profile picture has been updated!",
+                title: AppLocalizations.of(context)!.newChangeApplied,
+                message: AppLocalizations.of(context)!.accProfilePicIsUpdated,
                 type: CustomNotificationType.success),
           );
-      _logger.i("user account profile picture is updated!");
+      _logger.d("user account profile picture is updated!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
       context.goNamed('Settings');
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = AuthService.getReadableFirebaseAuthErrorMessage(e);
-      context.read<NotificationManager>().showNotification(
-            context,
-            NotificationData(
-                title: 'Failed',
-                message: _errorMessage,
-                type: CustomNotificationType.error),
-          );
-    } catch (e) {
+    } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Failed',
+                title: AppLocalizations.of(context)!.failed,
                 message: _errorMessage,
                 type: CustomNotificationType.error),
           );

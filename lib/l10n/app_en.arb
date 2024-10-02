@@ -111,5 +111,21 @@
   "reauthenticated": "Reauthenticated!",
   "@reauthenticated": {
     "description": "Reauthenticated!"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save"
+  },
+  "passwordResentEmailHasBeenSent": "Password reset email has been sent to your mailbox!",
+  "@passwordResentEmailHasBeenSent": {
+    "description": "Password reset email has been sent to your mailbox!"
+  },
+  "pleaseCheckoutEmailWeSentYou": "Please checkout the email we have sent you.",
+  "@pleaseCheckoutEmailWeSentYou": {
+    "description": "Please checkout the email we have sent you."
+  },
+  "accProfilePicIsUpdated": "Your account profile picture has been updated!",
+  "@accProfilePicIsUpdated": {
+    "description": "A sentence inform user that his/her acc profile picture is updated."
   }
 }

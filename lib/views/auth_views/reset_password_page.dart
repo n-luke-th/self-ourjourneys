@@ -4,6 +4,7 @@
 /// TODO: edit this page
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
@@ -123,7 +124,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               border: InputBorder.none)),
                       UiConsts.SizedBoxGapVertical_large,
                       ElevatedButton(
-                        onPressed: _resetPassword,
+                        onPressed: () async => _resetPassword(),
                         style: ElevatedButton.styleFrom(
                           foregroundColor:
                               Theme.of(context).colorScheme.onTertiaryContainer,
@@ -151,9 +152,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     );
   }
 
-  void _resetPassword() {
-    if (_formKey.currentState!.validate()) {
-      _authWrapper.handleSubmittedPasswordResetEmail(context, _emailController);
+  Future<void> _resetPassword() async {
+    try {
+      context.loaderOverlay.show();
+      if (_formKey.currentState!.validate()) {
+        await _authWrapper.handleSubmittedPasswordResetEmail(
+            context, _emailController);
+      }
+    } finally {
+      // ignore: use_build_context_synchronously
+      context.loaderOverlay.hide();
     }
   }
 }

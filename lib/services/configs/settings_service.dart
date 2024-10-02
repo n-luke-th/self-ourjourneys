@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/services/configs/appearance/lang/language_provider.dart';
 import 'package:xiaokeai/services/configs/appearance/theme/theme_provider.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
@@ -14,6 +15,7 @@ class SettingsService with ChangeNotifier {
   final LanguageProvider languageProvider;
   final ThemeProvider themeProvider;
   final SharedPreferencesService _prefs = getIt<SharedPreferencesService>();
+  final AuthService _auth = getIt<AuthService>();
   SettingsService(
       {required this.languageProvider, required this.themeProvider}) {
     _init();
@@ -34,6 +36,9 @@ class SettingsService with ChangeNotifier {
 
   Future<bool> setLocale(Locale? locale) async {
     bool result = await languageProvider.setLocale(locale);
+    final String langCode = _prefs.getString("languageCode") ??
+        languageProvider.currentLocale.languageCode;
+    await _auth.setAuthLocale(langCode);
     notifyListeners();
     return result;
   }

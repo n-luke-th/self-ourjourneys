@@ -20,6 +20,10 @@
     "success",
     "warning",
     "failed",
-    "reauthenticated"
+    "reauthenticated",
+    "save",
+    "passwordResentEmailHasBeenSent",
+    "pleaseCheckoutEmailWeSentYou",
+    "accProfilePicIsUpdated"
   ]
 }

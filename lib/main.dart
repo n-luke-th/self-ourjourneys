@@ -18,6 +18,7 @@ import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/get_platform_service.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/navigation/page_router.dart';
+import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/services/configs/appearance/lang/language_provider.dart';
 import 'package:xiaokeai/services/configs/appearance/theme/theme_provider.dart';
 import 'package:xiaokeai/services/configs/settings_service.dart';
@@ -64,6 +65,8 @@ void _main() async {
           ),
           // setting page service
           ChangeNotifierProvider.value(value: settingsService),
+          // auth notifier helper
+          ChangeNotifierProvider(create: (_) => getIt<AuthService>()),
           // notification service
           ProxyProvider<SettingsService, NotificationManager>(
             update: (_, settings, __) => NotificationManager(settings),

@@ -13,7 +13,7 @@ import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/helpers/rate_limiter.dart';
 import 'package:xiaokeai/shared/errors_code_and_msg/auth_errors.dart';
 // import 'package:flutter/foundation.dart'
-// show defaultTargetPlatform, kIsWeb, TargetPlatform;
+//     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -282,12 +282,20 @@ class AuthService with ChangeNotifier {
     }
   }
 
+  /// set the Firebase Auth locale to the given language code
+  ///
+  /// When set to null, sets the user-facing language code to be the default app language.
+  Future<void> setAuthLocale(String? languageCode) async {
+    await _auth.setLanguageCode(languageCode);
+    _logger.d("Auth language is now '${languageCode ?? _auth.languageCode}'");
+    notifyListeners();
+  }
+
   /// send a reset password email to user
   ///
   /// must call `completePasswordReset` after
   Future<void> resetPassword(String email) async {
     try {
-      // await _auth.setLanguageCode("th"); // TODO: set the locale to current locale
       await _auth.sendPasswordResetEmail(email: email);
       _logger.d("reset password email has been sent to email: $email");
     } on FirebaseAuthException catch (e) {
@@ -343,6 +351,7 @@ class AuthService with ChangeNotifier {
   Future<void> updateUserAccountDisplayName(String newDisplayName) async {
     try {
       await _auth.currentUser?.updateDisplayName(newDisplayName);
+      notifyListeners();
     } on FirebaseAuthException catch (e) {
       _mapFirebaseErrorsAndThrowsError(e, "update user's display name");
     } catch (e) {
@@ -359,6 +368,7 @@ class AuthService with ChangeNotifier {
   Future<void> updateUserAccountProfilePic(String newProfilePicURL) async {
     try {
       await _auth.currentUser?.updatePhotoURL(newProfilePicURL);
+      notifyListeners();
     } on FirebaseAuthException catch (e) {
       _mapFirebaseErrorsAndThrowsError(e, "update user's profile pic");
     } catch (e) {
@@ -393,14 +403,16 @@ class AuthService with ChangeNotifier {
   Future<void> updateUserAccountEmail(String newEmail) async {
     try {
       await _auth.currentUser?.verifyBeforeUpdateEmail(newEmail);
+      notifyListeners();
     } on FirebaseAuthException catch (e) {
-      _logger.e("failed to update user's account email: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, "update user's account email");
     } catch (e) {
-      _logger.e("failed to update user's account email: ${e.toString()}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "update user's account email",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
@@ -409,13 +421,14 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.currentUser?.reauthenticateWithCredential(credential);
     } on FirebaseAuthException catch (e) {
-      _logger.e("failed to reauthenticate user: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, "reauthenticate user");
     } catch (e) {
-      _logger.e("failed to reauthenticate user: ${e.toString()}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "reauthenticate user",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 
@@ -429,10 +442,15 @@ class AuthService with ChangeNotifier {
   //           .addScope('https://www.googleapis.com/auth/contacts.readonly');
   //       googleProvider.setCustomParameters({'login_hint': 'user@thaitune.io'});
   //       return await _auth.currentUser?.reauthenticateWithPopup(googleProvider);
-  //     } on Exception catch (e) {
-  //       _logger.e('Unexpected error during reauth with Google: ${e.toString()}',
-  //           error: e, stackTrace: StackTrace.current);
-  //       rethrow;
+  //     } on FirebaseAuthException catch (e) {
+  //       _mapFirebaseErrorsAndThrowsError(e, "reauth with Google");
+  //     } catch (e) {
+  //       throw AuthException(
+  //           process: "reauth with Google",
+  //           errorEnum: AuthErrors.AUTH_U00,
+  //           st: StackTrace.current,
+  //           errorDetailsFromDependency: e.toString(),
+  //           error: e);
   //     }
   //   }
   //   // if current platform is mobile or other
@@ -447,21 +465,21 @@ class AuthService with ChangeNotifier {
   //         return await _auth.currentUser
   //             ?.reauthenticateWithCredential(credential);
   //       } on FirebaseAuthException catch (e) {
-  //         _logger.e("Failed to reauth with Google: ${e.message}",
-  //             error: e, stackTrace: StackTrace.current);
-  //         rethrow;
+  //         _mapFirebaseErrorsAndThrowsError(e, "reauth with Google");
   //       } catch (e) {
-  //         _logger.e(
-  //             "Unexpected error during reauth with Google: ${e.toString()}",
-  //             error: e,
-  //             stackTrace: StackTrace.current);
-  //         rethrow;
+  //         throw AuthException(
+  //             process: "reauth with Google",
+  //             errorEnum: AuthErrors.AUTH_U00,
+  //             st: StackTrace.current,
+  //             errorDetailsFromDependency: e.toString(),
+  //             error: e);
   //       }
   //     default:
   //       throw UnsupportedError(
   //         'Sorry, we currently have no support for this platform: $defaultTargetPlatform',
   //       );
   //   }
+  //   return null;
   // }
 
   /// verify user's new account email
@@ -469,13 +487,14 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.currentUser?.verifyBeforeUpdateEmail(newEmail);
     } on FirebaseAuthException catch (e) {
-      _logger.e("failed to verify user's account new email: ${e.message}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      _mapFirebaseErrorsAndThrowsError(e, "verify user's account new email");
     } catch (e) {
-      _logger.e("failed to verify user's account new email: ${e.toString()}",
-          error: e, stackTrace: StackTrace.current);
-      rethrow;
+      throw AuthException(
+          process: "verify user's account new email",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
     }
   }
 

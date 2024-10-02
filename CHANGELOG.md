@@ -20,3 +20,4 @@
 - Initial Development: Fixed the dead lock for dependencies creation with getIt, and other improvements on October 1, 2024 -> **0.1.2** by Luke
 - Initial Development: Made progress on authentication process, and other improvements on October 1, 2024 -> **0.1.3** by Luke
 - Initial Development: Login + logout and reset password seems working, and other improvements on October 2, 2024 -> **0.1.4** by Luke
+- Initial Development: Improved the authentication service, and other improvements on October 3, 2024 -> **0.1.5** by Luke

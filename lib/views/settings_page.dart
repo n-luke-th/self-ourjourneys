@@ -278,7 +278,7 @@ Future<void> _updateSetting(
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-              title: 'Success',
+              title: AppLocalizations.of(context)!.success,
               message: AppLocalizations.of(context)!.newChangeApplied,
               type: CustomNotificationType.success,
             ),
