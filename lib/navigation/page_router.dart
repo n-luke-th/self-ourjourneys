@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:xiaokeai/navigation/nav_bar.dart';
 import 'package:xiaokeai/views/albums/albums_page.dart';
 import 'package:xiaokeai/views/auth_views/auth_flow.dart';
+import 'package:xiaokeai/views/auth_views/change_password_page.dart';
 import 'package:xiaokeai/views/auth_views/login_page.dart';
 import 'package:xiaokeai/views/auth_views/reset_password_page.dart';
 import 'package:xiaokeai/views/home_page.dart';
@@ -33,10 +34,17 @@ final router = GoRouter(
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
-          path: '/settings',
-          name: 'SettingsPage',
-          builder: (context, state) => SettingsPage(),
-        ),
+            path: '/settings',
+            name: 'SettingsPage',
+            builder: (context, state) => SettingsPage(),
+            routes: [
+              GoRoute(
+                path: '/change-password',
+                name: 'ChangePasswordPage',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => const ChangePasswordPage(),
+              ),
+            ]),
         GoRoute(
             path: '/memories',
             name: 'MemoriesPage',

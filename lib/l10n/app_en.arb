@@ -80,6 +80,10 @@
   "@password": {
     "description": "Password"
   },
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm Password"
+  },
   "loggedIn": "Logged in!",
   "@loggedIn": {
     "description": "A pop up notification to user that he/she is now logged in to the system"

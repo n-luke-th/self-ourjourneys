@@ -7,6 +7,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/components/quick_settings_menu.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/shared/views/ui_consts.dart';
@@ -35,6 +36,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       context,
       appBarTitle: AppLocalizations.of(context)!.resetPassword.toUpperCase(),
       appBarBackgroundColor: Colors.transparent,
+      appbarActions: [QuickSettingsMenu()],
       extendBodyBehindAppBar: true,
       body: Container(
         decoration: BoxDecoration(

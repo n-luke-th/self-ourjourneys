@@ -172,6 +172,8 @@ class AuthWrapper {
                 message: _errorMessage,
                 type: CustomNotificationType.error),
           );
+    } finally {
+      context.loaderOverlay.hide();
     }
   }
 

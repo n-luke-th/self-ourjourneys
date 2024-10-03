@@ -4,6 +4,7 @@
 ///
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -15,6 +16,7 @@ import 'package:xiaokeai/components/main_view.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/services/bottom_sheet/bottom_sheet_service.dart';
 import 'package:xiaokeai/services/configs/settings_service.dart';
@@ -33,6 +35,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
+  final Logger _logger = locator<Logger>();
   late PackageInfo packageInfo;
   final PermissionsService _permissionsService = getIt<PermissionsService>();
   late Future<Map<Permission, PermissionStatus>> _statuses;
@@ -66,10 +69,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Column buildSettingsPageBody() {
     // ignore: no_leading_underscores_for_local_identifiers
-    final Logger _logger = locator<Logger>();
     return Column(
       children: [
         Expanded(flex: 2, child: profileSection()),
+        Divider(
+          indent: MediaQuery.of(context).size.width * 0.2,
+          endIndent: MediaQuery.of(context).size.width * 0.2,
+        ),
         Expanded(flex: 6, child: settingsListSection()),
         Expanded(
           flex: 1,
@@ -117,7 +123,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Column _accountSection(BuildContext context) {
+    // TODO: edit this method
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Align(
           alignment: Alignment.topLeft,
@@ -132,12 +140,33 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ),
+        ListTile(
+          title: Text("Update profile"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              UiConsts.spaceForTextAndElement,
+              const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+            ],
+          ),
+        ),
+        ListTile(
+          title: Text("Update email or password"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              UiConsts.spaceForTextAndElement,
+              const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+            ],
+          ),
+        ),
       ],
     );
   }
 
   Column _appearanceSection(BuildContext context, SettingsService settings) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Align(
           alignment: Alignment.topLeft,
@@ -257,11 +286,51 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget profileSection() {
-    return Container(
-      color: Colors.amber,
-      child: const SizedBox.expand(
-        child: Text(" Profile section "),
-      ),
+    return Consumer<AuthService>(
+      builder: (BuildContext context, AuthService value, Widget? child) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: UiConsts.PaddingAll_standard,
+            child: Column(
+              children: [
+                SizedBox.square(
+                  dimension: 90,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: value.authInstance!.currentUser!.photoURL ??
+                          "https://ui-avatars.com/api/?background=8FE8FF&color=fff&name=${value.authInstance!.currentUser!.email}",
+                      placeholder: (context, url) {
+                        return Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        );
+                      },
+                      errorWidget: (context, url, error) {
+                        // TODO: throw global error here
+                        _logger.e(
+                            "error loading img: '${error.toString()}' from '$url'",
+                            error: error,
+                            stackTrace: StackTrace.current);
+                        return const Icon(Icons.error);
+                      },
+                      width: 100.0,
+                      height: 100.0,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+
+                UiConsts.SizedBoxGapVertical_standard, // Reduced spacing here
+                Text(
+                  value.authInstance!.currentUser!.displayName ??
+                      value.authInstance!.currentUser!.email ??
+                      "",
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -328,7 +397,7 @@ class _SettingDropdownState<T> extends State<SettingDropdown<T>> {
     return ListTile(
       title: Text(widget.title),
       trailing: _isChanging
-          ? LoadingAnimationWidget.twoRotatingArc(
+          ? LoadingAnimationWidget.beat(
               color: Theme.of(context).colorScheme.onSurface, size: 22)
           : Row(
               mainAxisSize: MainAxisSize.min,
@@ -389,7 +458,8 @@ class SettingBottomSheet<T> extends StatelessWidget {
       padding: UiConsts.PaddingAll_large,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(UiConsts.borderRadius)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -407,7 +477,7 @@ class SettingBottomSheet<T> extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 20),
+          UiConsts.SizedBoxGapVertical_large,
           ...items.map((item) => ListTile(
                 title: itemBuilder(item),
                 onTap: () async {
