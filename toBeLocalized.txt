@@ -18,13 +18,22 @@
     "welcomeBackWithDisplayNameNext",
     "askForUserEmail",
     "accPasswordIsUpdated",
+    "accEmailIsUpdated",
     "success",
     "warning",
     "failed",
     "reauthenticated",
+    "reauthenticate",
     "save",
+    "changePassword",
     "passwordResentEmailHasBeenSent",
     "pleaseCheckoutEmailWeSentYou",
-    "accProfilePicIsUpdated"
+    "accProfilePicIsUpdated",
+    "whatToBeUpdated",
+    "updateEmailOrPassword",
+    "updateEmail",
+    "updatePassword",
+    "changeEmail",
+    "updateProfile"
   ]
 }

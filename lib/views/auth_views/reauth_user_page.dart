@@ -1,50 +1,52 @@
-/// lib/views/auth_views/change_password_page.dart
+/// lib/views/auth_views/reauth_user_page.dart
 ///
-/// change password page
-/// TODO: edit this page
+/// reauthenticate user page
+// TODO: edit this page
+
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:xiaokeai/components/main_view.dart';
+import 'package:xiaokeai/components/quick_settings_menu.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 import 'package:xiaokeai/shared/views/ui_consts.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class ChangePasswordPage extends StatefulWidget {
-  const ChangePasswordPage({super.key});
+class ReauthUserPage extends StatefulWidget {
+  final String routeToBePushed;
+  const ReauthUserPage({super.key, required this.routeToBePushed});
 
   @override
-  State<ChangePasswordPage> createState() => _ChangePasswordPage();
+  State<ReauthUserPage> createState() => _ReauthUserPage();
 }
 
-class _ChangePasswordPage extends State<ChangePasswordPage> {
+class _ReauthUserPage extends State<ReauthUserPage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final SharedPreferencesService _prefs = getIt<SharedPreferencesService>();
   final _formKey = GlobalKey<FormState>();
-  final _passwordFieldKey = GlobalKey<FormFieldState>();
-  final _confirmPasswordFieldKey = GlobalKey<FormFieldState>();
+  final _emailKey = GlobalKey<FormFieldState>();
+  final _passwordKey = GlobalKey<FormFieldState>();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  bool _passwordVisible1 = false;
-  bool _passwordVisible2 = false;
-  late Color fillColorPassword1;
-  late Color fillColorPassword2;
-  late Color labelTextColorPassword1;
-  late Color labelTextColorPassword2;
+  bool _passwordVisible = false;
+  late Color fillColorEmail;
+  late Color fillColorPassword;
+  late Color labelTextColorEmail;
+  late Color labelTextColorPassword;
 
   @override
   void initState() {
     super.initState();
-    fillColorPassword1 = Colors.transparent;
-    fillColorPassword2 = Colors.transparent;
-    labelTextColorPassword1 = ThemeMode
+    fillColorEmail = Colors.transparent;
+    fillColorPassword = Colors.transparent;
+    labelTextColorEmail = ThemeMode
                 .values[_prefs.getInt('themeMode') ?? ThemeMode.system.index] ==
             ThemeMode.dark
         ? Colors.white
         : Colors.black;
-    labelTextColorPassword2 = ThemeMode
+    labelTextColorPassword = ThemeMode
                 .values[_prefs.getInt('themeMode') ?? ThemeMode.system.index] ==
             ThemeMode.dark
         ? Colors.white
@@ -54,8 +56,8 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
   @override
   void dispose() {
     super.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
   }
 
   @override
@@ -64,7 +66,8 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
       context,
       appBarBackgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-      appBarTitle: AppLocalizations.of(context)!.changePassword.toUpperCase(),
+      appBarTitle: AppLocalizations.of(context)!.reauthenticate.toUpperCase(),
+      appbarActions: [QuickSettingsMenu()],
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -98,52 +101,36 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                       ),
                       UiConsts.SizedBoxGapVertical_large,
                       TextFormField(
-                          key: _passwordFieldKey,
-                          controller: _passwordController,
-                          obscureText: !_passwordVisible1,
+                          key: _emailKey,
+                          controller: _emailController,
                           // autofocus: false,
-                          validator: FormBuilderValidators.password(),
+                          validator: FormBuilderValidators.email(),
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           onChanged: (value) {
                             setState(() {
-                              if (_passwordFieldKey.currentState?.validate() ==
-                                  true) {
-                                fillColorPassword1 = Colors.transparent;
-                                labelTextColorPassword1 =
+                              if (_emailKey.currentState?.validate() == true) {
+                                fillColorEmail = Colors.transparent;
+                                labelTextColorEmail =
                                     Theme.of(context).colorScheme.onSurface;
                               } else {
-                                fillColorPassword1 =
-                                    Theme.of(context).cardColor;
-                                labelTextColorPassword1 =
+                                fillColorEmail = Theme.of(context).cardColor;
+                                labelTextColorEmail =
                                     Theme.of(context).colorScheme.onSurface;
                               }
                             });
                           },
-                          cursorColor: labelTextColorPassword1,
+                          cursorColor: labelTextColorEmail,
                           decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _passwordVisible1
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                  color: Theme.of(context).hintColor,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _passwordVisible1 = !_passwordVisible1;
-                                  });
-                                },
-                              ),
-                              hintText: AppLocalizations.of(context)!.password,
-                              labelText: AppLocalizations.of(context)!.password,
+                              prefixIcon: Icon(Icons.email_rounded),
+                              hintText: AppLocalizations.of(context)!.email,
+                              labelText: AppLocalizations.of(context)!.email,
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
-                              fillColor: fillColorPassword1,
-                              hoverColor: fillColorPassword1,
+                              fillColor: fillColorEmail,
+                              hoverColor: fillColorEmail,
                               floatingLabelStyle:
-                                  TextStyle(color: labelTextColorPassword1),
+                                  TextStyle(color: labelTextColorEmail),
                               // labelStyle: TextStyle(color: labelTextColorEmail),
                               errorStyle: TextStyle(
                                   color: Theme.of(context)
@@ -178,64 +165,54 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                               border: InputBorder.none)),
                       UiConsts.SizedBoxGapVertical_large,
                       TextFormField(
-                          key: _confirmPasswordFieldKey,
-                          controller: _confirmPasswordController,
-                          obscureText: !_passwordVisible2,
+                          key: _passwordKey,
+                          controller: _passwordController,
+                          obscureText: !_passwordVisible,
                           // autofocus: false,
-                          validator: (value) {
-                            if (value != _passwordController.text) {
-                              // TODO: localize this
-                              return 'Passwords do not match';
-                            }
-                            return null;
-                          },
+                          validator: FormBuilderValidators.required(),
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           onChanged: (value) {
                             setState(() {
-                              if (_confirmPasswordFieldKey.currentState
-                                      ?.validate() ==
+                              if (_passwordKey.currentState?.validate() ==
                                   true) {
-                                fillColorPassword2 = Colors.transparent;
-                                labelTextColorPassword2 =
+                                fillColorPassword = Colors.transparent;
+                                labelTextColorPassword =
                                     Theme.of(context).colorScheme.onSurface;
                               } else {
-                                fillColorPassword2 =
-                                    Theme.of(context).cardColor;
-                                labelTextColorPassword2 =
+                                fillColorPassword = Theme.of(context).cardColor;
+                                labelTextColorPassword =
                                     Theme.of(context).colorScheme.onSurface;
                               }
                             });
                           },
-                          cursorColor: labelTextColorPassword2,
+                          cursorColor: labelTextColorPassword,
                           decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.lock),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _passwordVisible2
+                                  _passwordVisible
                                       ? Icons.visibility
                                       : Icons.visibility_off,
                                   color: Theme.of(context).hintColor,
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    _passwordVisible2 = !_passwordVisible2;
+                                    _passwordVisible = !_passwordVisible;
                                   });
                                 },
                               ),
-                              hintText:
-                                  AppLocalizations.of(context)!.confirmPassword,
-                              labelText:
-                                  AppLocalizations.of(context)!.confirmPassword,
+                              hintText: AppLocalizations.of(context)!.password,
+                              labelText: AppLocalizations.of(context)!.password,
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
                               filled: true,
-                              fillColor: fillColorPassword2,
-                              hoverColor: fillColorPassword2,
+                              fillColor: fillColorPassword,
+                              hoverColor: fillColorPassword,
                               floatingLabelStyle:
-                                  TextStyle(color: labelTextColorPassword2),
+                                  TextStyle(color: labelTextColorPassword),
                               // labelStyle:
-                              //     TextStyle(color: labelTextColorPassword2),
+                              //     TextStyle(color: labelTextColorPassword),
                               errorStyle: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme
@@ -270,7 +247,7 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                       UiConsts.SizedBoxGapVertical_large,
                       UiConsts.SizedBoxGapVertical_large,
                       ElevatedButton(
-                        onPressed: () async => await _changePassword(),
+                        onPressed: () async => _reauth(widget.routeToBePushed),
                         style: ElevatedButton.styleFrom(
                           foregroundColor:
                               Theme.of(context).colorScheme.onPrimaryContainer,
@@ -283,7 +260,7 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                           ),
                         ),
                         child: Text(AppLocalizations.of(context)!
-                            .changePassword
+                            .reauthenticate
                             .toUpperCase()),
                       ),
                     ],
@@ -297,13 +274,13 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
     );
   }
 
-  Future<void> _changePassword() async {
+  Future<void> _reauth(String routeToBePushed) async {
     try {
       context.loaderOverlay.show();
       if (_formKey.currentState!.validate()) {
-        await _authWrapper.handleChangePassword(context, _passwordController);
+        await _authWrapper.handleReauthUser(
+            context, _emailController, _passwordController, routeToBePushed);
         _passwordController.clear();
-        _confirmPasswordController.clear();
       }
     } finally {
       // ignore: use_build_context_synchronously

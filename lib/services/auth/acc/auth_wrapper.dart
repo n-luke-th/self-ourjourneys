@@ -213,11 +213,11 @@ class AuthWrapper {
   // }
 
   Future<void> handleReauthUser(
-    BuildContext context,
-    TextEditingController emailController,
-    TextEditingController passwordController,
-  ) async {
-    _logger.i("user selected to reauth with native provider");
+      BuildContext context,
+      TextEditingController emailController,
+      TextEditingController passwordController,
+      String routeToBePushed) async {
+    _logger.d("user selected to reauth with native provider");
     try {
       AuthCredential credential = EmailAuthProvider.credential(
           email: emailController.text.trim(),
@@ -235,6 +235,7 @@ class AuthWrapper {
       _logger.d("user: '$_displayName' reauth with native provider success!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
+      context.pushReplacementNamed(routeToBePushed);
       // TODO: handle push to profile page
       // Navigator.of(context).push(
       //   MaterialPageRoute(
@@ -271,6 +272,37 @@ class AuthWrapper {
                 type: CustomNotificationType.success),
           );
       _logger.d("user account password is updated!");
+      _logger
+          .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
+      context.goNamed('Settings');
+    } on AuthException catch (e) {
+      _errorMessage = e.toString();
+      context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.failed,
+                message: _errorMessage,
+                type: CustomNotificationType.error),
+          );
+    }
+  }
+
+  Future<void> handleChangeEmail(
+    BuildContext context,
+    TextEditingController newEmailController,
+  ) async {
+    _logger.d("user submitted a request to change password");
+    try {
+      await _auth.updateUserAccountEmail(newEmailController.text);
+
+      context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.newChangeApplied,
+                message: AppLocalizations.of(context)!.accEmailIsUpdated,
+                type: CustomNotificationType.success),
+          );
+      _logger.d("user account email is updated!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
       context.goNamed('Settings');

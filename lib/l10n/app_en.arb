@@ -100,6 +100,10 @@
   "@accPasswordIsUpdated": {
     "description": "A sentence inform user that his/her acc password is updated."
   },
+  "accEmailIsUpdated": "Your account email has been updated!",
+  "@accEmailIsUpdated": {
+    "description": "A sentence inform user that his/her acc email is updated."
+  },
   "success": "Success!",
   "@success": {
     "description": "Success!"
@@ -116,9 +120,17 @@
   "@reauthenticated": {
     "description": "Reauthenticated!"
   },
+  "reauthenticate": "Reauthenticate",
+  "@reauthenticate": {
+    "description": "Reauthenticate"
+  },
   "save": "Save",
   "@save": {
     "description": "Save"
+  },
+  "changePassword": "Change Password",
+  "@changePassword": {
+    "description": "Change password"
   },
   "passwordResentEmailHasBeenSent": "Password reset email has been sent to your mailbox!",
   "@passwordResentEmailHasBeenSent": {
@@ -131,5 +143,29 @@
   "accProfilePicIsUpdated": "Your account profile picture has been updated!",
   "@accProfilePicIsUpdated": {
     "description": "A sentence inform user that his/her acc profile picture is updated."
+  },
+  "whatToBeUpdated": "What would you like to updated?",
+  "@whatToBeUpdated": {
+    "description": "A question asking what option user would like to update it."
+  },
+  "updateEmailOrPassword": "Update email or password",
+  "@updateEmailOrPassword": {
+    "description": "Update email or password"
+  },
+  "updateEmail": "Update email",
+  "@updateEmail": {
+    "description": "Update email"
+  },
+  "updatePassword": "Update password",
+  "@updatePassword": {
+    "description": "Update password"
+  },
+  "changeEmail": "Change email",
+  "@changeEmail": {
+    "description": "Change email"
+  },
+  "updateProfile": "Update profile",
+  "@updateProfile": {
+    "description": "Update profile"
   }
 }

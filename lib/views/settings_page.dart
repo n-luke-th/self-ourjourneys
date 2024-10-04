@@ -6,6 +6,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
@@ -70,55 +71,61 @@ class _SettingsPageState extends State<SettingsPage> {
   Column buildSettingsPageBody() {
     // ignore: no_leading_underscores_for_local_identifiers
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Expanded(flex: 2, child: profileSection()),
-        Divider(
-          indent: MediaQuery.of(context).size.width * 0.2,
-          endIndent: MediaQuery.of(context).size.width * 0.2,
-        ),
-        Expanded(flex: 6, child: settingsListSection()),
         Expanded(
-          flex: 1,
-          child: Consumer<PackageInfoProvider>(
-              builder: (context, provider, child) {
-            final packageInfo = provider.packageInfo;
+            flex: 2,
+            child: Scaffold(
+                extendBody: true,
+                body: profileSection(),
+                extendBodyBehindAppBar: true)),
+        Expanded(
+            flex: 5,
+            child: Scaffold(
+              body: settingsListSection(),
+              extendBody: true,
+              extendBodyBehindAppBar: true,
+            )),
+        Consumer<PackageInfoProvider>(builder: (context, provider, child) {
+          final packageInfo = provider.packageInfo;
 
-            if (packageInfo == null) {
-              return const Center(child: Text("No version found!"));
-            }
-            _logger.i(
-                "version: ${packageInfo.version} | build num: ${packageInfo.buildNumber}");
-            return Padding(
-              padding: UiConsts.PaddingAll_large,
-              child: Center(
-                child: Text('Version: ${packageInfo.version}'),
-              ),
-            );
-          }),
-        )
+          if (packageInfo == null) {
+            return const Center(child: Text("No version found!"));
+          }
+          _logger.i(
+              "version: ${packageInfo.version} | build num: ${packageInfo.buildNumber}");
+          return Padding(
+            padding: UiConsts.PaddingAll_standard,
+            child: Center(
+              child: Text('Version: ${packageInfo.version}'),
+            ),
+          );
+        })
       ],
     );
   }
 
-  Column settingsListSection() {
-    return Column(
-      children: [
-        Expanded(
-          flex: 3,
-          child: Consumer<SettingsService>(
-            builder: (context, settings, child) {
-              return ListView(
-                children: [
-                  _accountSection(context),
-                  _appearanceSection(context, settings),
-                  _permissionSection(context)
-                ],
-              );
-            },
-          ),
-        ),
-        // Expanded(flex: 2, child: SizedBox.expand(child: Text("About")))
-      ],
+  Container settingsListSection() {
+    return Container(
+      margin: EdgeInsets.only(top: UiConsts.margin_standard),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.vertical(
+            top: Radius.elliptical(
+                UiConsts.borderRadius, UiConsts.borderRadius)),
+      ),
+      child: Consumer<SettingsService>(
+        builder: (context, settings, child) {
+          return ListView(
+            clipBehavior: Clip.antiAlias,
+            children: [
+              _accountSection(context),
+              _appearanceSection(context, settings),
+              _permissionSection(context)
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -142,6 +149,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         ListTile(
           title: Text("Update profile"),
+          onTap: () => context.pushReplacementNamed("UpdateProfilePage"),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -151,7 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: Text("Update email or password"),
+          title: Text(AppLocalizations.of(context)!.updateEmailOrPassword),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -159,6 +167,66 @@ class _SettingsPageState extends State<SettingsPage> {
               const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
             ],
           ),
+          onTap: () {
+            BottomSheetService.showCustomBottomSheet(
+                context: context,
+                builder: (context, scroll) {
+                  return Container(
+                    padding: UiConsts.PaddingAll_large,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(UiConsts.borderRadius)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 20),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.3),
+                            borderRadius:
+                                UiConsts.BorderRadiusCircular_standard,
+                          ),
+                        ),
+                        Text(
+                          AppLocalizations.of(context)!.whatToBeUpdated,
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        UiConsts.SizedBoxGapVertical_large,
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ListTile(
+                              title: Text(
+                                  AppLocalizations.of(context)!.updateEmail),
+                              onTap: () => context.pushReplacementNamed(
+                                  "ReauthPage",
+                                  pathParameters: <String, String>{
+                                    "next": "ChangeEmailPage"
+                                  }),
+                            ),
+                            ListTile(
+                              title: Text(
+                                  AppLocalizations.of(context)!.updatePassword),
+                              onTap: () => context.pushReplacementNamed(
+                                  "ReauthPage",
+                                  pathParameters: {
+                                    'next': 'ChangePasswordPage'
+                                  }),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                });
+          },
         ),
       ],
     );
@@ -209,6 +277,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Column _permissionSection(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Align(
           alignment: Alignment.topLeft,
@@ -286,51 +355,67 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget profileSection() {
-    return Consumer<AuthService>(
-      builder: (BuildContext context, AuthService value, Widget? child) {
-        return SingleChildScrollView(
-          child: Padding(
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.vertical(
+            bottom: Radius.elliptical(
+                UiConsts.borderRadius_large, UiConsts.borderRadius_large)),
+        gradient: LinearGradient(
+            begin: AlignmentDirectional.topCenter,
+            end: AlignmentDirectional.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.errorContainer,
+              Theme.of(context).colorScheme.secondaryContainer,
+            ]),
+      ),
+      child: Consumer<AuthService>(
+        builder: (BuildContext context, AuthService value, Widget? child) {
+          return Padding(
             padding: UiConsts.PaddingAll_standard,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox.square(
-                  dimension: 90,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: value.authInstance!.currentUser!.photoURL ??
-                          "https://ui-avatars.com/api/?background=8FE8FF&color=fff&name=${value.authInstance!.currentUser!.email}",
-                      placeholder: (context, url) {
-                        return Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        );
-                      },
-                      errorWidget: (context, url, error) {
-                        // TODO: throw global error here
-                        _logger.e(
-                            "error loading img: '${error.toString()}' from '$url'",
-                            error: error,
-                            stackTrace: StackTrace.current);
-                        return const Icon(Icons.error);
-                      },
-                      width: 100.0,
-                      height: 100.0,
-                      fit: BoxFit.cover,
+                Align(
+                  child: SizedBox.square(
+                    dimension: 90,
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: value.authInstance!.currentUser?.photoURL ??
+                            "https://ui-avatars.com/api/?background=8FE8FF&color=fff&name=${value.authInstance!.currentUser?.email ?? 'Xiaokeai'}",
+                        placeholder: (context, url) {
+                          return Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          );
+                        },
+                        errorWidget: (context, url, error) {
+                          // TODO: throw global error here
+                          _logger.e(
+                              "error loading img: '${error.toString()}' from '$url'",
+                              error: error,
+                              stackTrace: StackTrace.current);
+                          return const Icon(Icons.error);
+                        },
+                        width: 100.0,
+                        height: 100.0,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
 
                 UiConsts.SizedBoxGapVertical_standard, // Reduced spacing here
                 Text(
-                  value.authInstance!.currentUser!.displayName ??
-                      value.authInstance!.currentUser!.email ??
-                      "",
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  value.authInstance!.currentUser?.displayName ??
+                      value.authInstance!.currentUser?.email ??
+                      "Xiaokeai user",
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

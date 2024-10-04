@@ -54,6 +54,9 @@ class UiConsts {
   /// borderRadius = 20.0
   static const double borderRadius = 20.0;
 
+  /// borderRadius = 45.0
+  static const double borderRadius_large = 45.0;
+
   /// double 16
   static const double smallIconSize = 16;
 
@@ -68,4 +71,7 @@ class UiConsts {
     height: 5,
     width: 5,
   );
+
+  /// double 10
+  static const double margin_standard = 10;
 }

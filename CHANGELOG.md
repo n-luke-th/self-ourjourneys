@@ -22,3 +22,4 @@
 - Initial Development: Login + logout and reset password seems working, and other improvements on October 2, 2024 -> **0.1.4** by Luke
 - Initial Development: Improved the authentication service, and other improvements on October 3, 2024 -> **0.1.5** by Luke
 - Initial Development: Improved the authentication process and experience, added place holder for change password page, added the display of profile and account settings menu on settings page, and other improvements on October 3, 2024 -> **0.1.6** by Luke
+- Initial Development: Improved the authentication process, added place holder for change email and update profile page, improved the settings page, and other improvements on October 5, 2024 -> **0.1.7** by Luke

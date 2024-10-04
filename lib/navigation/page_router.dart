@@ -7,9 +7,12 @@ import 'package:go_router/go_router.dart';
 import 'package:xiaokeai/navigation/nav_bar.dart';
 import 'package:xiaokeai/views/albums/albums_page.dart';
 import 'package:xiaokeai/views/auth_views/auth_flow.dart';
+import 'package:xiaokeai/views/auth_views/change_email_page.dart';
 import 'package:xiaokeai/views/auth_views/change_password_page.dart';
 import 'package:xiaokeai/views/auth_views/login_page.dart';
+import 'package:xiaokeai/views/auth_views/reauth_user_page.dart';
 import 'package:xiaokeai/views/auth_views/reset_password_page.dart';
+import 'package:xiaokeai/views/auth_views/update_profile_page.dart';
 import 'package:xiaokeai/views/home_page.dart';
 import 'package:xiaokeai/views/memories/memories_page.dart';
 import 'package:xiaokeai/views/memories/new_memory_page.dart';
@@ -36,13 +39,38 @@ final router = GoRouter(
         GoRoute(
             path: '/settings',
             name: 'SettingsPage',
-            builder: (context, state) => SettingsPage(),
+            builder: (context, state) {
+              state.pathParameters['next'];
+              return SettingsPage();
+            },
             routes: [
               GoRoute(
-                path: '/change-password',
+                path: 'change-password',
                 name: 'ChangePasswordPage',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (context, state) => const ChangePasswordPage(),
+              ),
+              GoRoute(
+                path: 'change-email',
+                name: 'ChangeEmailPage',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => const ChangeEmailPage(),
+              ),
+              GoRoute(
+                path: 'update-profile',
+                name: 'UpdateProfilePage',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => const UpdateProfilePage(),
+              ),
+              GoRoute(
+                path: 'reauth',
+                name: 'ReauthPage',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) {
+                  state.pathParameters['next'];
+                  return ReauthUserPage(
+                      routeToBePushed: state.pathParameters['next']!);
+                },
               ),
             ]),
         GoRoute(
@@ -73,7 +101,7 @@ final router = GoRouter(
       path: '/login',
       name: 'LoginPage',
       parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => LoginPage(),
+      builder: (context, state) => const LoginPage(),
     ),
     GoRoute(
       path: '/reset-password',
