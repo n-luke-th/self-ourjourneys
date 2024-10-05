@@ -11,8 +11,6 @@
     "errorOccurred",
     "login",
     "resetPassword",
-    "email",
-    "password",
     "confirmPassword",
     "loggedIn",
     "welcomeBackWithDisplayNameNext",
@@ -24,16 +22,20 @@
     "failed",
     "reauthenticated",
     "reauthenticate",
+    "youNeedToReauth",
     "save",
+    "version",
     "changePassword",
     "passwordResentEmailHasBeenSent",
     "pleaseCheckoutEmailWeSentYou",
     "accProfilePicIsUpdated",
+    "accProfileIsUpdated",
     "whatToBeUpdated",
     "updateEmailOrPassword",
     "updateEmail",
     "updatePassword",
     "changeEmail",
-    "updateProfile"
+    "updateProfile",
+    "displayName"
   ]
 }

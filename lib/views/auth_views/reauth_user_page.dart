@@ -99,6 +99,11 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                         size: 110,
                         color: Theme.of(context).colorScheme.tertiary,
                       ),
+                      UiConsts.spaceForTextAndElement,
+                      Text(
+                          style: Theme.of(context).textTheme.titleMedium,
+                          textAlign: TextAlign.center,
+                          "${AppLocalizations.of(context)!.youNeedToReauth}: ${widget.routeToBePushed.contains('Email') == true ? AppLocalizations.of(context)!.changeEmail : AppLocalizations.of(context)!.changePassword}"),
                       UiConsts.SizedBoxGapVertical_large,
                       TextFormField(
                           key: _emailKey,

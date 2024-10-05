@@ -347,6 +347,26 @@ class AuthService with ChangeNotifier {
     }
   }
 
+  /// update user account profile: `DisplayName` & `PhotoURL`
+  Future<void> updateUserAccountProfile(
+      {required String newDisplayName,
+      required String newProfilePicURL}) async {
+    try {
+      await _auth.currentUser?.updateProfile(
+          displayName: newDisplayName, photoURL: newProfilePicURL);
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      _mapFirebaseErrorsAndThrowsError(e, "update user's profile");
+    } catch (e) {
+      throw AuthException(
+          process: "update user's profile",
+          errorEnum: AuthErrors.AUTH_U00,
+          st: StackTrace.current,
+          errorDetailsFromDependency: e.toString(),
+          error: e);
+    }
+  }
+
   /// update user account details: `DisplayName`
   Future<void> updateUserAccountDisplayName(String newDisplayName) async {
     try {

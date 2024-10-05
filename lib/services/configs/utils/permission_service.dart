@@ -3,7 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:universal_io/io.dart';
-import 'package:xiaokeai/shared/services/permission_const.dart';
+import 'package:xiaokeai/shared/services/permission_enum.dart';
 
 class PermissionsService {
   final List<Permission> _permissions = [
@@ -12,7 +12,6 @@ class PermissionsService {
     if (Platform.isAndroid || Platform.isIOS) Permission.calendarFullAccess,
     if (Platform.isAndroid || Platform.isIOS) Permission.calendarWriteOnly,
     Permission.notification,
-    // if (Platform.isAndroid) Permission.accessNotificationPolicy
   ];
 
   List<Permission> get permissionsList => _permissions;

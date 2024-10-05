@@ -22,6 +22,12 @@ class UiConsts {
   /// EdgeInsets.symmetric(vertical: 8);
   static const PaddingVertical_standard = EdgeInsets.symmetric(vertical: 8);
 
+  /// EdgeInsets.symmetric(vertical: 4);
+  static const PaddingVertical_small = EdgeInsets.symmetric(vertical: 4);
+
+  /// EdgeInsets.symmetric(horizontal: 4);
+  static const PaddingHorizontal_small = EdgeInsets.symmetric(horizontal: 4);
+
   /// EdgeInsets.symmetric(vertical: 16.0)
   static const PaddingVertical_large = EdgeInsets.symmetric(vertical: 16.0);
 
@@ -46,6 +52,16 @@ class UiConsts {
   /// SizedBox(width: 8);
   static const SizedBoxGapHorizontal_standard = SizedBox(
     width: 8,
+  );
+
+  /// SizedBox(height: 4);
+  static const SizedBoxGapVertical_small = SizedBox(
+    height: 4,
+  );
+
+  /// SizedBox(width: 4);
+  static const SizedBoxGapHorizontal_small = SizedBox(
+    width: 4,
   );
 
   /// BorderRadius.circular(20)

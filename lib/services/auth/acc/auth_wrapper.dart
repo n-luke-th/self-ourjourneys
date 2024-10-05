@@ -236,14 +236,6 @@ class AuthWrapper {
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
       context.pushReplacementNamed(routeToBePushed);
-      // TODO: handle push to profile page
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(
-      //       builder: (context) => EditProfilePage(
-      //           displayName: _displayName,
-      //           emailAddress: _emailAddress,
-      //           profilePicURL: _profilePicURL)),
-      // );
     } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
@@ -274,7 +266,7 @@ class AuthWrapper {
       _logger.d("user account password is updated!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
-      context.goNamed('Settings');
+      context.goNamed('SettingsPage');
     } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
@@ -305,7 +297,7 @@ class AuthWrapper {
       _logger.d("user account email is updated!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
-      context.goNamed('Settings');
+      context.goNamed('SettingsPage');
     } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(
@@ -356,7 +348,7 @@ class AuthWrapper {
   Future<void> handleChangeProfilePic(
     BuildContext context,
   ) async {
-    _logger.i("user submitted a request to change the account profile pic");
+    _logger.d("user submitted a request to change the account profile pic");
     try {
       if (_auth.getCurrentUserAttributes()!['photoURL'] != '') {
         await _cloudObjectStorageWrapper.handleDeleteAllFilesInFolder(context,
@@ -383,7 +375,51 @@ class AuthWrapper {
       _logger.d("user account profile picture is updated!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
-      context.goNamed('Settings');
+      context.goNamed('SettingsPage');
+    } on AuthException catch (e) {
+      _errorMessage = e.toString();
+      context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.failed,
+                message: _errorMessage,
+                type: CustomNotificationType.error),
+          );
+    }
+  }
+
+  /// TODO: method is not working yet, make it work
+  Future<void> handleUpdateUserAccountProfile(
+      BuildContext context, String newDisplayName) async {
+    _logger.d("user submitted a request to update the account profile");
+    try {
+      if (_auth.getCurrentUserAttributes()!['photoURL'] != '') {
+        await _cloudObjectStorageWrapper.handleDeleteAllFilesInFolder(context,
+            firebaseStoragePath: FirebaseStoragePaths.profile);
+      }
+      final uploadResult =
+          await _cloudObjectStorageWrapper.handlePickAndUploadFile(context,
+              firebaseStoragePath: FirebaseStoragePaths.profile);
+
+      if (uploadResult != null) {
+        final url = uploadResult[1];
+        // ignore: unused_local_variable
+        final path = uploadResult[0];
+        await _auth.updateUserAccountProfile(
+            newDisplayName: newDisplayName, newProfilePicURL: url);
+      }
+
+      context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.newChangeApplied,
+                message: AppLocalizations.of(context)!.accProfileIsUpdated,
+                type: CustomNotificationType.success),
+          );
+      _logger.d("user account profile is updated!");
+      _logger
+          .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
+      context.goNamed('SettingsPage');
     } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(

@@ -40,7 +40,6 @@ final router = GoRouter(
             path: '/settings',
             name: 'SettingsPage',
             builder: (context, state) {
-              state.pathParameters['next'];
               return SettingsPage();
             },
             routes: [
@@ -63,11 +62,10 @@ final router = GoRouter(
                 builder: (context, state) => const UpdateProfilePage(),
               ),
               GoRoute(
-                path: 'reauth',
+                path: 'reauth/next=:next',
                 name: 'ReauthPage',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (context, state) {
-                  state.pathParameters['next'];
                   return ReauthUserPage(
                       routeToBePushed: state.pathParameters['next']!);
                 },

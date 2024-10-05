@@ -1,4 +1,4 @@
-/// lib/shared/permission_const.dart
+/// lib/shared/permission_enum.dart
 /// for consistent implementation of the app
 /// we will define the consts or enum for Permission that might be reusable here
 ///
@@ -9,5 +9,4 @@ enum PermissionConst {
   calendarFullAccess,
   calendarWriteOnly,
   notifications,
-  accessNotificationPolicy
 }

@@ -23,3 +23,4 @@
 - Initial Development: Improved the authentication service, and other improvements on October 3, 2024 -> **0.1.5** by Luke
 - Initial Development: Improved the authentication process and experience, added place holder for change password page, added the display of profile and account settings menu on settings page, and other improvements on October 3, 2024 -> **0.1.6** by Luke
 - Initial Development: Improved the authentication process, added place holder for change email and update profile page, improved the settings page, and other improvements on October 5, 2024 -> **0.1.7** by Luke
+- Initial Development: Improved the authentication and edit account process, improved the settings page and ui design for edit account pages, and other improvements on October 5, 2024 -> **0.1.8** by Luke

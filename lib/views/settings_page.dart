@@ -57,6 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
       appBarTitle: AppLocalizations.of(context)!.settings,
       appbarActions: [
         IconButton(
+          tooltip: AppLocalizations.of(context)!.logout,
           onPressed: () async => _showLogoutConfirmation(context),
           icon: Icon(
             Icons.logout_outlined,
@@ -97,7 +98,8 @@ class _SettingsPageState extends State<SettingsPage> {
           return Padding(
             padding: UiConsts.PaddingAll_standard,
             child: Center(
-              child: Text('Version: ${packageInfo.version}'),
+              child: Text(
+                  '${AppLocalizations.of(context)!.version}: ${packageInfo.version}'),
             ),
           );
         })
@@ -130,7 +132,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Column _accountSection(BuildContext context) {
-    // TODO: edit this method
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -303,6 +304,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           onTap: () => BottomSheetService.showCustomBottomSheet(
             context: context,
+            initialChildSize: 0.6,
             builder: (context, scrollController) {
               return Column(
                 children: [
@@ -373,7 +375,7 @@ class _SettingsPageState extends State<SettingsPage> {
           return Padding(
             padding: UiConsts.PaddingAll_standard,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Align(
@@ -403,13 +405,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
-
-                UiConsts.SizedBoxGapVertical_standard, // Reduced spacing here
+                // UiConsts.SizedBoxGapVertical_small,
                 Text(
                   value.authInstance!.currentUser?.displayName ??
                       value.authInstance!.currentUser?.email ??
                       "Xiaokeai user",
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
               ],
             ),

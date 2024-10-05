@@ -26,6 +26,14 @@
   },
   "underDevelopment": "กำลังพัฒนา",
   "@underDevelopment": {
-    "description": "indicates that this is under development"
+    "description": "Indicates that this is under development"
+  },
+  "password": "รหัสผ่าน",
+  "@password": {
+    "description": "Password"
+  },
+  "email": "อีเมล์",
+  "@email": {
+    "description": "Email"
   }
 }

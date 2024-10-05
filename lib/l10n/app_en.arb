@@ -124,9 +124,17 @@
   "@reauthenticate": {
     "description": "Reauthenticate"
   },
+  "youNeedToReauth": "You need to reauthenticate in order to proceed",
+  "@youNeedToReauth": {
+    "description": "You need to reauthenticate in order to proceed"
+  },
   "save": "Save",
   "@save": {
     "description": "Save"
+  },
+  "version": "Version",
+  "@version": {
+    "description": "Version"
   },
   "changePassword": "Change Password",
   "@changePassword": {
@@ -143,6 +151,10 @@
   "accProfilePicIsUpdated": "Your account profile picture has been updated!",
   "@accProfilePicIsUpdated": {
     "description": "A sentence inform user that his/her acc profile picture is updated."
+  },
+  "accProfileIsUpdated": "Your account profile has been updated!",
+  "@accProfileIsUpdated": {
+    "description": "A sentence inform user that his/her acc profile is updated."
   },
   "whatToBeUpdated": "What would you like to updated?",
   "@whatToBeUpdated": {
@@ -167,5 +179,9 @@
   "updateProfile": "Update profile",
   "@updateProfile": {
     "description": "Update profile"
+  },
+  "displayName": "Display name",
+  "@displayName": {
+    "description": "Display name"
   }
 }
