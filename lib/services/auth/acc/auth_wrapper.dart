@@ -24,6 +24,7 @@ import 'package:xiaokeai/services/notifications/notification_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:xiaokeai/services/object_storage/cloud_object_storage_wrapper.dart';
 import 'package:xiaokeai/shared/services/firebase_storage_enum.dart';
+import 'package:xiaokeai/views/auth_views/email_sent_page.dart';
 
 class AuthWrapper {
   final Logger _logger = locator<Logger>();
@@ -315,7 +316,6 @@ class AuthWrapper {
     BuildContext context,
     TextEditingController emailController,
   ) async {
-    // TODO: edit this method
     _logger.d(
         "trying to send the password reset email to '${emailController.text.trim()}'");
     try {
@@ -323,17 +323,17 @@ class AuthWrapper {
       context.read<NotificationManager>().showNotification(
           context,
           NotificationData(
-              title: "Password reset email has been sent to your mailbox!",
-              message: "Please checkout the email we have sent you.",
+              title:
+                  AppLocalizations.of(context)!.passwordResentEmailHasBeenSent,
+              message:
+                  AppLocalizations.of(context)!.pleaseCheckoutEmailWeSentYou,
               type: CustomNotificationType.success));
-      context.pushReplacementNamed("LoginPage");
-      // TODO: handle email sent page
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //       builder: (context) =>
-      //           EmailSentPage(email: emailController.text.trim())),
-      // );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                EmailSentPage(email: emailController.text.trim())),
+      );
     } on AuthException catch (e) {
       _errorMessage = e.toString();
       context.read<NotificationManager>().showNotification(

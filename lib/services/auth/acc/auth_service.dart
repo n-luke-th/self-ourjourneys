@@ -297,7 +297,7 @@ class AuthService with ChangeNotifier {
   Future<void> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      _logger.d("reset password email has been sent to email: $email");
+      _logger.d("reset password email has been sent to email: '$email'");
     } on FirebaseAuthException catch (e) {
       _mapFirebaseErrorsAndThrowsError(e, 'reset user account password');
     } catch (e) {

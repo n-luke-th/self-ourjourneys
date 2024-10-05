@@ -77,6 +77,8 @@ void _main() async {
       ),
     );
   } on Exception catch (e) {
+    final Logger logger = locator<Logger>();
+    logger.e(e.toString(), error: e, stackTrace: StackTrace.current);
     runApp(Text("Error starting the app: ${e.toString()}"));
   }
 }
