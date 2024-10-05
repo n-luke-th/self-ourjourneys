@@ -37,8 +37,8 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final Logger _logger = locator<Logger>();
-  late PackageInfo packageInfo;
   final PermissionsService _permissionsService = getIt<PermissionsService>();
+  late PackageInfo packageInfo;
   late Future<Map<Permission, PermissionStatus>> _statuses;
 
   @override
@@ -405,7 +405,9 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       ListTile(
         title: Text("Git Stamps"),
-        onTap: () => context.pushReplacementNamed("GitStampPage"),
+        onTap: () {
+          context.pushReplacementNamed("GitStampPage");
+        },
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

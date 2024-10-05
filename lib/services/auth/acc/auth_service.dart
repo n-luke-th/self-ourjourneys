@@ -350,7 +350,7 @@ class AuthService with ChangeNotifier {
   /// update user account profile: `DisplayName` & `PhotoURL`
   Future<void> updateUserAccountProfile(
       {required String newDisplayName,
-      required String newProfilePicURL}) async {
+      required String? newProfilePicURL}) async {
     try {
       await _auth.currentUser?.updateProfile(
           displayName: newDisplayName, photoURL: newProfilePicURL);
@@ -385,7 +385,7 @@ class AuthService with ChangeNotifier {
   }
 
   /// update user account details: `PhotoURL`
-  Future<void> updateUserAccountProfilePic(String newProfilePicURL) async {
+  Future<void> updateUserAccountProfilePic(String? newProfilePicURL) async {
     try {
       await _auth.currentUser?.updatePhotoURL(newProfilePicURL);
       notifyListeners();

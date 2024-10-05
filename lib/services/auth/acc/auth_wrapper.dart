@@ -7,6 +7,7 @@
 // TODO: edit this auth wrapper
 // TODO: localize this file
 
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -388,18 +389,53 @@ class AuthWrapper {
     }
   }
 
-  /// TODO: method is not working yet, make it work
-  Future<void> handleUpdateUserAccountProfile(
-      BuildContext context, String newDisplayName) async {
-    _logger.d("user submitted a request to update the account profile");
+  Future<void> handleRemoveProfilePic(
+    BuildContext context,
+  ) async {
+    _logger.d("user submitted a request to remove the account profile pic");
     try {
       if (_auth.getCurrentUserAttributes()!['photoURL'] != '') {
         await _cloudObjectStorageWrapper.handleDeleteAllFilesInFolder(context,
             firebaseStoragePath: FirebaseStoragePaths.profile);
       }
-      final uploadResult =
-          await _cloudObjectStorageWrapper.handlePickAndUploadFile(context,
-              firebaseStoragePath: FirebaseStoragePaths.profile);
+      await _auth.updateUserAccountProfilePic(null);
+
+      context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.newChangeApplied,
+                message: AppLocalizations.of(context)!.accProfilePicIsUpdated,
+                type: CustomNotificationType.success),
+          );
+      _logger.d("user account profile picture is removed!");
+      _logger
+          .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
+      context.goNamed("SettingsPage");
+    } on AuthException catch (e) {
+      _errorMessage = e.toString();
+      context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.failed,
+                message: _errorMessage,
+                type: CustomNotificationType.error),
+          );
+    }
+  }
+
+  Future<void> handleUpdateUserAccountProfile(
+      BuildContext context, String newDisplayName, PlatformFile? file) async {
+    _logger.d("user submitted a request to update the account profile");
+    try {
+      if (_auth.getCurrentUserAttributes()!['photoURL'] != '') {
+        await _cloudObjectStorageWrapper.handleDeleteAllFilesInFolder(context,
+            firebaseStoragePath: FirebaseStoragePaths.profile,
+            showNotification: false);
+      }
+      final uploadResult = await _cloudObjectStorageWrapper.handleUploadFile(
+          context, file,
+          firebaseStoragePath: FirebaseStoragePaths.profile,
+          showNotification: false);
 
       if (uploadResult != null) {
         final url = uploadResult[1];
@@ -429,6 +465,8 @@ class AuthWrapper {
                 message: _errorMessage,
                 type: CustomNotificationType.error),
           );
+    } finally {
+      context.loaderOverlay.hide();
     }
   }
 

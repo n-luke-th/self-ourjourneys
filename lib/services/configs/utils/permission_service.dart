@@ -38,33 +38,33 @@ class PermissionsService {
   }
 
   /// Checks the status of a specific permission based on the provided enum value.
-  Future<PermissionStatus> checkPermission(PermissionConst permission) async {
+  Future<PermissionStatus> checkPermission(PermissionEnum permission) async {
     switch (permission) {
-      case PermissionConst.photos:
+      case PermissionEnum.photos:
         if (kIsWeb) {
           throw UnsupportedError(
               'Unsupported on web for permission : $permission');
         }
         return await Permission.photos.status;
-      case PermissionConst.locationWhenInUse:
+      case PermissionEnum.locationWhenInUse:
         if (kIsWeb) {
           throw UnsupportedError(
               'Unsupported on web for permission : $permission');
         }
         return await Permission.locationWhenInUse.status;
-      case PermissionConst.calendarFullAccess:
+      case PermissionEnum.calendarFullAccess:
         if (kIsWeb) {
           throw UnsupportedError(
               'Unsupported on web for permission : $permission');
         }
         return await Permission.calendarFullAccess.status;
-      case PermissionConst.calendarWriteOnly:
+      case PermissionEnum.calendarWriteOnly:
         if (kIsWeb) {
           throw UnsupportedError(
               'Unsupported on web for permission : $permission');
         }
         return await Permission.calendarWriteOnly.status;
-      case PermissionConst.notifications:
+      case PermissionEnum.notifications:
         return await Permission.notification.status;
       default:
         throw ArgumentError('Unsupported permission: $permission');

@@ -20,27 +20,28 @@ class FullScreenRedirectionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
         child: SingleChildScrollView(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-          Text(
-            displayText,
-            style: Theme.of(context).textTheme.titleLarge,
-            textAlign: TextAlign.justify,
-          ),
-          UiConsts.SizedBoxGapVertical_large,
-          ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor:
-                    Theme.of(context).colorScheme.onPrimaryContainer,
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                padding: UiConsts.PaddingElevBtn,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
+            child: Padding(
+      padding: UiConsts.PaddingAll_large,
+      child:
+          Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text(
+          displayText,
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
+        UiConsts.SizedBoxGapVertical_large,
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              padding: UiConsts.PaddingElevBtn,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
               ),
-              onPressed: () => context.goNamed(destinationRouteName),
-              child: Text(callToActionBtnText))
-        ])));
+            ),
+            onPressed: () => context.goNamed(destinationRouteName),
+            child: Text(callToActionBtnText))
+      ]),
+    )));
   }
 }

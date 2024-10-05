@@ -9,6 +9,7 @@ Scaffold mainView(BuildContext context,
     required Widget body,
     List<Widget>? appbarActions = const [],
     Color? appBarBackgroundColor,
+    Color? backgroundColor,
     bool? extendBodyBehindAppBar = false}) {
   return Scaffold(
       extendBodyBehindAppBar: extendBodyBehindAppBar!,
@@ -22,6 +23,7 @@ Scaffold mainView(BuildContext context,
         ),
         actions: appbarActions,
       ),
-      backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+      backgroundColor:
+          backgroundColor ?? Theme.of(context).colorScheme.secondaryContainer,
       body: body);
 }

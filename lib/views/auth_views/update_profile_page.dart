@@ -4,16 +4,27 @@
 // TODO: edit this page
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:universal_io/io.dart';
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:xiaokeai/components/quick_settings_menu.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/helpers/get_platform_service.dart';
+import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
+import 'package:xiaokeai/services/dialog/dialog_service.dart';
+import 'package:xiaokeai/services/notifications/notification_manager.dart';
+import 'package:xiaokeai/services/notifications/notification_service.dart';
+import 'package:xiaokeai/services/object_storage/cloud_object_storage_wrapper.dart';
+import 'package:xiaokeai/shared/common/file_picker_enum.dart';
+import 'package:xiaokeai/shared/helpers/platform_enum.dart';
 import 'package:xiaokeai/shared/views/ui_consts.dart';
 
 class UpdateProfilePage extends StatefulWidget {
@@ -27,7 +38,11 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
+  final _platformDetectionService = PlatformDetectionService();
+  final _cloudObjectStorageWrapper = getIt<CloudObjectStorageWrapper>();
+  final Logger _logger = locator<Logger>();
   File? _image;
+  PlatformFile? _picToBeUploaded;
 
   @override
   void initState() {
@@ -37,12 +52,100 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   }
 
   Future<void> _getImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await _cloudObjectStorageWrapper
+        .handlePickImageOrFile(FilePickerMode.photoPicker);
     if (pickedFile != null) {
       setState(() {
-        _image = File(pickedFile.path);
+        _picToBeUploaded = pickedFile;
+        switch (_platformDetectionService.currentPlatform) {
+          case PlatformEnum.web:
+            _image = File.fromRawPath(pickedFile.bytes!);
+            break;
+          case PlatformEnum.android || PlatformEnum.iOS:
+            _image = File(pickedFile.path!);
+            break;
+          default:
+          // TODO: throws global error
+        }
       });
+    }
+  }
+
+  Future<void> _deleteImage() async {
+    // TODO: localize this
+    _authWrapper.refreshAttributes();
+    if (_image != null || _authWrapper.profilePicURL != '') {
+      final bool? confirmed = await DialogService.showConfirmationDialog(
+          context: context,
+          title: "Delete this profile picture?",
+          message:
+              "This will delete current profile picture immediately once you click 'CONTINUE'.",
+          confirmText: "CONTINUE");
+      if (confirmed == true) {
+        context.loaderOverlay.show();
+        setState(() {
+          CachedNetworkImage.evictFromCache(_authWrapper.profilePicURL);
+
+          _image = null;
+        });
+        await _authWrapper.handleRemoveProfilePic(context);
+      }
+    } else {
+      context.read<NotificationManager>().showNotification(
+          context,
+          NotificationData(
+              title: AppLocalizations.of(context)!.warning,
+              message: "There is no profile picture to delete.",
+              type: CustomNotificationType.warning));
+    }
+    context.loaderOverlay.hide();
+  }
+
+  Widget _renderImage() {
+    setState(() {
+      _authWrapper.refreshAttributes();
+      // _photoURL = _authWrapper.profilePicURL;
+    });
+    // _logger.w("------ ${_authWrapper.profilePicURL}");
+    var imageHolder = _image == null
+        ? Icon(Icons.add_a_photo, size: 50, color: Colors.grey)
+        : SizedBox(
+            child: Image.file(
+              _image!,
+              width: 100.0,
+              height: 100.0,
+              fit: BoxFit.cover,
+            ),
+          );
+    var networkImageHolder = CachedNetworkImage(
+      imageUrl: _authWrapper.profilePicURL,
+      width: 100.0,
+      height: 100.0,
+      fit: BoxFit.cover,
+      placeholder: (context, url) {
+        return Center(
+          child: CircularProgressIndicator.adaptive(),
+        );
+      },
+      errorWidget: (context, url, error) {
+        // TODO: throw global error here
+        _logger.e("error loading img: '${error.toString()}' from '$url'",
+            error: error, stackTrace: StackTrace.current);
+        return const Icon(Icons.error);
+      },
+    );
+    if ((_authWrapper.profilePicURL == "_Unauthenticated user_") ||
+        (_authWrapper.profilePicURL == '')) {
+      return imageHolder;
+    } else if (_image == null) {
+      if ((_authWrapper.profilePicURL == "_Unauthenticated user_") ||
+          (_authWrapper.profilePicURL == '')) {
+        return imageHolder;
+      } else {
+        return networkImageHolder;
+      }
+    } else {
+      return networkImageHolder;
     }
   }
 
@@ -77,18 +180,12 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                 children: [
                   GestureDetector(
                     onTap: _getImage,
-                    child: CircleAvatar(
-                      radius: 75,
-                      backgroundColor: Colors.white,
-                      backgroundImage:
-                          _image != null ? FileImage(_image!) : null,
-                      child: _image == null
-                          ? Icon(Icons.add_a_photo,
-                              size: 50, color: Colors.grey)
-                          : null,
+                    onDoubleTap: _deleteImage,
+                    child: ClipOval(
+                      child: _renderImage(),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  UiConsts.SizedBoxGapVertical_large,
                   TextFormField(
                       controller: _displayNameController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -158,7 +255,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     context.loaderOverlay.show();
     if (_formKey.currentState!.validate()) {
       await _authWrapper.handleUpdateUserAccountProfile(
-          context, _displayNameController.text);
+          context, _displayNameController.text, _picToBeUploaded);
       context.loaderOverlay.hide();
     }
     context.loaderOverlay.hide();

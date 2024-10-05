@@ -4,8 +4,11 @@
 /// are the top-level functions that will perform
 /// neccessary cloud object storage actions called when user trigger call to action btn (upload btn, download btn, etc.)
 
+// TODO: localize this file
+
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
@@ -17,6 +20,7 @@ import 'package:xiaokeai/services/notifications/notification_service.dart';
 import 'package:xiaokeai/services/object_storage/cloud_object_storage_service.dart';
 import 'package:xiaokeai/shared/common/file_picker_enum.dart';
 import 'package:xiaokeai/shared/services/firebase_storage_enum.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CloudObjectStorageWrapper {
   final Logger _logger = locator<Logger>();
@@ -24,6 +28,36 @@ class CloudObjectStorageWrapper {
       getIt<CloudObjectStorageService>();
 
   CloudObjectStorageWrapper();
+
+  Future<PlatformFile?> handlePickImageOrFile(context,
+      {FilePickerMode pickerMode = FilePickerMode.photoPicker}) async {
+    PlatformFile? file;
+    try {
+      file = await _cloudObjectStorageService.pickImageOrFile(pickerMode);
+    } on PlatformException catch (e) {
+      context.read<NotificationManager>().showNotification(
+          context,
+          NotificationData(
+              title: 'Failed: [${e.code}]',
+              message: e.message ??
+                  "Unexpected error occurred, likely is denied permission!",
+              type: CustomNotificationType.error));
+      rethrow;
+    } catch (e) {
+      context.read<NotificationManager>().showNotification(
+          context,
+          NotificationData(
+              title: 'Failed',
+              message: e.toString(),
+              type: CustomNotificationType.error));
+      rethrow;
+    }
+    if (file != null) {
+      return file;
+    } else {
+      return null;
+    }
+  }
 
   /// returns `[path, downloadUrl]`
   Future<List<String>?> handlePickAndUploadFile(BuildContext context,
@@ -39,11 +73,11 @@ class CloudObjectStorageWrapper {
             firebaseStoragePath: firebaseStoragePath);
         final path = uploadResult[0];
         final url = uploadResult[1];
-        _logger.i('File "$path" uploaded successfully. URL: $url');
+        _logger.d('File "$path" uploaded successfully. URL: $url');
         context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-                title: 'Success',
+                title: AppLocalizations.of(context)!.success,
                 message: "File uploaded!",
                 type: CustomNotificationType.success));
         return [path, url];
@@ -64,6 +98,57 @@ class CloudObjectStorageWrapper {
               title: 'Failed',
               message: e.toString(),
               type: CustomNotificationType.error));
+      rethrow;
+    }
+    return null;
+  }
+
+  /// returns `[path, downloadUrl]`
+  Future<List<String>?> handleUploadFile(
+      BuildContext context, PlatformFile? file,
+      {FilePickerMode? pickerMode = FilePickerMode.photoPicker,
+      FirebaseStoragePaths? firebaseStoragePath =
+          FirebaseStoragePaths.userContent,
+      bool showNotification = true}) async {
+    try {
+      if (file != null) {
+        _logger.d("uploading file: ${file.name}");
+        final uploadResult = await _cloudObjectStorageService.uploadFile(
+            'uploads/${file.name}', file,
+            firebaseStoragePath: firebaseStoragePath);
+        final path = uploadResult[0];
+        final url = uploadResult[1];
+        _logger.d('File "$path" uploaded successfully. URL: $url');
+        if (showNotification) {
+          context.read<NotificationManager>().showNotification(
+              context,
+              NotificationData(
+                  title: AppLocalizations.of(context)!.success,
+                  message: "File uploaded!",
+                  type: CustomNotificationType.success));
+        }
+        return [path, url];
+      }
+    } on PlatformException catch (e) {
+      if (showNotification) {
+        context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: 'Failed: [${e.code}]',
+                message: e.message ??
+                    "Unexpected error occurred, likely is denied permission!",
+                type: CustomNotificationType.error));
+      }
+      rethrow;
+    } catch (e) {
+      if (showNotification) {
+        context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: 'Failed',
+                message: e.toString(),
+                type: CustomNotificationType.error));
+      }
       rethrow;
     }
     return null;
@@ -102,23 +187,28 @@ class CloudObjectStorageWrapper {
 
   Future<void> handleDeleteAllFilesInFolder(BuildContext context,
       {FirebaseStoragePaths? firebaseStoragePath =
-          FirebaseStoragePaths.userContent}) async {
+          FirebaseStoragePaths.userContent,
+      bool showNotification = true}) async {
     try {
-      await _cloudObjectStorageService.deleteAllFilesInFolder(
-          firebaseStoragePath: firebaseStoragePath!);
-      context.read<NotificationManager>().showNotification(
-          context,
-          NotificationData(
-              title: 'Success',
-              message: "File(s) deleted!",
-              type: CustomNotificationType.success));
+      if (showNotification) {
+        await _cloudObjectStorageService.deleteAllFilesInFolder(
+            firebaseStoragePath: firebaseStoragePath!);
+        context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.success,
+                message: "File(s) deleted!",
+                type: CustomNotificationType.success));
+      }
     } catch (e) {
-      context.read<NotificationManager>().showNotification(
-          context,
-          NotificationData(
-              title: 'Failed',
-              message: e.toString(),
-              type: CustomNotificationType.error));
+      if (showNotification) {
+        context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+                title: AppLocalizations.of(context)!.failed,
+                message: e.toString(),
+                type: CustomNotificationType.error));
+      }
       rethrow;
     }
   }
