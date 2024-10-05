@@ -227,5 +227,21 @@
   "biometricProtection": "Biometric Protection",
   "@biometricProtection": {
     "description": "Biometric Protection"
+  },
+  "deleteThisProfilePicConfirmationTitle": "Delete this profile picture?",
+  "@deleteThisProfilePicConfirmationTitle": {
+    "description": "Confirmation title text to the dialog for delete profile pic"
+  },
+  "deleteThisProfilePicConfirmationMessage": "This will delete current profile picture immediately",
+  "@deleteThisProfilePicConfirmationMessage": {
+    "description": "Confirmation details text to the dialog for delete profile pic"
+  },
+  "noProfilePicToDelete": "There is no profile picture to delete.",
+  "@noProfilePicToDelete": {
+    "description": "There is no profile picture to delete."
+  },
+  "continueTxt": "Continue",
+  "@continueTxt": {
+    "description": "Continue"
   }
 }

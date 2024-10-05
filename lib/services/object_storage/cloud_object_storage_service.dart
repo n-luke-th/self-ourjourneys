@@ -105,13 +105,13 @@ class CloudObjectStorageService {
       // web does not use File, directly use Uint8List
       return await FlutterImageCompress.compressWithList(
         file.bytes!,
-        quality: 70,
+        quality: 60,
       );
     } else {
       final fileToCompress = File(file.path!);
       return await FlutterImageCompress.compressWithFile(
         fileToCompress.absolute.path,
-        quality: 70,
+        quality: 60,
       );
     }
   }

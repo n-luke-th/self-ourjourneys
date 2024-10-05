@@ -47,6 +47,10 @@
     "accessibility",
     "about",
     "passwordNotMatch",
-    "biometricProtection"
+    "biometricProtection",
+    "deleteThisProfilePicConfirmationTitle",
+    "deleteThisProfilePicConfirmationMessage",
+    "noProfilePicToDelete",
+    "continueTxt"
   ]
 }

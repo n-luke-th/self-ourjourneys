@@ -78,9 +78,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       final bool? confirmed = await DialogService.showConfirmationDialog(
           context: context,
           title: "Delete this profile picture?",
-          message:
-              "This will delete current profile picture immediately once you click 'CONTINUE'.",
-          confirmText: "CONTINUE");
+          message: AppLocalizations.of(context)!
+              .deleteThisProfilePicConfirmationMessage,
+          confirmText: AppLocalizations.of(context)!.continueTxt.toUpperCase());
       if (confirmed == true) {
         context.loaderOverlay.show();
         setState(() {
@@ -95,7 +95,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
           context,
           NotificationData(
               title: AppLocalizations.of(context)!.warning,
-              message: "There is no profile picture to delete.",
+              message: AppLocalizations.of(context)!.noProfilePicToDelete,
               type: CustomNotificationType.warning));
     }
     context.loaderOverlay.hide();
@@ -144,6 +144,8 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       } else {
         return networkImageHolder;
       }
+    } else if (_image != null) {
+      return imageHolder;
     } else {
       return networkImageHolder;
     }

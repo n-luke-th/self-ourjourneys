@@ -26,3 +26,4 @@
 - Initial Development: Improved the authentication and edit account process, improved the settings page and ui design for edit account pages, and other improvements on October 5, 2024 -> **0.1.8** by Luke
 - Initial Development: Improved the authentication and edit account process, added auth protected view wrapper and git stamp page, and other improvements on October 5, 2024 -> **0.1.9** by Luke
 - Initial Development: All authentication and edit account processes are working now, and other improvements on October 5, 2024 -> **0.2.0** by Luke
+- Initial Development: Fixed the update account profile picture image rendering bug, and other improvements on October 5, 2024 -> **0.2.1** by Luke
