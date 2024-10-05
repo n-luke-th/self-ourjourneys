@@ -136,10 +136,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                           Theme.of(context).colorScheme.onPrimaryContainer,
                       backgroundColor:
                           Theme.of(context).colorScheme.primaryContainer,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      padding: UiConsts.PaddingElevBtn,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: UiConsts.BorderRadiusCircular_standard,
                       ),
                     ),
                     child: Text(AppLocalizations.of(context)!

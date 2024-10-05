@@ -1,7 +1,6 @@
 /// lib/views/auth_views/login_page.dart
 ///
 /// login page
-/// TODO: edit this page
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';

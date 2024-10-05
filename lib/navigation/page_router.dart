@@ -10,9 +10,11 @@ import 'package:xiaokeai/views/auth_views/auth_flow.dart';
 import 'package:xiaokeai/views/auth_views/change_email_page.dart';
 import 'package:xiaokeai/views/auth_views/change_password_page.dart';
 import 'package:xiaokeai/views/auth_views/login_page.dart';
+import 'package:xiaokeai/views/auth_views/protected_auth_view_wrapper.dart';
 import 'package:xiaokeai/views/auth_views/reauth_user_page.dart';
 import 'package:xiaokeai/views/auth_views/reset_password_page.dart';
 import 'package:xiaokeai/views/auth_views/update_profile_page.dart';
+import 'package:xiaokeai/views/git_stamp_page.dart';
 import 'package:xiaokeai/views/home_page.dart';
 import 'package:xiaokeai/views/memories/memories_page.dart';
 import 'package:xiaokeai/views/memories/new_memory_page.dart';
@@ -34,58 +36,73 @@ final router = GoRouter(
         GoRoute(
           path: '/',
           name: 'HomePage',
-          builder: (context, state) => const HomePage(),
+          builder: (context, state) =>
+              ProtectedAuthViewWrapper(child: const HomePage()),
         ),
         GoRoute(
             path: '/settings',
             name: 'SettingsPage',
             builder: (context, state) {
-              return SettingsPage();
+              return ProtectedAuthViewWrapper(child: SettingsPage());
             },
             routes: [
               GoRoute(
                 path: 'change-password',
                 name: 'ChangePasswordPage',
                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => const ChangePasswordPage(),
+                builder: (context, state) =>
+                    ProtectedAuthViewWrapper(child: const ChangePasswordPage()),
               ),
               GoRoute(
                 path: 'change-email',
                 name: 'ChangeEmailPage',
                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => const ChangeEmailPage(),
+                builder: (context, state) =>
+                    ProtectedAuthViewWrapper(child: const ChangeEmailPage()),
               ),
               GoRoute(
                 path: 'update-profile',
                 name: 'UpdateProfilePage',
                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => const UpdateProfilePage(),
+                builder: (context, state) =>
+                    ProtectedAuthViewWrapper(child: const UpdateProfilePage()),
               ),
               GoRoute(
                 path: 'reauth/next=:next',
                 name: 'ReauthPage',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (context, state) {
-                  return ReauthUserPage(
-                      routeToBePushed: state.pathParameters['next']!);
+                  return ProtectedAuthViewWrapper(
+                    child: ReauthUserPage(
+                        routeToBePushed: state.pathParameters['next']!),
+                  );
                 },
+              ),
+              GoRoute(
+                path: 'git-stamp',
+                name: 'GitStampPage',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => const MyGitStampPage(),
               ),
             ]),
         GoRoute(
             path: '/memories',
             name: 'MemoriesPage',
-            builder: (context, state) => MemoriesPage(),
+            builder: (context, state) =>
+                ProtectedAuthViewWrapper(child: MemoriesPage()),
             routes: [
               GoRoute(
                 path: 'new/memory',
                 name: 'NewMemory',
-                builder: (context, state) => NewMemoryPage(),
+                builder: (context, state) =>
+                    ProtectedAuthViewWrapper(child: NewMemoryPage()),
               ),
             ]),
         GoRoute(
           path: '/albums',
           name: 'AlbumsPage',
-          builder: (context, state) => AlbumsPage(),
+          builder: (context, state) =>
+              ProtectedAuthViewWrapper(child: AlbumsPage()),
         ),
       ],
     ),

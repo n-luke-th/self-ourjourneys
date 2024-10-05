@@ -69,7 +69,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         size: 110,
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
-                      SizedBox(height: 30),
+                      UiConsts.SizedBoxGapVertical_large,
                       Text(
                         AppLocalizations.of(context)!.askForUserEmail,
                         style: TextStyle(
@@ -132,8 +132,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               Theme.of(context).colorScheme.onTertiaryContainer,
                           backgroundColor:
                               Theme.of(context).colorScheme.tertiaryContainer,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 15),
+                          padding: UiConsts.PaddingElevBtn,
                           shape: RoundedRectangleBorder(
                             borderRadius:
                                 UiConsts.BorderRadiusCircular_standard,

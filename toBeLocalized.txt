@@ -11,6 +11,7 @@
     "errorOccurred",
     "login",
     "resetPassword",
+    "newPassword",
     "confirmPassword",
     "loggedIn",
     "welcomeBackWithDisplayNameNext",
@@ -20,6 +21,7 @@
     "success",
     "warning",
     "failed",
+    "appearance",
     "reauthenticated",
     "reauthenticate",
     "youNeedToReauth",
@@ -36,6 +38,15 @@
     "updatePassword",
     "changeEmail",
     "updateProfile",
-    "displayName"
+    "displayName",
+    "permission",
+    "currentPermission",
+    "requestedPageMustBeAuthenticatedUser",
+    "goLoginNow",
+    "account",
+    "accessibility",
+    "about",
+    "passwordNotMatch",
+    "biometricProtection"
   ]
 }

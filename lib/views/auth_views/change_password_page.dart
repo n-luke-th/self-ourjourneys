@@ -1,11 +1,11 @@
 /// lib/views/auth_views/change_password_page.dart
 ///
 /// change password page
-/// TODO: edit this page
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:xiaokeai/components/main_view.dart';
+import 'package:xiaokeai/components/quick_settings_menu.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
@@ -65,6 +65,7 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
       appBarBackgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBarTitle: AppLocalizations.of(context)!.changePassword.toUpperCase(),
+      appbarActions: [QuickSettingsMenu()],
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -135,8 +136,10 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                                   });
                                 },
                               ),
-                              hintText: AppLocalizations.of(context)!.password,
-                              labelText: AppLocalizations.of(context)!.password,
+                              hintText:
+                                  AppLocalizations.of(context)!.newPassword,
+                              labelText:
+                                  AppLocalizations.of(context)!.newPassword,
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
@@ -184,8 +187,8 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                           // autofocus: false,
                           validator: (value) {
                             if (value != _passwordController.text) {
-                              // TODO: localize this
-                              return 'Passwords do not match';
+                              return AppLocalizations.of(context)!
+                                  .passwordNotMatch;
                             }
                             return null;
                           },
@@ -276,7 +279,7 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                               Theme.of(context).colorScheme.onPrimaryContainer,
                           backgroundColor:
                               Theme.of(context).colorScheme.primaryContainer,
-                          padding: UiConsts.PaddingAll_large,
+                          padding: UiConsts.PaddingElevBtn,
                           shape: RoundedRectangleBorder(
                             borderRadius:
                                 UiConsts.BorderRadiusCircular_standard,

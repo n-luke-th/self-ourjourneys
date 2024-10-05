@@ -6,7 +6,9 @@
 
 1. run `flutter clean && flutter pub get` to clean up and get dependencies
 
-2. run app on another terminal by using command `flutter run -d chrome --web-port 5555` (this will run on Chrome with port 5555)
+2. run `dart run git_stamp` to generated most recent git info (LTE version)
+
+3. run app on another terminal by using command `flutter run -d chrome --web-port 5555` (this will run on Chrome with port 5555)
 
 ## Notable config
 

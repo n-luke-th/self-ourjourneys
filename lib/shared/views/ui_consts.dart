@@ -34,6 +34,12 @@ class UiConsts {
   /// EdgeInsets.symmetric(horizontal: 16.0)
   static const PaddingHorizontal_large = EdgeInsets.symmetric(horizontal: 16.0);
 
+  /// EdgeInsets.only(bottom: 16);
+  static const PaddingBottom_large = EdgeInsets.only(bottom: 16);
+
+  /// EdgeInsets.only(bottom: 24);
+  static const PaddingBottom_extraLarge = EdgeInsets.only(bottom: 24);
+
   /// SizedBox(height: 8);
   static const SizedBoxGapVertical_standard = SizedBox(
     height: 8,
@@ -90,4 +96,8 @@ class UiConsts {
 
   /// double 10
   static const double margin_standard = 10;
+
+  ///  EdgeInsets.symmetric(horizontal: 50, vertical: 15)
+  static const PaddingElevBtn =
+      EdgeInsets.symmetric(horizontal: 50, vertical: 15);
 }

@@ -80,6 +80,10 @@
   "@password": {
     "description": "Password"
   },
+  "newPassword": "New Password",
+  "@newPassword": {
+    "description": "New Password"
+  },
   "confirmPassword": "Confirm Password",
   "@confirmPassword": {
     "description": "Confirm Password"
@@ -115,6 +119,10 @@
   "failed": "Failed!",
   "@failed": {
     "description": "Failed!"
+  },
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "Appearance"
   },
   "reauthenticated": "Reauthenticated!",
   "@reauthenticated": {
@@ -183,5 +191,41 @@
   "displayName": "Display name",
   "@displayName": {
     "description": "Display name"
+  },
+  "permission": "Permission",
+  "@permission": {
+    "description": "Permission"
+  },
+  "currentPermission": "Current Permissions",
+  "@currentPermission": {
+    "description": "Current Permissions"
+  },
+  "requestedPageMustBeAuthenticatedUser": "The page you have requested requires you to be an authenticated user.",
+  "@requestedPageMustBeAuthenticatedUser": {
+    "description": "The page you have requested requires you to be an authenticated user."
+  },
+  "goLoginNow": "Go Login now!",
+  "@goLoginNow": {
+    "description": "Go Login now!"
+  },
+  "account": "Account",
+  "@account": {
+    "description": "Account"
+  },
+  "accessibility": "Accessibility",
+  "@accessibility": {
+    "description": "Accessibility"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About"
+  },
+  "passwordNotMatch": "Passwords do not match!",
+  "@passwordNotMatch": {
+    "description": "Passwords do not match!"
+  },
+  "biometricProtection": "Biometric Protection",
+  "@biometricProtection": {
+    "description": "Biometric Protection"
   }
 }

@@ -118,13 +118,18 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       child: Consumer<SettingsService>(
         builder: (context, settings, child) {
-          return ListView(
-            clipBehavior: Clip.antiAlias,
-            children: [
-              _accountSection(context),
-              _appearanceSection(context, settings),
-              _permissionSection(context)
-            ],
+          return Padding(
+            padding: UiConsts.PaddingBottom_extraLarge,
+            child: ListView(
+              clipBehavior: Clip.antiAlias,
+              children: [
+                _accountSection(context),
+                _appearanceSection(context, settings),
+                _permissionSection(context),
+                _accessibilitySection(context),
+                _aboutSection(context)
+              ],
+            ),
           );
         },
       ),
@@ -138,9 +143,9 @@ class _SettingsPageState extends State<SettingsPage> {
         Align(
           alignment: Alignment.topLeft,
           child: Padding(
-            padding: UiConsts.PaddingAll_large,
+            padding: UiConsts.PaddingAll_standard,
             child: Text(
-              "Account",
+              AppLocalizations.of(context)!.account,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSecondary,
                   fontSize:
@@ -149,7 +154,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: Text("Update profile"),
+          title: Text(AppLocalizations.of(context)!.updateProfile),
           onTap: () => context.pushReplacementNamed("UpdateProfilePage"),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -240,9 +245,9 @@ class _SettingsPageState extends State<SettingsPage> {
         Align(
           alignment: Alignment.topLeft,
           child: Padding(
-            padding: UiConsts.PaddingAll_large,
+            padding: UiConsts.PaddingAll_standard,
             child: Text(
-              "Appearance",
+              AppLocalizations.of(context)!.appearance,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSecondary,
                   fontSize:
@@ -283,9 +288,9 @@ class _SettingsPageState extends State<SettingsPage> {
         Align(
           alignment: Alignment.topLeft,
           child: Padding(
-            padding: UiConsts.PaddingAll_large,
+            padding: UiConsts.PaddingAll_standard,
             child: Text(
-              "Permission",
+              AppLocalizations.of(context)!.permission,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSecondary,
                   fontSize:
@@ -294,7 +299,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: Text("Current Permission"),
+          title: Text(AppLocalizations.of(context)!.currentPermission),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -309,7 +314,7 @@ class _SettingsPageState extends State<SettingsPage> {
               return Column(
                 children: [
                   Text(
-                    'Current Permissions',
+                    AppLocalizations.of(context)!.currentPermission,
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const Divider(),
@@ -356,7 +361,63 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget profileSection() {
+  Column _accessibilitySection(BuildContext context) {
+    return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+      Align(
+        alignment: Alignment.topLeft,
+        child: Padding(
+          padding: UiConsts.PaddingAll_standard,
+          child: Text(
+            AppLocalizations.of(context)!.accessibility,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
+          ),
+        ),
+      ),
+      ListTile(
+        title: Text(AppLocalizations.of(context)!.biometricProtection),
+        onTap: () => {},
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            UiConsts.spaceForTextAndElement,
+            const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+          ],
+        ),
+      ),
+    ]);
+  }
+
+  Column _aboutSection(BuildContext context) {
+    return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+      Align(
+        alignment: Alignment.topLeft,
+        child: Padding(
+          padding: UiConsts.PaddingAll_standard,
+          child: Text(
+            AppLocalizations.of(context)!.about,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
+          ),
+        ),
+      ),
+      ListTile(
+        title: Text("Git Stamps"),
+        onTap: () => context.pushReplacementNamed("GitStampPage"),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            UiConsts.spaceForTextAndElement,
+            const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+          ],
+        ),
+      ),
+    ]);
+  }
+
+  Container profileSection() {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(

@@ -1,7 +1,6 @@
 /// lib/views/auth_views/reauth_user_page.dart
 ///
 /// reauthenticate user page
-// TODO: edit this page
 
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -250,7 +249,7 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                               ),
                               border: InputBorder.none)),
                       UiConsts.SizedBoxGapVertical_large,
-                      UiConsts.SizedBoxGapVertical_large,
+                      UiConsts.SizedBoxGapVertical_standard,
                       ElevatedButton(
                         onPressed: () async => _reauth(widget.routeToBePushed),
                         style: ElevatedButton.styleFrom(

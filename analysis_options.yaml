@@ -10,6 +10,7 @@
 analyzer:
   errors:
     dangling_library_doc_comments: ignore
+    unnecessary_library_name: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:
