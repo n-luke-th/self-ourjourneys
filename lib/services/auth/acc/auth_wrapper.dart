@@ -437,13 +437,14 @@ class AuthWrapper {
           firebaseStoragePath: FirebaseStoragePaths.profile,
           showNotification: false);
 
+      String? url;
       if (uploadResult != null) {
-        final url = uploadResult[1];
+        url = uploadResult[1];
         // ignore: unused_local_variable
         final path = uploadResult[0];
-        await _auth.updateUserAccountProfile(
-            newDisplayName: newDisplayName, newProfilePicURL: url);
       }
+      await _auth.updateUserAccountProfile(
+          newDisplayName: newDisplayName, newProfilePicURL: url);
 
       context.read<NotificationManager>().showNotification(
             context,

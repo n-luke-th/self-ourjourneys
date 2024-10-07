@@ -243,5 +243,9 @@
   "continueTxt": "Continue",
   "@continueTxt": {
     "description": "Continue"
+  },
+  "collections": "Collections",
+  "@collections": {
+    "description": "Collections"
   }
 }

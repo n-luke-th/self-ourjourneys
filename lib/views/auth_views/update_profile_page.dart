@@ -227,7 +227,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                           ),
                           border: InputBorder.none),
                       validator: FormBuilderValidators.maxLength(24)),
-                  SizedBox(height: 30),
+                  UiConsts.SizedBoxGapVertical_large,
                   ElevatedButton(
                     onPressed: () async => _updateProfile(),
                     style: ElevatedButton.styleFrom(

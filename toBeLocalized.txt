@@ -51,6 +51,7 @@
     "deleteThisProfilePicConfirmationTitle",
     "deleteThisProfilePicConfirmationMessage",
     "noProfilePicToDelete",
-    "continueTxt"
+    "continueTxt",
+    "collections"
   ]
 }

@@ -28,3 +28,4 @@
 - Initial Development: All authentication and edit account processes are working now, and other improvements on October 5, 2024 -> **0.2.0** by Luke
 - Initial Development: Fixed the update account profile picture image rendering bug, and other improvements on October 5, 2024 -> **0.2.1** by Luke
 - Initial Development: Added the email sent page, and other improvements on October 6, 2024 -> **0.2.2** by Luke
+- Initial Development: Fixed the update account profile bug, added the placeholder for the 'Collections' page, and other improvements on October 8, 2024 -> **0.2.3** by Luke

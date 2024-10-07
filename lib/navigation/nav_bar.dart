@@ -17,7 +17,7 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  int currentIndex = 0;
+  int currentIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +48,16 @@ class _NavBarState extends State<NavBar> {
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           surfaceTintColor: Colors.amber,
           destinations: [
+            // collections
             NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
+              icon: const Icon(Icons.collections_bookmark_outlined),
               selectedIcon: Icon(
-                Icons.home,
+                Icons.collections_bookmark_rounded,
                 color: ThemeData.light().colorScheme.tertiaryContainer,
               ),
-              label: AppLocalizations.of(context)!.home,
+              label: AppLocalizations.of(context)!.collections,
             ),
+            // memories
             NavigationDestination(
               icon: const Icon(Icons.favorite_outline_rounded),
               selectedIcon: Icon(
@@ -64,6 +66,16 @@ class _NavBarState extends State<NavBar> {
               ),
               label: AppLocalizations.of(context)!.memories,
             ),
+            // home
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: Icon(
+                Icons.home,
+                color: ThemeData.light().colorScheme.tertiaryContainer,
+              ),
+              label: AppLocalizations.of(context)!.home,
+            ),
+            // albums
             NavigationDestination(
               icon: const Icon(Icons.auto_awesome_mosaic_outlined),
               selectedIcon: Icon(
@@ -72,6 +84,7 @@ class _NavBarState extends State<NavBar> {
               ),
               label: AppLocalizations.of(context)!.albums,
             ),
+            // settings
             NavigationDestination(
               icon: const Icon(Icons.settings_outlined),
               selectedIcon: Icon(
@@ -95,16 +108,22 @@ class _NavBarState extends State<NavBar> {
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
       case 0:
-        context.goNamed("HomePage");
+        context.goNamed("CollectionsPage");
         break;
       case 1:
         GoRouter.of(context).go('/memories');
         break;
       case 2:
-        GoRouter.of(context).go('/albums');
+        context.goNamed("HomePage");
         break;
       case 3:
+        GoRouter.of(context).go('/albums');
+        break;
+      case 4:
         GoRouter.of(context).go('/settings');
+        break;
+      default:
+        context.goNamed("HomePage");
         break;
     }
     setState(() {

@@ -14,6 +14,7 @@ import 'package:xiaokeai/views/auth_views/protected_auth_view_wrapper.dart';
 import 'package:xiaokeai/views/auth_views/reauth_user_page.dart';
 import 'package:xiaokeai/views/auth_views/reset_password_page.dart';
 import 'package:xiaokeai/views/auth_views/update_profile_page.dart';
+import 'package:xiaokeai/views/collections/collections_page.dart';
 import 'package:xiaokeai/views/git_stamp_page.dart';
 import 'package:xiaokeai/views/home_page.dart';
 import 'package:xiaokeai/views/memories/memories_page.dart';
@@ -49,28 +50,28 @@ final router = GoRouter(
               GoRoute(
                 path: 'change-password',
                 name: 'ChangePasswordPage',
-                parentNavigatorKey: _rootNavigatorKey,
+                parentNavigatorKey: _navbarNavigatorKey,
                 builder: (context, state) =>
                     ProtectedAuthViewWrapper(child: const ChangePasswordPage()),
               ),
               GoRoute(
                 path: 'change-email',
                 name: 'ChangeEmailPage',
-                parentNavigatorKey: _rootNavigatorKey,
+                parentNavigatorKey: _navbarNavigatorKey,
                 builder: (context, state) =>
                     ProtectedAuthViewWrapper(child: const ChangeEmailPage()),
               ),
               GoRoute(
                 path: 'update-profile',
                 name: 'UpdateProfilePage',
-                parentNavigatorKey: _rootNavigatorKey,
+                parentNavigatorKey: _navbarNavigatorKey,
                 builder: (context, state) =>
                     ProtectedAuthViewWrapper(child: const UpdateProfilePage()),
               ),
               GoRoute(
                 path: 'reauth/next=:next',
                 name: 'ReauthPage',
-                parentNavigatorKey: _rootNavigatorKey,
+                parentNavigatorKey: _navbarNavigatorKey,
                 builder: (context, state) {
                   return ProtectedAuthViewWrapper(
                     child: ReauthUserPage(
@@ -81,10 +82,17 @@ final router = GoRouter(
               GoRoute(
                 path: 'git-stamp',
                 name: 'GitStampPage',
-                parentNavigatorKey: _rootNavigatorKey,
+                parentNavigatorKey: _navbarNavigatorKey,
                 builder: (context, state) => const MyGitStampPage(),
               ),
             ]),
+        GoRoute(
+          path: '/collections',
+          name: 'CollectionsPage',
+          parentNavigatorKey: _navbarNavigatorKey,
+          builder: (context, state) =>
+              ProtectedAuthViewWrapper(child: CollectionsPage()),
+        ),
         GoRoute(
             path: '/memories',
             name: 'MemoriesPage',
