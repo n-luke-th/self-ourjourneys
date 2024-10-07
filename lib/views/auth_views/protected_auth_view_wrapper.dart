@@ -23,8 +23,8 @@ class ProtectedAuthViewWrapper extends StatelessWidget {
       _logger.d("current user is authenticated!");
       return child;
     } else {
-      _logger
-          .d("current user is not authenticated!\nredirecting to login page");
+      _logger.d(
+          "current user is not authenticated!\nsuggested to redirect to login page");
       return FullScreenRedirectionPage(
         callToActionBtnText: AppLocalizations.of(context)!.goLoginNow,
         displayText:

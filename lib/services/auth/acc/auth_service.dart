@@ -73,6 +73,8 @@ class AuthService with ChangeNotifier {
       case "requires-recent-login":
         // TODO: make sure to handle the redirection and identity verification
         return "You are required to verify your identity before process.";
+      case "user-token-expired":
+        return "Login credential is no longer valid, please logout & sign in again.";
 
       /// default error msg
       default:
@@ -209,6 +211,12 @@ class AuthService with ChangeNotifier {
         throw AuthException(
             process: process,
             errorEnum: AuthErrors.AUTH_C11,
+            error: e,
+            errorDetailsFromDependency: "${e.code}...${e.message!}");
+      case "user-token-expired":
+        throw AuthException(
+            process: process,
+            errorEnum: AuthErrors.AUTH_C12,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
 

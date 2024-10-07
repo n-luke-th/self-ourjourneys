@@ -44,6 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    _authWrapper.handleRefreshUser();
     Future.microtask(
         () => context.read<PackageInfoProvider>().loadPackageInfo());
 

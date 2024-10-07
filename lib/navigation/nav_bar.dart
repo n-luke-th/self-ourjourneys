@@ -28,7 +28,7 @@ class _NavBarState extends State<NavBar> {
           labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>(
             (Set<WidgetState> states) {
               return TextStyle(
-                fontSize: 20,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.onSurface,
               );
@@ -48,15 +48,6 @@ class _NavBarState extends State<NavBar> {
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           surfaceTintColor: Colors.amber,
           destinations: [
-            // collections
-            NavigationDestination(
-              icon: const Icon(Icons.collections_bookmark_outlined),
-              selectedIcon: Icon(
-                Icons.collections_bookmark_rounded,
-                color: ThemeData.light().colorScheme.tertiaryContainer,
-              ),
-              label: AppLocalizations.of(context)!.collections,
-            ),
             // memories
             NavigationDestination(
               icon: const Icon(Icons.favorite_outline_rounded),
@@ -65,6 +56,15 @@ class _NavBarState extends State<NavBar> {
                 color: ThemeData.light().colorScheme.tertiaryContainer,
               ),
               label: AppLocalizations.of(context)!.memories,
+            ),
+            // albums
+            NavigationDestination(
+              icon: const Icon(Icons.auto_awesome_mosaic_outlined),
+              selectedIcon: Icon(
+                Icons.auto_awesome_mosaic_rounded,
+                color: ThemeData.light().colorScheme.tertiaryContainer,
+              ),
+              label: AppLocalizations.of(context)!.albums,
             ),
             // home
             NavigationDestination(
@@ -75,14 +75,14 @@ class _NavBarState extends State<NavBar> {
               ),
               label: AppLocalizations.of(context)!.home,
             ),
-            // albums
+            // collections
             NavigationDestination(
-              icon: const Icon(Icons.auto_awesome_mosaic_outlined),
+              icon: const Icon(Icons.collections_bookmark_outlined),
               selectedIcon: Icon(
-                Icons.auto_awesome_mosaic_rounded,
+                Icons.collections_bookmark_rounded,
                 color: ThemeData.light().colorScheme.tertiaryContainer,
               ),
-              label: AppLocalizations.of(context)!.albums,
+              label: AppLocalizations.of(context)!.collections,
             ),
             // settings
             NavigationDestination(
@@ -108,16 +108,16 @@ class _NavBarState extends State<NavBar> {
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
       case 0:
-        context.goNamed("CollectionsPage");
+        GoRouter.of(context).go('/memories');
         break;
       case 1:
-        GoRouter.of(context).go('/memories');
+        GoRouter.of(context).go('/albums');
         break;
       case 2:
         context.goNamed("HomePage");
         break;
       case 3:
-        GoRouter.of(context).go('/albums');
+        context.goNamed("CollectionsPage");
         break;
       case 4:
         GoRouter.of(context).go('/settings');

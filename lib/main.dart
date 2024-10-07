@@ -100,6 +100,7 @@ Future<void> logSettingsConfig(
   final platformService = getIt<PlatformDetectionService>();
   final packageInfoService = getIt<PackageInfoService>();
   final packageInfo = await packageInfoService.getPackageInfo();
+  logger.d("Application is starting...");
   logger.d("\tXiaokeai:\n"
       ">>> Platform: '${platformService.readableCurrentPlatform}'\n"
       ">>> Version '${packageInfo.version}'");

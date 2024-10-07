@@ -47,6 +47,9 @@ enum AuthErrors implements ErrorType {
   /// User is required to verify their identity before proceeding.
   AUTH_C11('You are required to verify your identity before process.'),
 
+  /// Login credential is no longer valid, please logout & login again.
+  AUTH_C12("Login credential is no longer valid, please logout & login again."),
+
   // Server-side errors (AUTH_S)
 
   /// Something went wrong with our backend service, please try again. (error thrown from backend service but don't know what it is)

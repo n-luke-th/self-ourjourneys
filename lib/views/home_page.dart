@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:xiaokeai/components/main_view.dart';
+import 'package:xiaokeai/helpers/dependencies_injection.dart';
+import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,6 +15,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
+
+  @override
+  void initState() {
+    super.initState();
+    _authWrapper.handleRefreshUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return mainView(context,
