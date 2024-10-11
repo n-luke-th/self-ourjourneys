@@ -52,6 +52,7 @@
     "deleteThisProfilePicConfirmationMessage",
     "noProfilePicToDelete",
     "continueTxt",
-    "collections"
+    "collections",
+    "tripCollections"
   ]
 }

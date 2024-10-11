@@ -6,14 +6,12 @@
 // TODO: edit this auth service file
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:xiaokeai/errors/auth_exception/auth_exception.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
 import 'package:xiaokeai/helpers/rate_limiter.dart';
 import 'package:xiaokeai/shared/errors_code_and_msg/auth_errors.dart';
-// import 'package:flutter/foundation.dart'
-//     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -73,7 +71,7 @@ class AuthService with ChangeNotifier {
       case "requires-recent-login":
         // TODO: make sure to handle the redirection and identity verification
         return "You are required to verify your identity before process.";
-      case "user-token-expired":
+      case "user-token-expired" || "auth/user-token-expired":
         return "Login credential is no longer valid, please logout & sign in again.";
 
       /// default error msg
@@ -213,7 +211,7 @@ class AuthService with ChangeNotifier {
             errorEnum: AuthErrors.AUTH_C11,
             error: e,
             errorDetailsFromDependency: "${e.code}...${e.message!}");
-      case "user-token-expired":
+      case "user-token-expired" || "auth/user-token-expired":
         throw AuthException(
             process: process,
             errorEnum: AuthErrors.AUTH_C12,

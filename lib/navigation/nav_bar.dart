@@ -83,6 +83,7 @@ class _NavBarState extends State<NavBar> {
                 color: ThemeData.light().colorScheme.tertiaryContainer,
               ),
               label: AppLocalizations.of(context)!.collections,
+              tooltip: AppLocalizations.of(context)!.tripCollections,
             ),
             // settings
             NavigationDestination(

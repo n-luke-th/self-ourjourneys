@@ -247,5 +247,9 @@
   "collections": "Collections",
   "@collections": {
     "description": "Collections"
+  },
+  "tripCollections": "Trip Collections",
+  "@tripCollections": {
+    "description": "Trip Collections"
   }
 }
