@@ -31,3 +31,4 @@
 - Initial Development: Fixed the update account profile bug, added the placeholder for the 'Collections' page, and other improvements on October 8, 2024 -> **0.2.3** by Luke
 - Initial Development: Improved the authentication service and error exception, changed & improved the navbar arrangement and font size, and other improvements on October 8, 2024 -> **0.2.4** by Luke
 - Initial Development: Minor improvements on October 11, 2024 -> **0.2.5** by Luke
+- Initial Development: Added more log information, and upgraded the dependency constraints on October 26, 2024 -> **0.2.51** by Luke

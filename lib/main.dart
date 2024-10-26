@@ -100,11 +100,14 @@ Future<void> logSettingsConfig(
   final platformService = getIt<PlatformDetectionService>();
   final packageInfoService = getIt<PackageInfoService>();
   final packageInfo = await packageInfoService.getPackageInfo();
-  logger.d("Application is starting...");
+  logger
+      .d("${DateTime.now().toLocal()}: Application is starting/restarting...");
   logger.d("\tXiaokeai:\n"
       ">>> Platform: '${platformService.readableCurrentPlatform}'\n"
-      ">>> Version '${packageInfo.version}'");
-  logger.d("\tUser Preferences:\n"
+      ">>> Version '${packageInfo.version}'\n"
+      ">>> Package Name: '${packageInfo.packageName}'\n"
+      //
+      "\tUser Preferences:\n"
       ">>> Language Code: '${prefs.getString('languageCode')}'\n"
       ">>> Is System Default Language: '${prefs.getBool('isSystemDefault')}'\n"
       ">>> Theme Mode: '${ThemeMode.values[prefs.getInt('themeMode') ?? ThemeMode.system.index].toString().split('.').last}'\n"
