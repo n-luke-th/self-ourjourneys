@@ -458,56 +458,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // /// reauthenticate user with Google provider
-  // Future<UserCredential?> reauthenticateUserWithGoogle() async {
-  //   // if current platform is web
-  //   if (kIsWeb) {
-  //     try {
-  //       GoogleAuthProvider googleProvider = GoogleAuthProvider();
-  //       googleProvider
-  //           .addScope('https://www.googleapis.com/auth/contacts.readonly');
-  //       googleProvider.setCustomParameters({'login_hint': 'user@thaitune.io'});
-  //       return await _auth.currentUser?.reauthenticateWithPopup(googleProvider);
-  //     } on FirebaseAuthException catch (e) {
-  //       _mapFirebaseErrorsAndThrowsError(e, "reauth with Google");
-  //     } catch (e) {
-  //       throw AuthException(
-  //           process: "reauth with Google",
-  //           errorEnum: AuthErrors.AUTH_U00,
-  //           st: StackTrace.current,
-  //           errorDetailsFromDependency: e.toString(),
-  //           error: e);
-  //     }
-  //   }
-  //   // if current platform is mobile or other
-  //   switch (defaultTargetPlatform) {
-  //     case TargetPlatform.android || TargetPlatform.iOS:
-  //       try {
-  //         final googleUser = await GoogleSignIn().signIn();
-  //         final googleAuth = await googleUser?.authentication;
-  //         final credential = GoogleAuthProvider.credential(
-  //             idToken: googleAuth?.idToken,
-  //             accessToken: googleAuth?.accessToken);
-  //         return await _auth.currentUser
-  //             ?.reauthenticateWithCredential(credential);
-  //       } on FirebaseAuthException catch (e) {
-  //         _mapFirebaseErrorsAndThrowsError(e, "reauth with Google");
-  //       } catch (e) {
-  //         throw AuthException(
-  //             process: "reauth with Google",
-  //             errorEnum: AuthErrors.AUTH_U00,
-  //             st: StackTrace.current,
-  //             errorDetailsFromDependency: e.toString(),
-  //             error: e);
-  //       }
-  //     default:
-  //       throw UnsupportedError(
-  //         'Sorry, we currently have no support for this platform: $defaultTargetPlatform',
-  //       );
-  //   }
-  //   return null;
-  // }
-
   /// verify user's new account email
   Future<void> verifyUserNewEmail(String newEmail) async {
     try {

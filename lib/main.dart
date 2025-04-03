@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';

@@ -4,7 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:xiaokeai/shared/views/ui_consts.dart';
 
 class NavBar extends StatefulWidget {

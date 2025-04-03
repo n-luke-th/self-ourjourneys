@@ -8,7 +8,8 @@ import 'package:logger/logger.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/views/auth_views/full_screen_auth_redirection_page.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 
 class ProtectedAuthViewWrapper extends StatelessWidget {
   final Widget child;

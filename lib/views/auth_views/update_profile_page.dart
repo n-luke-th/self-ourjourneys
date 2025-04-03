@@ -13,7 +13,8 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:universal_io/io.dart';
 import 'package:xiaokeai/components/main_view.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:xiaokeai/components/quick_settings_menu.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/get_platform_service.dart';

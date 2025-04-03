@@ -1,11 +1,13 @@
 /// lib/services/configs/appearance/lang/language_provider.dart
 
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
+
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 
 class LanguageProvider with ChangeNotifier {

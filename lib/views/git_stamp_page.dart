@@ -6,10 +6,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:xiaokeai/git_stamp/git_stamp_node.dart';
 import 'package:xiaokeai/git_stamp/src/ui/git_stamp_list_tile.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 
 class MyGitStampPage extends StatelessWidget {
   const MyGitStampPage({super.key});

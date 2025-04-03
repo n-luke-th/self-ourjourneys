@@ -6,7 +6,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xiaokeai/components/main_view.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:xiaokeai/components/quick_settings_menu.dart';
 import 'package:xiaokeai/shared/views/ui_consts.dart';
 
@@ -62,7 +63,7 @@ class EmailSentPage extends StatelessWidget {
                     UiConsts.SizedBoxGapVertical_large,
                     UiConsts.SizedBoxGapVertical_large,
                     ElevatedButton(
-                      onPressed: () => context.goNamed("AuthFlow"),
+                      onPressed: () => context.goNamed("LoginPage"),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             Theme.of(context).colorScheme.onTertiaryContainer,

@@ -21,7 +21,8 @@ import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/services/dialog/dialog_service.dart';
 import 'package:xiaokeai/services/notifications/notification_manager.dart';
 import 'package:xiaokeai/services/notifications/notification_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:xiaokeai/services/object_storage/cloud_object_storage_wrapper.dart';
 import 'package:xiaokeai/shared/services/firebase_storage_enum.dart';
 import 'package:xiaokeai/views/auth_views/email_sent_page.dart';

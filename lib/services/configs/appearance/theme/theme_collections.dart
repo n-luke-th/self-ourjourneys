@@ -17,7 +17,6 @@ class ThemeCollections {
   static const _subThemesData = FlexSubThemesData(
     blendOnLevel: 10,
     blendOnColors: false,
-    useTextTheme: true,
     useM2StyleDividerInM3: true,
     alignedDropdown: true,
     useInputDecoratorThemeInDialogs: true,

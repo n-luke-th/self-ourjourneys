@@ -13,14 +13,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:xiaokeai/services/notifications/notification_manager.dart';
 import 'package:xiaokeai/services/notifications/notification_service.dart';
 import 'package:xiaokeai/services/object_storage/cloud_object_storage_service.dart';
 import 'package:xiaokeai/shared/common/file_picker_enum.dart';
 import 'package:xiaokeai/shared/services/firebase_storage_enum.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CloudObjectStorageWrapper {
   final Logger _logger = locator<Logger>();

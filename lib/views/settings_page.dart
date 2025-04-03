@@ -16,7 +16,8 @@ import 'package:provider/provider.dart';
 import 'package:xiaokeai/components/main_view.dart';
 import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/helpers/logger_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:xiaokeai/services/auth/acc/auth_service.dart';
 import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/services/bottom_sheet/bottom_sheet_service.dart';
@@ -448,7 +449,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: ClipOval(
                       child: CachedNetworkImage(
                         imageUrl: value.authInstance!.currentUser?.photoURL ??
-                            "https://ui-avatars.com/api/?background=8FE8FF&color=fff&name=${value.authInstance!.currentUser?.email ?? 'Xiaokeai'}",
+                            "https://ui-avatars.com/api/?background=8FE8FF&color=fff&name=Xiaokeai",
                         placeholder: (context, url) {
                           return Center(
                             child: CircularProgressIndicator.adaptive(),

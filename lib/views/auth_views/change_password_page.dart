@@ -10,7 +10,8 @@ import 'package:xiaokeai/helpers/dependencies_injection.dart';
 import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
 import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 import 'package:xiaokeai/shared/views/ui_consts.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});

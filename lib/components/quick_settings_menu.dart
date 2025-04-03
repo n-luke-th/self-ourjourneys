@@ -2,7 +2,8 @@
 ///
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
+    show AppLocalizations;
 import 'package:xiaokeai/services/configs/settings_service.dart';
 
 class QuickSettingsMenu extends StatelessWidget {
