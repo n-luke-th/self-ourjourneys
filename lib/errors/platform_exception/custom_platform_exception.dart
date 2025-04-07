@@ -2,7 +2,7 @@
 ///
 ///
 /// Platform-related exceptions
-import 'package:xiaokeai/errors/base/base_exception.dart';
+import 'package:ourjourneys/errors/base/base_exception.dart';
 
 class CustomPlatformException extends BaseException {
   CustomPlatformException({

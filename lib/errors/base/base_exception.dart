@@ -2,13 +2,13 @@
 ///
 /// base class for global error exception
 import 'package:logger/logger.dart';
-import 'package:xiaokeai/errors/base/base_error_enum.dart';
-import 'package:xiaokeai/helpers/logger_provider.dart';
+import 'package:ourjourneys/errors/base/base_error_enum.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
 
 abstract class BaseException implements Exception {
   final ErrorType errorEnum;
   final String? process;
-  final Logger _logger = locator<Logger>();
+  final Logger _logger = getIt<Logger>();
   final String? errorDetailsFromDependency;
   final Object? error;
   final StackTrace? st;

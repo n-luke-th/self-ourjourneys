@@ -4,29 +4,25 @@
 ///
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
+import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/services/auth/acc/auth_service.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart';
+import 'package:ourjourneys/services/configs/settings_service.dart';
+import 'package:ourjourneys/services/configs/utils/permission_service.dart';
+import 'package:ourjourneys/services/notifications/notification_manager.dart';
+import 'package:ourjourneys/services/notifications/notification_service.dart';
+import 'package:ourjourneys/services/package/package_info_provider.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:xiaokeai/components/main_view.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/helpers/logger_provider.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
-import 'package:xiaokeai/services/auth/acc/auth_service.dart';
-import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
-import 'package:xiaokeai/services/bottom_sheet/bottom_sheet_service.dart';
-import 'package:xiaokeai/services/configs/settings_service.dart';
-import 'package:xiaokeai/services/configs/utils/permission_service.dart';
-import 'package:xiaokeai/services/notifications/notification_manager.dart';
-import 'package:xiaokeai/services/notifications/notification_service.dart';
-import 'package:xiaokeai/services/package/package_info_provider.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -37,7 +33,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
-  final Logger _logger = locator<Logger>();
+  final Logger _logger = getIt<Logger>();
   final PermissionsService _permissionsService = getIt<PermissionsService>();
   late PackageInfo packageInfo;
   late Future<Map<Permission, PermissionStatus>> _statuses;
@@ -56,10 +52,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return mainView(
       context,
-      appBarTitle: AppLocalizations.of(context)!.settings,
+      appBarTitle: "Settings".toUpperCase(),
       appbarActions: [
         IconButton(
-          tooltip: AppLocalizations.of(context)!.logout,
+          tooltip: "logout",
           onPressed: () async => _showLogoutConfirmation(context),
           icon: Icon(
             Icons.logout_outlined,
@@ -100,8 +96,7 @@ class _SettingsPageState extends State<SettingsPage> {
           return Padding(
             padding: UiConsts.PaddingAll_standard,
             child: Center(
-              child: Text(
-                  '${AppLocalizations.of(context)!.version}: ${packageInfo.version}'),
+              child: Text('version: ${packageInfo.version}'),
             ),
           );
         })
@@ -147,7 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Padding(
             padding: UiConsts.PaddingAll_standard,
             child: Text(
-              AppLocalizations.of(context)!.account,
+              "Account",
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSecondary,
                   fontSize:
@@ -156,7 +151,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: Text(AppLocalizations.of(context)!.updateProfile),
+          title: Text("Update Profile"),
           onTap: () => context.pushReplacementNamed("UpdateProfilePage"),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -167,7 +162,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: Text(AppLocalizations.of(context)!.updateEmailOrPassword),
+          title: Text("Update Password/Email"),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -203,7 +198,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                         Text(
-                          AppLocalizations.of(context)!.whatToBeUpdated,
+                          "Update Password or Email",
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
                         UiConsts.SizedBoxGapVertical_large,
@@ -211,8 +206,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             ListTile(
-                              title: Text(
-                                  AppLocalizations.of(context)!.updateEmail),
+                              title: Text("Update email"),
                               onTap: () => context.pushReplacementNamed(
                                   "ReauthPage",
                                   pathParameters: <String, String>{
@@ -220,8 +214,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   }),
                             ),
                             ListTile(
-                              title: Text(
-                                  AppLocalizations.of(context)!.updatePassword),
+                              title: Text("Update password"),
                               onTap: () => context.pushReplacementNamed(
                                   "ReauthPage",
                                   pathParameters: {
@@ -249,7 +242,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Padding(
             padding: UiConsts.PaddingAll_standard,
             child: Text(
-              AppLocalizations.of(context)!.appearance,
+              "Appearance",
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSecondary,
                   fontSize:
@@ -258,7 +251,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         SettingDropdown<ThemeMode>(
-          title: AppLocalizations.of(context)!.themeMode,
+          title: "Theme mode",
           value: settings.themeMode,
           items: ThemeMode.values,
           onChanged: (newValue) => _updateSetting(
@@ -267,17 +260,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           itemBuilder: (mode) =>
               Text(mode.toString().split('.').last.toUpperCase()),
-        ),
-        SettingDropdown<Locale?>(
-          title: AppLocalizations.of(context)!.language,
-          value: settings.currentLocaleOrNull,
-          items: settings.supportedLocalesWithDefault,
-          onChanged: (newValue) => _updateSetting(
-            context,
-            () => settings.setLocale(newValue),
-          ),
-          itemBuilder: (locale) =>
-              Text(settings.getLanguageName(locale, context)),
         ),
       ],
     );
@@ -292,7 +274,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Padding(
             padding: UiConsts.PaddingAll_standard,
             child: Text(
-              AppLocalizations.of(context)!.permission,
+              "Permissions",
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSecondary,
                   fontSize:
@@ -301,7 +283,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: Text(AppLocalizations.of(context)!.currentPermission),
+          title: Text("Current permission"),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -316,7 +298,7 @@ class _SettingsPageState extends State<SettingsPage> {
               return Column(
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.currentPermission,
+                    "Current permission",
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const Divider(),
@@ -370,7 +352,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Padding(
           padding: UiConsts.PaddingAll_standard,
           child: Text(
-            AppLocalizations.of(context)!.accessibility,
+            "Accessibility",
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onSecondary,
                 fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
@@ -378,7 +360,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
       ListTile(
-        title: Text(AppLocalizations.of(context)!.biometricProtection),
+        title: Text("Biometric protection"),
         onTap: () => {},
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -398,7 +380,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Padding(
           padding: UiConsts.PaddingAll_standard,
           child: Text(
-            AppLocalizations.of(context)!.about,
+            "About",
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onSecondary,
                 fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
@@ -443,33 +425,6 @@ class _SettingsPageState extends State<SettingsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Align(
-                  child: SizedBox.square(
-                    dimension: 90,
-                    child: ClipOval(
-                      child: CachedNetworkImage(
-                        imageUrl: value.authInstance!.currentUser?.photoURL ??
-                            "https://ui-avatars.com/api/?background=8FE8FF&color=fff&name=Xiaokeai",
-                        placeholder: (context, url) {
-                          return Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          );
-                        },
-                        errorWidget: (context, url, error) {
-                          // TODO: throw global error here
-                          _logger.e(
-                              "error loading img: '${error.toString()}' from '$url'",
-                              error: error,
-                              stackTrace: StackTrace.current);
-                          return const Icon(Icons.error);
-                        },
-                        width: 100.0,
-                        height: 100.0,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
                 // UiConsts.SizedBoxGapVertical_small,
                 Text(
                   value.authInstance!.currentUser?.displayName ??
@@ -498,8 +453,8 @@ Future<void> _updateSetting(
       context.read<NotificationManager>().showNotification(
             context,
             NotificationData(
-              title: AppLocalizations.of(context)!.success,
-              message: AppLocalizations.of(context)!.newChangeApplied,
+              title: "New Change Applied",
+              message: "Your setting has been updated",
               type: CustomNotificationType.success,
             ),
           );
@@ -511,7 +466,7 @@ Future<void> _updateSetting(
     context.read<NotificationManager>().showNotification(
           context,
           NotificationData(
-              title: AppLocalizations.of(context)!.errorOccurred,
+              title: "Update Failed",
               message: 'error details',
               type: CustomNotificationType.error),
         );

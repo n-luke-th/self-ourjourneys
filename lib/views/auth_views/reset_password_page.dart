@@ -6,13 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
-import 'package:xiaokeai/components/main_view.dart';
-import 'package:xiaokeai/components/quick_settings_menu.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
-import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
+import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/quick_settings_menu.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -36,7 +34,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget build(BuildContext context) {
     return mainView(
       context,
-      appBarTitle: AppLocalizations.of(context)!.resetPassword.toUpperCase(),
+      appBarTitle: "reset password".toUpperCase(),
       appBarBackgroundColor: Colors.transparent,
       appbarActions: [QuickSettingsMenu()],
       extendBodyBehindAppBar: true,
@@ -73,7 +71,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       ),
                       UiConsts.SizedBoxGapVertical_large,
                       Text(
-                        AppLocalizations.of(context)!.askForUserEmail,
+                        "Your email",
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18),
@@ -87,8 +85,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: InputDecoration(
                               prefixIcon: Icon(Icons.email_rounded),
-                              hintText: AppLocalizations.of(context)!.email,
-                              labelText: AppLocalizations.of(context)!.email,
+                              hintText: "email",
+                              labelText: "email",
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
@@ -140,9 +138,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 UiConsts.BorderRadiusCircular_standard,
                           ),
                         ),
-                        child: Text(AppLocalizations.of(context)!
-                            .resetPassword
-                            .toUpperCase()),
+                        child: Text("reset password".toUpperCase()),
                       ),
                     ],
                   ),

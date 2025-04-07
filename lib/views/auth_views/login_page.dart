@@ -6,14 +6,12 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
-import 'package:xiaokeai/components/main_view.dart';
-import 'package:xiaokeai/components/quick_settings_menu.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
-import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
-import 'package:xiaokeai/services/pref/shared_pref_service.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
+import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/quick_settings_menu.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/services/pref/shared_pref_service.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -66,7 +64,7 @@ class _LoginPage extends State<LoginPage> {
       context,
       appBarBackgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-      appBarTitle: AppLocalizations.of(context)!.login.toUpperCase(),
+      appBarTitle: "login".toUpperCase(),
       appbarActions: [QuickSettingsMenu()],
       body: Container(
         decoration: BoxDecoration(
@@ -122,8 +120,8 @@ class _LoginPage extends State<LoginPage> {
                           cursorColor: labelTextColorEmail,
                           decoration: InputDecoration(
                               prefixIcon: Icon(Icons.email_rounded),
-                              hintText: AppLocalizations.of(context)!.email,
-                              labelText: AppLocalizations.of(context)!.email,
+                              hintText: "email",
+                              labelText: "email",
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
@@ -201,8 +199,8 @@ class _LoginPage extends State<LoginPage> {
                                   });
                                 },
                               ),
-                              hintText: AppLocalizations.of(context)!.password,
-                              labelText: AppLocalizations.of(context)!.password,
+                              hintText: "password",
+                              labelText: "password",
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
@@ -258,9 +256,7 @@ class _LoginPage extends State<LoginPage> {
                                   .colorScheme
                                   .onSecondaryContainer),
                           child: Text(
-                            AppLocalizations.of(context)!
-                                .resetPassword
-                                .toUpperCase(),
+                            "reset password".toUpperCase(),
                             style: TextStyle(
                                 color: Theme.of(context)
                                     .colorScheme
@@ -282,8 +278,7 @@ class _LoginPage extends State<LoginPage> {
                                 UiConsts.BorderRadiusCircular_standard,
                           ),
                         ),
-                        child: Text(
-                            AppLocalizations.of(context)!.login.toUpperCase()),
+                        child: Text("login".toUpperCase()),
                       ),
                     ],
                   ),

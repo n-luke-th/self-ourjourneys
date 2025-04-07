@@ -3,9 +3,7 @@
 /// a landing page for collections feature
 ///
 import 'package:flutter/material.dart';
-import 'package:xiaokeai/components/main_view.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
+import 'package:ourjourneys/components/main_view.dart';
 
 class CollectionsPage extends StatelessWidget {
   const CollectionsPage({super.key});
@@ -13,8 +11,7 @@ class CollectionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return mainView(context,
-        appBarTitle: AppLocalizations.of(context)!.collections,
-        body: Center(
-            child: Text(AppLocalizations.of(context)!.underDevelopment)));
+        appBarTitle: "Collections".toUpperCase(),
+        body: Center(child: Text("Collections feature is under development!")));
   }
 }

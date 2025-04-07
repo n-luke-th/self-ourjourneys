@@ -3,14 +3,13 @@
 /// a theme provider that wraps the collection
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/helpers/logger_provider.dart';
-import 'package:xiaokeai/services/configs/appearance/theme/theme_collections.dart';
-import 'package:xiaokeai/services/pref/shared_pref_service.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/services/configs/appearance/theme/theme_collections.dart';
+import 'package:ourjourneys/services/pref/shared_pref_service.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
-  final Logger _logger = locator<Logger>();
+  final Logger _logger = getIt<Logger>();
   final SharedPreferencesService _prefs = getIt<SharedPreferencesService>();
 
   ThemeProvider() {

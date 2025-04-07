@@ -4,29 +4,19 @@
 // TODO: edit this page
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:logger/logger.dart';
-import 'package:provider/provider.dart';
+import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/quick_settings_menu.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/get_platform_service.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/services/object_storage/cloud_object_storage_wrapper.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 import 'package:universal_io/io.dart';
-import 'package:xiaokeai/components/main_view.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
-import 'package:xiaokeai/components/quick_settings_menu.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/helpers/get_platform_service.dart';
-import 'package:xiaokeai/helpers/logger_provider.dart';
-import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
-import 'package:xiaokeai/services/dialog/dialog_service.dart';
-import 'package:xiaokeai/services/notifications/notification_manager.dart';
-import 'package:xiaokeai/services/notifications/notification_service.dart';
-import 'package:xiaokeai/services/object_storage/cloud_object_storage_wrapper.dart';
-import 'package:xiaokeai/shared/common/file_picker_enum.dart';
-import 'package:xiaokeai/shared/helpers/platform_enum.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
 
 class UpdateProfilePage extends StatefulWidget {
   const UpdateProfilePage({super.key});
@@ -41,7 +31,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   final _displayNameController = TextEditingController();
   final _platformDetectionService = PlatformDetectionService();
   final _cloudObjectStorageWrapper = getIt<CloudObjectStorageWrapper>();
-  final Logger _logger = locator<Logger>();
+  final Logger _logger = getIt<Logger>();
   File? _image;
   PlatformFile? _picToBeUploaded;
 
@@ -52,111 +42,11 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     _displayNameController.text = _authWrapper.displayName;
   }
 
-  Future<void> _getImage() async {
-    final pickedFile = await _cloudObjectStorageWrapper
-        .handlePickImageOrFile(FilePickerMode.photoPicker);
-    if (pickedFile != null) {
-      setState(() {
-        _picToBeUploaded = pickedFile;
-        switch (_platformDetectionService.currentPlatform) {
-          case PlatformEnum.web:
-            _image = File.fromRawPath(pickedFile.bytes!);
-            break;
-          case PlatformEnum.android || PlatformEnum.iOS:
-            _image = File(pickedFile.path!);
-            break;
-          default:
-          // TODO: throws global error
-        }
-      });
-    }
-  }
-
-  Future<void> _deleteImage() async {
-    // TODO: localize this
-    _authWrapper.refreshAttributes();
-    if (_image != null || _authWrapper.profilePicURL != '') {
-      final bool? confirmed = await DialogService.showConfirmationDialog(
-          context: context,
-          title: "Delete this profile picture?",
-          message: AppLocalizations.of(context)!
-              .deleteThisProfilePicConfirmationMessage,
-          confirmText: AppLocalizations.of(context)!.continueTxt.toUpperCase());
-      if (confirmed == true) {
-        context.loaderOverlay.show();
-        setState(() {
-          CachedNetworkImage.evictFromCache(_authWrapper.profilePicURL);
-
-          _image = null;
-        });
-        await _authWrapper.handleRemoveProfilePic(context);
-      }
-    } else {
-      context.read<NotificationManager>().showNotification(
-          context,
-          NotificationData(
-              title: AppLocalizations.of(context)!.warning,
-              message: AppLocalizations.of(context)!.noProfilePicToDelete,
-              type: CustomNotificationType.warning));
-    }
-    context.loaderOverlay.hide();
-  }
-
-  Widget _renderImage() {
-    setState(() {
-      _authWrapper.refreshAttributes();
-      // _photoURL = _authWrapper.profilePicURL;
-    });
-    // _logger.w("------ ${_authWrapper.profilePicURL}");
-    var imageHolder = _image == null
-        ? Icon(Icons.add_a_photo, size: 50, color: Colors.grey)
-        : SizedBox(
-            child: Image.file(
-              _image!,
-              width: 100.0,
-              height: 100.0,
-              fit: BoxFit.cover,
-            ),
-          );
-    var networkImageHolder = CachedNetworkImage(
-      imageUrl: _authWrapper.profilePicURL,
-      width: 100.0,
-      height: 100.0,
-      fit: BoxFit.cover,
-      placeholder: (context, url) {
-        return Center(
-          child: CircularProgressIndicator.adaptive(),
-        );
-      },
-      errorWidget: (context, url, error) {
-        // TODO: throw global error here
-        _logger.e("error loading img: '${error.toString()}' from '$url'",
-            error: error, stackTrace: StackTrace.current);
-        return const Icon(Icons.error);
-      },
-    );
-    if ((_authWrapper.profilePicURL == "_Unauthenticated user_") ||
-        (_authWrapper.profilePicURL == '')) {
-      return imageHolder;
-    } else if (_image == null) {
-      if ((_authWrapper.profilePicURL == "_Unauthenticated user_") ||
-          (_authWrapper.profilePicURL == '')) {
-        return imageHolder;
-      } else {
-        return networkImageHolder;
-      }
-    } else if (_image != null) {
-      return imageHolder;
-    } else {
-      return networkImageHolder;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return mainView(
       context,
-      appBarTitle: AppLocalizations.of(context)!.updateProfile.toUpperCase(),
+      appBarTitle: "Update profile".toUpperCase(),
       appBarBackgroundColor: Colors.transparent,
       appbarActions: [QuickSettingsMenu()],
       extendBodyBehindAppBar: true,
@@ -181,20 +71,20 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    onTap: _getImage,
-                    onDoubleTap: _deleteImage,
-                    child: ClipOval(
-                      child: _renderImage(),
-                    ),
-                  ),
+                  // GestureDetector(
+                  //   onTap: _getImage,
+                  //   onDoubleTap: _deleteImage,
+                  //   child: ClipOval(
+                  //     child: _renderImage(),
+                  //   ),
+                  // ),
                   UiConsts.SizedBoxGapVertical_large,
                   TextFormField(
                       controller: _displayNameController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.displayName,
-                          labelText: AppLocalizations.of(context)!.displayName,
+                          hintText: "display name",
+                          labelText: "display name",
                           floatingLabelBehavior: FloatingLabelBehavior.auto,
                           floatingLabelAlignment: FloatingLabelAlignment.center,
                           floatingLabelStyle: TextStyle(
@@ -241,9 +131,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                         borderRadius: UiConsts.BorderRadiusCircular_standard,
                       ),
                     ),
-                    child: Text(AppLocalizations.of(context)!
-                        .updateProfile
-                        .toUpperCase()),
+                    child: Text("update profile".toUpperCase()),
                   ),
                 ],
               ),
@@ -257,8 +145,8 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   Future<void> _updateProfile() async {
     context.loaderOverlay.show();
     if (_formKey.currentState!.validate()) {
-      await _authWrapper.handleUpdateUserAccountProfile(
-          context, _displayNameController.text, _picToBeUploaded);
+      await _authWrapper.handleUpdateDisplayName(
+          context, _displayNameController);
       context.loaderOverlay.hide();
     }
     context.loaderOverlay.hide();

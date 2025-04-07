@@ -6,14 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
-import 'package:xiaokeai/components/main_view.dart';
-import 'package:xiaokeai/components/quick_settings_menu.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
-import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
-import 'package:xiaokeai/services/pref/shared_pref_service.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
+import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/quick_settings_menu.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/services/pref/shared_pref_service.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class ReauthUserPage extends StatefulWidget {
   final String routeToBePushed;
@@ -67,7 +65,7 @@ class _ReauthUserPage extends State<ReauthUserPage> {
       context,
       appBarBackgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-      appBarTitle: AppLocalizations.of(context)!.reauthenticate.toUpperCase(),
+      appBarTitle: "Reauthenticate",
       appbarActions: [QuickSettingsMenu()],
       body: Container(
         decoration: BoxDecoration(
@@ -104,7 +102,7 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                       Text(
                           style: Theme.of(context).textTheme.titleMedium,
                           textAlign: TextAlign.center,
-                          "${AppLocalizations.of(context)!.youNeedToReauth}: ${widget.routeToBePushed.contains('Email') == true ? AppLocalizations.of(context)!.changeEmail : AppLocalizations.of(context)!.changePassword}"),
+                          "You need to reauthenticate: ${widget.routeToBePushed.contains('Email') == true ? 'Change email' : 'Chage password'}"),
                       UiConsts.SizedBoxGapVertical_large,
                       TextFormField(
                           key: _emailKey,
@@ -128,8 +126,8 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                           cursorColor: labelTextColorEmail,
                           decoration: InputDecoration(
                               prefixIcon: Icon(Icons.email_rounded),
-                              hintText: AppLocalizations.of(context)!.email,
-                              labelText: AppLocalizations.of(context)!.email,
+                              hintText: "email",
+                              labelText: "email",
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
@@ -207,8 +205,8 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                                   });
                                 },
                               ),
-                              hintText: AppLocalizations.of(context)!.password,
-                              labelText: AppLocalizations.of(context)!.password,
+                              hintText: "password",
+                              labelText: "password",
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
@@ -265,9 +263,7 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                                 UiConsts.BorderRadiusCircular_standard,
                           ),
                         ),
-                        child: Text(AppLocalizations.of(context)!
-                            .reauthenticate
-                            .toUpperCase()),
+                        child: Text("reauthenticate".toUpperCase()),
                       ),
                     ],
                   ),

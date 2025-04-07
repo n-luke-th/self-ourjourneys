@@ -1,4 +1,4 @@
-package com.lukecreated.xiaokeai
+package com.lukecreated.ourjourneys
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

@@ -3,7 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:universal_io/io.dart';
-import 'package:xiaokeai/shared/services/permission_enum.dart';
+import 'package:ourjourneys/shared/services/permission_enum.dart';
 
 class PermissionsService {
   final List<Permission> _permissions = [

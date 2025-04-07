@@ -5,28 +5,22 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
+import 'package:ourjourneys/firebase_options.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/get_platform_service.dart';
+import 'package:ourjourneys/navigation/page_router.dart';
+import 'package:ourjourneys/services/auth/acc/auth_service.dart';
+import 'package:ourjourneys/services/configs/appearance/theme/theme_provider.dart';
+import 'package:ourjourneys/services/configs/settings_service.dart';
+import 'package:ourjourneys/services/notifications/notification_manager.dart';
+import 'package:ourjourneys/services/package/package_info_provider.dart';
+import 'package:ourjourneys/services/package/package_info_service.dart';
+import 'package:ourjourneys/services/pref/shared_pref_service.dart';
 import 'package:provider/provider.dart';
-import 'package:xiaokeai/firebase_options.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/helpers/get_platform_service.dart';
-import 'package:xiaokeai/helpers/logger_provider.dart';
-import 'package:xiaokeai/navigation/page_router.dart';
-import 'package:xiaokeai/services/auth/acc/auth_service.dart';
-import 'package:xiaokeai/services/configs/appearance/lang/language_provider.dart';
-import 'package:xiaokeai/services/configs/appearance/theme/theme_provider.dart';
-import 'package:xiaokeai/services/configs/settings_service.dart';
-import 'package:xiaokeai/services/notifications/notification_manager.dart';
-import 'package:xiaokeai/services/package/package_info_provider.dart';
-import 'package:xiaokeai/services/package/package_info_service.dart';
-import 'package:xiaokeai/services/pref/shared_pref_service.dart';
 
 Future<void> _configureServices() async {
   setupLogger();
@@ -44,19 +38,15 @@ void _main() async {
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
     await _configureServices();
-    final LanguageProvider languageProvider = LanguageProvider();
     final ThemeProvider themeProvider = ThemeProvider();
-    await languageProvider.loadFromPrefs();
     await themeProvider.loadFromPrefs();
     FlutterNativeSplash.remove();
     LoadingAnimationWidget.fourRotatingDots(
       color: Color(0xFF8FE8FF),
       size: 35,
     );
-    final settingsService = SettingsService(
-        languageProvider: languageProvider, themeProvider: themeProvider);
-    await logSettingsConfig(
-        themeProvider: themeProvider, languageProvider: languageProvider);
+    final settingsService = SettingsService(themeProvider: themeProvider);
+    await logSettingsConfig(themeProvider: themeProvider);
     runApp(
       MultiProvider(
         providers: [
@@ -74,11 +64,11 @@ void _main() async {
             dispose: (_, manager) => manager.dispose(),
           ),
         ],
-        child: Xiaokeai(),
+        child: OurJourneys(),
       ),
     );
   } on Exception catch (e) {
-    final Logger logger = locator<Logger>();
+    final Logger logger = getIt<Logger>();
     logger.e(e.toString(), error: e, stackTrace: StackTrace.current);
     runApp(Text("Error starting the app: ${e.toString()}"));
   }
@@ -88,15 +78,13 @@ void main() {
   runZonedGuarded(() {
     _main();
   }, (error, stackTrace) {
-    final Logger logger = locator<Logger>();
+    final Logger logger = getIt<Logger>();
     logger.e(error.toString(), error: error, stackTrace: stackTrace);
   });
 }
 
-Future<void> logSettingsConfig(
-    {required ThemeProvider themeProvider,
-    required LanguageProvider languageProvider}) async {
-  final Logger logger = locator<Logger>();
+Future<void> logSettingsConfig({required ThemeProvider themeProvider}) async {
+  final Logger logger = getIt<Logger>();
   SharedPreferencesService prefs = getIt<SharedPreferencesService>();
   final platformService = getIt<PlatformDetectionService>();
   final packageInfoService = getIt<PackageInfoService>();
@@ -114,13 +102,11 @@ Future<void> logSettingsConfig(
       ">>> Theme Mode: '${ThemeMode.values[prefs.getInt('themeMode') ?? ThemeMode.system.index].toString().split('.').last}'\n"
       //
       "\tApplied Settings:\n"
-      ">>> Language: '${languageProvider.currentLocale.languageCode}'\n"
-      ">>> Is System Default Language: '${languageProvider.isSystemDefault}'\n"
       ">>> Theme Mode: '${themeProvider.themeMode.toString().split(".").last}'");
 }
 
-class Xiaokeai extends StatelessWidget {
-  const Xiaokeai({super.key});
+class OurJourneys extends StatelessWidget {
+  const OurJourneys({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -137,15 +123,8 @@ class Xiaokeai extends StatelessWidget {
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'Xiaokeai',
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            FormBuilderLocalizations.delegate,
-          ],
-          supportedLocales: settings.supportedLocales,
-          locale: settings.currentLocale,
+          supportedLocales: const <Locale>[Locale('en', 'US')],
+          locale: Locale("en", "US"),
           themeMode: settings.themeMode,
           theme: settings.themeProvider.lightTheme,
           darkTheme: settings.themeProvider.darkTheme,

@@ -7,21 +7,21 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
-import 'package:xiaokeai/errors/auth_exception/auth_exception.dart';
-import 'package:xiaokeai/helpers/logger_provider.dart';
-import 'package:xiaokeai/helpers/rate_limiter.dart';
-import 'package:xiaokeai/shared/errors_code_and_msg/auth_errors.dart';
+import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/rate_limiter.dart';
+import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final Logger _logger = locator<Logger>();
+  final Logger _logger = getIt<Logger>();
   final RateLimiter _rateLimiter = RateLimiter();
 
   FirebaseAuth? get authInstance => _auth;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  static String getReadableFirebaseAuthErrorMessage(FirebaseAuthException e) {
+  static String getReadableErrorMessage(FirebaseAuthException e) {
     switch (e.code) {
       /// below are shared cases
       case 'invalid-email':
@@ -69,7 +69,6 @@ class AuthService with ChangeNotifier {
 
       /// others
       case "requires-recent-login":
-        // TODO: make sure to handle the redirection and identity verification
         return "You are required to verify your identity before process.";
       case "user-token-expired" || "auth/user-token-expired":
         return "Login credential is no longer valid, please logout & sign in again.";
@@ -80,7 +79,7 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  void _mapFirebaseErrorsAndThrowsError(
+  void mapFirebaseErrorsAndThrowsError(
       FirebaseAuthException e, String process) {
     switch (e.code) {
       /// below are shared cases
@@ -230,14 +229,21 @@ class AuthService with ChangeNotifier {
 
   Future<UserCredential?> signInWithEmailAndPassword(
       String email, String password) async {
+    _logger.d("attempt counting: ${_rateLimiter.getAttempts(email)}");
     if (!_rateLimiter.canAttempt(email)) {
-      throw AuthException(errorEnum: AuthErrors.AUTH_C07, process: 'login');
+      throw RateLimitExceededException(
+              rateLimiter: _rateLimiter, identifier: email)
+          .getErrorDetails();
     }
+
     try {
-      return await _auth.signInWithEmailAndPassword(
+      final credential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
+      // Reset attempts after successful authentication
+      _rateLimiter.resetAttempts(email);
+      return credential;
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, 'login');
+      mapFirebaseErrorsAndThrowsError(e, 'login');
     } catch (e) {
       throw AuthException(
           process: "login",
@@ -251,15 +257,21 @@ class AuthService with ChangeNotifier {
 
   Future<UserCredential?> registerWithEmailAndPassword(
       String email, String password) async {
+    _logger.d("attempt counting: ${_rateLimiter.getAttempts(email)}");
     if (!_rateLimiter.canAttempt(email)) {
-      throw AuthException(errorEnum: AuthErrors.AUTH_C07, process: 'register');
+      throw RateLimitExceededException(
+              rateLimiter: _rateLimiter, identifier: email)
+          .getErrorDetails();
     }
 
     try {
-      return await _auth.createUserWithEmailAndPassword(
+      final credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      // Reset attempts after successful registration
+      _rateLimiter.resetAttempts(email);
+      return credential;
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, 'register');
+      mapFirebaseErrorsAndThrowsError(e, 'register');
     } catch (e) {
       throw AuthException(
           process: "register",
@@ -277,7 +289,7 @@ class AuthService with ChangeNotifier {
       await _auth.signOut();
       _logger.i("logout success");
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, 'signout');
+      mapFirebaseErrorsAndThrowsError(e, 'signout');
     } catch (e) {
       throw AuthException(
           process: "signout",
@@ -288,24 +300,15 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  /// set the Firebase Auth locale to the given language code
-  ///
-  /// When set to null, sets the user-facing language code to be the default app language.
-  Future<void> setAuthLocale(String? languageCode) async {
-    await _auth.setLanguageCode(languageCode);
-    _logger.d("Auth language is now '${languageCode ?? _auth.languageCode}'");
-    notifyListeners();
-  }
-
   /// send a reset password email to user
   ///
   /// must call `completePasswordReset` after
   Future<void> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      _logger.d("reset password email has been sent to email: '$email'");
+      _logger.i("reset password email has been sent to email: $email");
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, 'reset user account password');
+      mapFirebaseErrorsAndThrowsError(e, 'reset user account password');
     } catch (e) {
       throw AuthException(
           process: "reset user account password",
@@ -323,7 +326,7 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.confirmPasswordReset(code: code, newPassword: newPassword);
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, 'reset user account password');
+      mapFirebaseErrorsAndThrowsError(e, 'reset user account password');
     } catch (e) {
       throw AuthException(
           process: "reset user account password",
@@ -337,12 +340,11 @@ class AuthService with ChangeNotifier {
   /// sign user out and delete the account
   /// make sure to handle the redirection and identity verification
   ///
-  /// TODO: make sure to handle the redirection and identity verification
   Future<void> deleteAccount() async {
     try {
       await _auth.currentUser?.delete();
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, 'delete user account');
+      mapFirebaseErrorsAndThrowsError(e, 'delete user account');
     } catch (e) {
       throw AuthException(
           process: "delete user account",
@@ -362,7 +364,7 @@ class AuthService with ChangeNotifier {
           displayName: newDisplayName, photoURL: newProfilePicURL);
       notifyListeners();
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, "update user's profile");
+      mapFirebaseErrorsAndThrowsError(e, "update user's profile");
     } catch (e) {
       throw AuthException(
           process: "update user's profile",
@@ -379,7 +381,7 @@ class AuthService with ChangeNotifier {
       await _auth.currentUser?.updateDisplayName(newDisplayName);
       notifyListeners();
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, "update user's display name");
+      mapFirebaseErrorsAndThrowsError(e, "update user's display name");
     } catch (e) {
       throw AuthException(
           process: "update user's display name",
@@ -391,12 +393,12 @@ class AuthService with ChangeNotifier {
   }
 
   /// update user account details: `PhotoURL`
-  Future<void> updateUserAccountProfilePic(String? newProfilePicURL) async {
+  Future<void> updateUserAccountProfilePic(String newProfilePicURL) async {
     try {
       await _auth.currentUser?.updatePhotoURL(newProfilePicURL);
       notifyListeners();
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, "update user's profile pic");
+      mapFirebaseErrorsAndThrowsError(e, "update user's profile pic");
     } catch (e) {
       throw AuthException(
           process: "update user's profile pic",
@@ -412,7 +414,7 @@ class AuthService with ChangeNotifier {
     try {
       await _auth.currentUser?.updatePassword(newPassword);
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, "update user's account password");
+      mapFirebaseErrorsAndThrowsError(e, "update user's account password");
     } catch (e) {
       throw AuthException(
           process: "update user's account password",
@@ -424,14 +426,11 @@ class AuthService with ChangeNotifier {
   }
 
   /// update user account's email
-  ///
-  /// must call `verifyUserNewEmail` before
   Future<void> updateUserAccountEmail(String newEmail) async {
     try {
       await _auth.currentUser?.verifyBeforeUpdateEmail(newEmail);
-      notifyListeners();
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, "update user's account email");
+      mapFirebaseErrorsAndThrowsError(e, "update user's account email");
     } catch (e) {
       throw AuthException(
           process: "update user's account email",
@@ -444,10 +443,19 @@ class AuthService with ChangeNotifier {
 
   /// reauthenticate user
   Future<void> reauthenticateUser(AuthCredential credential) async {
+    _logger.d(
+        "attempt counting: ${_rateLimiter.getAttempts(credential.toString())}");
+    if (!_rateLimiter.canAttempt(credential.toString())) {
+      throw RateLimitExceededException(
+              rateLimiter: _rateLimiter, identifier: credential.toString())
+          .getErrorDetails();
+    }
     try {
       await _auth.currentUser?.reauthenticateWithCredential(credential);
+      // Reset attempts after successful reauthentication
+      _rateLimiter.resetAttempts(credential.toString());
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, "reauthenticate user");
+      mapFirebaseErrorsAndThrowsError(e, "reauthenticate user");
     } catch (e) {
       throw AuthException(
           process: "reauthenticate user",
@@ -459,11 +467,13 @@ class AuthService with ChangeNotifier {
   }
 
   /// verify user's new account email
+  @Deprecated(
+      'use `updateUserAccountEmail()` to verify and update the user email instead')
   Future<void> verifyUserNewEmail(String newEmail) async {
     try {
       await _auth.currentUser?.verifyBeforeUpdateEmail(newEmail);
     } on FirebaseAuthException catch (e) {
-      _mapFirebaseErrorsAndThrowsError(e, "verify user's account new email");
+      mapFirebaseErrorsAndThrowsError(e, "verify user's account new email");
     } catch (e) {
       throw AuthException(
           process: "verify user's account new email",

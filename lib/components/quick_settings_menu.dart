@@ -2,9 +2,7 @@
 ///
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
-import 'package:xiaokeai/services/configs/settings_service.dart';
+import 'package:ourjourneys/services/configs/settings_service.dart';
 
 class QuickSettingsMenu extends StatelessWidget {
   const QuickSettingsMenu({super.key});
@@ -21,9 +19,9 @@ class QuickSettingsMenu extends StatelessWidget {
                 _changeThemeMode(context, settings);
                 break;
 
-              case 'language':
-                _changeLanguage(context, settings);
-                break;
+              // case 'language':
+              //   _changeLanguage(context, settings);
+              //   break;
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -35,14 +33,14 @@ class QuickSettingsMenu extends StatelessWidget {
                     'Theme Mode: ${settings.themeMode.toString().split('.').last.toUpperCase()}'),
               ),
             ),
-            PopupMenuItem<String>(
-              value: 'language',
-              child: ListTile(
-                leading: const Icon(Icons.language),
-                title: Text(
-                    'Language: ${settings.getLanguageName(settings.currentLocaleOrNull, context).toUpperCase()}'),
-              ),
-            ),
+            // PopupMenuItem<String>(
+            //   value: 'language',
+            //   child: ListTile(
+            //     leading: const Icon(Icons.language),
+            //     title: Text(
+            //         'Language: ${settings.getLanguageName(settings.currentLocaleOrNull, context).toUpperCase()}'),
+            //   ),
+            // ),
           ],
         );
       },
@@ -54,7 +52,7 @@ class QuickSettingsMenu extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.themeMode),
+          title: Text("Theme Mode"),
           content: SingleChildScrollView(
             child: ListBody(
               children: ThemeMode.values.map((mode) {
@@ -74,30 +72,30 @@ class QuickSettingsMenu extends StatelessWidget {
     );
   }
 
-  void _changeLanguage(BuildContext context, SettingsService settings) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.language),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: settings.supportedLocalesWithDefault.map((locale) {
-                return ListTile(
-                  title: Text(
-                      settings.getLanguageName(locale, context).toUpperCase()),
-                  onTap: () {
-                    settings.setLocale(locale);
-                    Navigator.of(context).pop();
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // void _changeLanguage(BuildContext context, SettingsService settings) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text(AppLocalizations.of(context)!.language),
+  //         content: SingleChildScrollView(
+  //           child: ListBody(
+  //             children: settings.supportedLocalesWithDefault.map((locale) {
+  //               return ListTile(
+  //                 title: Text(
+  //                     settings.getLanguageName(locale, context).toUpperCase()),
+  //                 onTap: () {
+  //                   settings.setLocale(locale);
+  //                   Navigator.of(context).pop();
+  //                 },
+  //               );
+  //             }).toList(),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   IconData _getThemeModeIcon(ThemeMode mode) {
     switch (mode) {

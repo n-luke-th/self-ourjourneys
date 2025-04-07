@@ -4,14 +4,12 @@
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:xiaokeai/components/main_view.dart';
-import 'package:xiaokeai/components/quick_settings_menu.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/services/auth/acc/auth_wrapper.dart';
-import 'package:xiaokeai/services/pref/shared_pref_service.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
+import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/quick_settings_menu.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/services/pref/shared_pref_service.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -65,7 +63,7 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
       context,
       appBarBackgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-      appBarTitle: AppLocalizations.of(context)!.changePassword.toUpperCase(),
+      appBarTitle: "Change password".toUpperCase(),
       appbarActions: [QuickSettingsMenu()],
       body: Container(
         decoration: BoxDecoration(
@@ -137,10 +135,8 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                                   });
                                 },
                               ),
-                              hintText:
-                                  AppLocalizations.of(context)!.newPassword,
-                              labelText:
-                                  AppLocalizations.of(context)!.newPassword,
+                              hintText: "New password",
+                              labelText: "New password",
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
@@ -188,8 +184,7 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                           // autofocus: false,
                           validator: (value) {
                             if (value != _passwordController.text) {
-                              return AppLocalizations.of(context)!
-                                  .passwordNotMatch;
+                              return "Passwords don't match";
                             }
                             return null;
                           },
@@ -226,10 +221,8 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                                   });
                                 },
                               ),
-                              hintText:
-                                  AppLocalizations.of(context)!.confirmPassword,
-                              labelText:
-                                  AppLocalizations.of(context)!.confirmPassword,
+                              hintText: "confirm password",
+                              labelText: "confirm password",
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               floatingLabelAlignment:
                                   FloatingLabelAlignment.center,
@@ -286,9 +279,7 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                                 UiConsts.BorderRadiusCircular_standard,
                           ),
                         ),
-                        child: Text(AppLocalizations.of(context)!
-                            .changePassword
-                            .toUpperCase()),
+                        child: Text("change password".toUpperCase()),
                       ),
                     ],
                   ),

@@ -4,9 +4,9 @@
 ///
 ///
 import 'package:flutter/material.dart';
-import 'package:xiaokeai/services/configs/settings_service.dart';
-import 'package:xiaokeai/services/notifications/notification_factory.dart';
-import 'package:xiaokeai/services/notifications/notification_service.dart';
+import 'package:ourjourneys/services/configs/settings_service.dart';
+import 'package:ourjourneys/services/notifications/notification_factory.dart';
+import 'package:ourjourneys/services/notifications/notification_service.dart';
 
 class NotificationManager {
   final SettingsService _settingsService;

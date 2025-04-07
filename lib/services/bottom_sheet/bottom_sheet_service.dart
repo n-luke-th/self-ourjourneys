@@ -2,7 +2,7 @@
 ///
 /// a service file for bottom sheet
 import 'package:flutter/material.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 // TODO: add the ui consistency for the whole file
 class BottomSheetService {

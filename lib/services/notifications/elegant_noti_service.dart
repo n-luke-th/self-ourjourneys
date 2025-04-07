@@ -7,8 +7,8 @@ import 'package:elegant_notification/resources/arrays.dart';
 import 'package:elegant_notification/resources/stacked_options.dart';
 import 'package:flutter/material.dart';
 import 'package:elegant_notification/elegant_notification.dart';
-import 'package:xiaokeai/services/notifications/notification_service.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
+import 'package:ourjourneys/services/notifications/notification_service.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class ElegantNotificationService implements NotificationService {
   @override
@@ -34,7 +34,7 @@ class ElegantNotificationService implements NotificationService {
             displayCloseButton: data.showCloseBtn,
             progressBarPadding: UiConsts.PaddingAll_standard,
             shadow: BoxShadow(
-                color: Theme.of(context).dialogBackgroundColor,
+                color: Theme.of(context).dialogTheme.backgroundColor!,
                 blurRadius: UiConsts.borderRadius),
             stackedOptions: StackedOptions(
                 scaleFactor: BorderSide.strokeAlignCenter, key: 'stack_'),

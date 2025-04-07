@@ -4,28 +4,25 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:xiaokeai/navigation/nav_bar.dart';
-import 'package:xiaokeai/views/albums/albums_page.dart';
-import 'package:xiaokeai/views/auth_views/auth_flow.dart';
-import 'package:xiaokeai/views/auth_views/change_email_page.dart';
-import 'package:xiaokeai/views/auth_views/change_password_page.dart';
-import 'package:xiaokeai/views/auth_views/login_page.dart';
-import 'package:xiaokeai/views/auth_views/protected_auth_view_wrapper.dart';
-import 'package:xiaokeai/views/auth_views/reauth_user_page.dart';
-import 'package:xiaokeai/views/auth_views/reset_password_page.dart';
-import 'package:xiaokeai/views/auth_views/update_profile_page.dart';
-import 'package:xiaokeai/views/collections/collections_page.dart';
-import 'package:xiaokeai/views/git_stamp_page.dart';
-import 'package:xiaokeai/views/home_page.dart';
-import 'package:xiaokeai/views/memories/memories_page.dart';
-import 'package:xiaokeai/views/memories/new_memory_page.dart';
-import 'package:xiaokeai/views/settings_page.dart';
+import 'package:ourjourneys/navigation/nav_bar.dart';
+import 'package:ourjourneys/views/albums/albums_page.dart';
+import 'package:ourjourneys/views/auth_views/auth_flow.dart';
+import 'package:ourjourneys/views/auth_views/change_password_page.dart';
+import 'package:ourjourneys/views/auth_views/login_page.dart';
+import 'package:ourjourneys/views/auth_views/protected_auth_view_wrapper.dart';
+import 'package:ourjourneys/views/auth_views/reauth_user_page.dart';
+import 'package:ourjourneys/views/auth_views/reset_password_page.dart';
+import 'package:ourjourneys/views/auth_views/update_profile_page.dart';
+import 'package:ourjourneys/views/collections/collections_page.dart';
+import 'package:ourjourneys/views/memories/memories_page.dart';
+import 'package:ourjourneys/views/memories/new_memory_page.dart';
+import 'package:ourjourneys/views/settings_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final _navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
 
 final router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/settings',
   navigatorKey: _rootNavigatorKey,
   routes: [
     ShellRoute(
@@ -34,12 +31,12 @@ final router = GoRouter(
         return NavBar(child: child);
       },
       routes: [
-        GoRoute(
-          path: '/',
-          name: 'HomePage',
-          builder: (context, state) =>
-              ProtectedAuthViewWrapper(child: const HomePage()),
-        ),
+        // GoRoute(
+        //   path: '/',
+        //   name: 'HomePage',
+        //   builder: (context, state) =>
+        //       ProtectedAuthViewWrapper(child: const HomePage()),
+        // ),
         GoRoute(
             path: '/settings',
             name: 'SettingsPage',
@@ -54,13 +51,13 @@ final router = GoRouter(
                 builder: (context, state) =>
                     ProtectedAuthViewWrapper(child: const ChangePasswordPage()),
               ),
-              GoRoute(
-                path: 'change-email',
-                name: 'ChangeEmailPage',
-                parentNavigatorKey: _navbarNavigatorKey,
-                builder: (context, state) =>
-                    ProtectedAuthViewWrapper(child: const ChangeEmailPage()),
-              ),
+              // GoRoute(
+              //   path: 'change-email',
+              //   name: 'ChangeEmailPage',
+              //   parentNavigatorKey: _navbarNavigatorKey,
+              //   builder: (context, state) =>
+              //       ProtectedAuthViewWrapper(child: const ChangeEmailPage()),
+              // ),
               GoRoute(
                 path: 'update-profile',
                 name: 'UpdateProfilePage',
@@ -79,12 +76,12 @@ final router = GoRouter(
                   );
                 },
               ),
-              GoRoute(
-                path: 'git-stamp',
-                name: 'GitStampPage',
-                parentNavigatorKey: _navbarNavigatorKey,
-                builder: (context, state) => const MyGitStampPage(),
-              ),
+              // GoRoute(
+              //   path: 'git-stamp',
+              //   name: 'GitStampPage',
+              //   parentNavigatorKey: _navbarNavigatorKey,
+              //   builder: (context, state) => const MyGitStampPage(),
+              // ),
             ]),
         GoRoute(
           path: '/collections',

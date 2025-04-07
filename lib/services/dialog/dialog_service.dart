@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 enum DialogType {
   confirmation,

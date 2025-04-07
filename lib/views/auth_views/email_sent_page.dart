@@ -5,11 +5,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:xiaokeai/components/main_view.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
-import 'package:xiaokeai/components/quick_settings_menu.dart';
-import 'package:xiaokeai/shared/views/ui_consts.dart';
+import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/quick_settings_menu.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class EmailSentPage extends StatelessWidget {
   final String email;
@@ -19,9 +17,7 @@ class EmailSentPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return mainView(
       context,
-      appBarTitle: AppLocalizations.of(context)!
-          .passwordResentEmailHasBeenSent
-          .toUpperCase(),
+      appBarTitle: "Email Sent",
       appBarBackgroundColor: Colors.transparent,
       appbarActions: [QuickSettingsMenu()],
       extendBodyBehindAppBar: true,
@@ -56,7 +52,7 @@ class EmailSentPage extends StatelessWidget {
                     ),
                     UiConsts.SizedBoxGapVertical_large,
                     Text(
-                      "${AppLocalizations.of(context)!.pleaseCheckoutEmailWeSentYou} '$email'",
+                      "Please checkout mailbox of '$email'",
                       style: Theme.of(context).textTheme.titleLarge,
                       textAlign: TextAlign.center,
                     ),
@@ -74,9 +70,7 @@ class EmailSentPage extends StatelessWidget {
                           borderRadius: UiConsts.BorderRadiusCircular_standard,
                         ),
                       ),
-                      child: Text(AppLocalizations.of(context)!
-                          .goLoginNow
-                          .toUpperCase()),
+                      child: Text("Go LOGIN now"),
                     ),
                   ],
                 ),

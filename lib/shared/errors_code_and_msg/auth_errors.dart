@@ -3,7 +3,7 @@
 /// pairs of global error code and msg for authentication related
 // ignore_for_file: constant_identifier_names
 
-import 'package:xiaokeai/errors/base/base_error_enum.dart';
+import 'package:ourjourneys/errors/base/base_error_enum.dart';
 
 /// This enum contains key-value pairs for `AuthErrors`
 ///

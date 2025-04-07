@@ -35,3 +35,9 @@ doc/api/
 
 # git stamp
 lib/git_stamp
+
+
+# lambda
+lambda/cloudfront_block_viewers/node_modules
+lambda/cloudfront_block_viewers/package-lock.json
+lambda/cloudfront_block_viewers/function.zip

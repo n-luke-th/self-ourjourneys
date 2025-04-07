@@ -32,4 +32,5 @@
 - Initial Development: Improved the authentication service and error exception, changed & improved the navbar arrangement and font size, and other improvements on October 8, 2024 -> **0.2.4** by Luke
 - Initial Development: Minor improvements on October 11, 2024 -> **0.2.5** by Luke
 - Initial Development: Added more log information, and upgraded the dependency constraints on October 26, 2024 -> **0.2.51** by Luke
-- Initial Development: Updated the localization method, upgraded the dependency constraints, and other improvements on April 3, 2024 -> **0.2.6** by Luke
+- Initial Development: Updated the localization method, upgraded the dependency constraints, and other improvements on April 3, 2025 -> **0.2.6** by Luke
+- Initial Development: Changed app & package name, and other improvements on April 7, 2025 -> **0.2.7** by Luke

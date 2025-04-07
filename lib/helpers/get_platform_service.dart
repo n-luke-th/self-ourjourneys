@@ -4,7 +4,7 @@
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:universal_io/io.dart';
-import 'package:xiaokeai/shared/helpers/platform_enum.dart';
+import 'package:ourjourneys/shared/helpers/platform_enum.dart';
 
 class PlatformDetectionService {
   static final _instance = PlatformDetectionService._internal();

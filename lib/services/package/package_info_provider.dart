@@ -4,7 +4,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:xiaokeai/services/package/package_info_service.dart';
+import 'package:ourjourneys/services/package/package_info_service.dart';
 
 class PackageInfoProvider extends ChangeNotifier {
   final PackageInfoService _service;

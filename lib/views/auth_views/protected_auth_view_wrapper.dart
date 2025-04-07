@@ -5,11 +5,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:xiaokeai/helpers/dependencies_injection.dart';
-import 'package:xiaokeai/services/auth/acc/auth_service.dart';
-import 'package:xiaokeai/views/auth_views/full_screen_auth_redirection_page.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/services/auth/acc/auth_service.dart';
+import 'package:ourjourneys/views/auth_views/full_screen_auth_redirection_page.dart';
 
 class ProtectedAuthViewWrapper extends StatelessWidget {
   final Widget child;
@@ -27,9 +25,8 @@ class ProtectedAuthViewWrapper extends StatelessWidget {
       _logger.d(
           "current user is not authenticated!\nsuggested to redirect to login page");
       return FullScreenRedirectionPage(
-        callToActionBtnText: AppLocalizations.of(context)!.goLoginNow,
-        displayText:
-            AppLocalizations.of(context)!.requestedPageMustBeAuthenticatedUser,
+        callToActionBtnText: "Go login now!".toUpperCase(),
+        displayText: "You must be authenticated to access this page!",
       );
     }
   }

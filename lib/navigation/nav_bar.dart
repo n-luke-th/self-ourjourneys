@@ -4,9 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:xiaokeai/l10n/generated/i18n/app_localizations.dart'
-    show AppLocalizations;
-import 'package:xiaokeai/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class NavBar extends StatefulWidget {
   final Widget child;
@@ -18,7 +16,7 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  int currentIndex = 2;
+  int currentIndex = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +54,7 @@ class _NavBarState extends State<NavBar> {
                 Icons.favorite_rounded,
                 color: ThemeData.light().colorScheme.tertiaryContainer,
               ),
-              label: AppLocalizations.of(context)!.memories,
+              label: "Memories",
             ),
             // albums
             NavigationDestination(
@@ -65,17 +63,9 @@ class _NavBarState extends State<NavBar> {
                 Icons.auto_awesome_mosaic_rounded,
                 color: ThemeData.light().colorScheme.tertiaryContainer,
               ),
-              label: AppLocalizations.of(context)!.albums,
+              label: "Albums",
             ),
-            // home
-            NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
-              selectedIcon: Icon(
-                Icons.home,
-                color: ThemeData.light().colorScheme.tertiaryContainer,
-              ),
-              label: AppLocalizations.of(context)!.home,
-            ),
+
             // collections
             NavigationDestination(
               icon: const Icon(Icons.collections_bookmark_outlined),
@@ -83,8 +73,8 @@ class _NavBarState extends State<NavBar> {
                 Icons.collections_bookmark_rounded,
                 color: ThemeData.light().colorScheme.tertiaryContainer,
               ),
-              label: AppLocalizations.of(context)!.collections,
-              tooltip: AppLocalizations.of(context)!.tripCollections,
+              label: "Collections",
+              tooltip: "Collections",
             ),
             // settings
             NavigationDestination(
@@ -93,13 +83,13 @@ class _NavBarState extends State<NavBar> {
                 Icons.settings,
                 color: ThemeData.light().colorScheme.tertiaryContainer,
               ),
-              label: AppLocalizations.of(context)!.settings,
+              label: "Settings",
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: AppLocalizations.of(context)!.addNewMemory,
+        tooltip: "Create a new memory",
         onPressed: () => context.pushNamed('NewMemory'),
         child: const Icon(Icons.add),
       ),
@@ -116,16 +106,13 @@ class _NavBarState extends State<NavBar> {
         GoRouter.of(context).go('/albums');
         break;
       case 2:
-        context.goNamed("HomePage");
-        break;
-      case 3:
         context.goNamed("CollectionsPage");
         break;
-      case 4:
+      case 3:
         GoRouter.of(context).go('/settings');
         break;
       default:
-        context.goNamed("HomePage");
+        GoRouter.of(context).go('/settings');
         break;
     }
     setState(() {
