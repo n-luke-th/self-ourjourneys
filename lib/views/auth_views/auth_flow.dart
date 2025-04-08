@@ -60,11 +60,8 @@ class AuthFlow extends StatelessWidget {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 try {
                   context.loaderOverlay.hide();
-
-                  _logger.d("Thai Tune page");
-                  return context.pushReplacementNamed("HomePage");
+                  return context.pushReplacementNamed("SettingsPage");
                 } catch (e) {
-                  context.loaderOverlay.hide();
                   _logger.d('-Navigation error: $e');
                 }
               });

@@ -22,7 +22,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final _navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
 
 final router = GoRouter(
-  initialLocation: '/settings',
+  initialLocation: '/auth',
   navigatorKey: _rootNavigatorKey,
   routes: [
     ShellRoute(
@@ -54,7 +54,7 @@ final router = GoRouter(
               // GoRoute(
               //   path: 'change-email',
               //   name: 'ChangeEmailPage',
-              //   parentNavigatorKey: _navbarNavigatorKey,
+              //  // parentNavigatorKey: _navbarNavigatorKey,
               //   builder: (context, state) =>
               //       ProtectedAuthViewWrapper(child: const ChangeEmailPage()),
               // ),
@@ -86,7 +86,6 @@ final router = GoRouter(
         GoRoute(
           path: '/collections',
           name: 'CollectionsPage',
-          parentNavigatorKey: _navbarNavigatorKey,
           builder: (context, state) =>
               ProtectedAuthViewWrapper(child: CollectionsPage()),
         ),

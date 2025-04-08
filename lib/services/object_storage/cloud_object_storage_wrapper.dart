@@ -4,8 +4,6 @@
 /// are the top-level functions that will perform
 /// neccessary cloud object storage actions called when user trigger call to action btn (upload btn, download btn, etc.)
 
-// TODO: localize this file
-
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:file_picker/file_picker.dart';
@@ -19,7 +17,6 @@ import 'package:ourjourneys/services/notifications/notification_manager.dart';
 import 'package:ourjourneys/services/notifications/notification_service.dart';
 import 'package:ourjourneys/services/object_storage/cloud_object_storage_service.dart';
 import 'package:ourjourneys/shared/common/file_picker_enum.dart';
-import 'package:ourjourneys/shared/services/firebase_storage_enum.dart';
 
 class CloudObjectStorageWrapper {
   final Logger _logger = getIt<Logger>();

@@ -54,7 +54,7 @@ class AuthWrapper {
           "https://ui-avatars.com/api/?background=F2BE22&color=fff&name=$_emailAddress";
     } else {
       _uid = "";
-      _emailAddress = "Thai Tune user";
+      _emailAddress = "Our Journeys user";
       _displayName = "_Unauthenticated user_";
       _profilePicURL =
           "https://ui-avatars.com/api/?background=F2BE22&color=fff&name=$_emailAddress";
@@ -86,10 +86,10 @@ class AuthWrapper {
 
   Future<void> handleLogout(
     BuildContext context, {
-    String confirmationTitle = "ออกจากระบบ?",
-    String confirmationMessage = "คุณแน่ใจหรือว่าต้องการออกจากระบบ?",
-    String confirmationCancelText = "ยกเลิก",
-    String confirmationConfirmText = "ยืนยัน",
+    String confirmationTitle = "Logout?",
+    String confirmationMessage = "Are you sure you want to logout?",
+    String confirmationCancelText = "Cancel",
+    String confirmationConfirmText = "Logout",
     bool showConfirmationDialog = true,
   }) async {
     if (showConfirmationDialog) {
@@ -120,61 +120,6 @@ class AuthWrapper {
     context.loaderOverlay.hide();
   }
 
-  Future<void> handleRegister(
-      BuildContext context,
-      TextEditingController emailController,
-      TextEditingController passwordController,
-      {bool suppressNotification = false,
-      NotificationData? overrideNotiData,
-      NotificationData? overrideErrorNotiData}) async {
-    try {
-      await _auth.registerWithEmailAndPassword(
-        emailController.text.trim(),
-        passwordController.text,
-      );
-      if (!suppressNotification) {
-        context.read<NotificationManager>().showNotification(
-              context,
-              overrideNotiData ??
-                  NotificationData(
-                      title: 'สำเร็จ',
-                      message: 'ลงทะเบียนแล้ว',
-                      type: CustomNotificationType.success),
-            );
-      }
-      _logger.d('register success!');
-      context.pushNamed("Login");
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = AuthService.getReadableErrorMessage(e);
-      if (!suppressNotification) {
-        context.read<NotificationManager>().showNotification(
-              context,
-              overrideErrorNotiData ??
-                  NotificationData(
-                      title: 'Oops!',
-                      message: _errorMessage,
-                      type: CustomNotificationType.error),
-            );
-      }
-      rethrow;
-    } catch (e) {
-      if (!suppressNotification) {
-        _errorMessage = e.toString();
-        context.read<NotificationManager>().showNotification(
-              context,
-              overrideErrorNotiData ??
-                  NotificationData(
-                      title: 'Oops!',
-                      message: _errorMessage,
-                      type: CustomNotificationType.error),
-            );
-      }
-      rethrow;
-    } finally {
-      context.loaderOverlay.hide();
-    }
-  }
-
   Future<void> handleSignIn(
       BuildContext context,
       TextEditingController emailController,
@@ -194,8 +139,8 @@ class AuthWrapper {
               context,
               overrideNotiData ??
                   NotificationData(
-                      title: 'เข้าสู่ระบบ',
-                      message: "ยินดีต้อนรับ $_displayName",
+                      title: 'Login Success!',
+                      message: "Welcome, $_displayName",
                       type: CustomNotificationType.success),
             );
       }

@@ -91,7 +91,7 @@ Future<void> logSettingsConfig({required ThemeProvider themeProvider}) async {
   final packageInfo = await packageInfoService.getPackageInfo();
   logger
       .d("${DateTime.now().toLocal()}: Application is starting/restarting...");
-  logger.d("\tXiaokeai:\n"
+  logger.d("\tOurJourneys:\n"
       ">>> Platform: '${platformService.readableCurrentPlatform}'\n"
       ">>> Version '${packageInfo.version}'\n"
       ">>> Package Name: '${packageInfo.packageName}'\n"
@@ -122,7 +122,7 @@ class OurJourneys extends StatelessWidget {
         ),
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: 'Xiaokeai',
+          title: 'OurJourneys',
           supportedLocales: const <Locale>[Locale('en', 'US')],
           locale: Locale("en", "US"),
           themeMode: settings.themeMode,

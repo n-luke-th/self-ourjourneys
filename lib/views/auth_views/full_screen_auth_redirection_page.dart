@@ -11,7 +11,7 @@ class FullScreenRedirectionPage extends StatelessWidget {
   final String callToActionBtnText;
   const FullScreenRedirectionPage(
       {super.key,
-      this.destinationRouteName = "AuthFlow",
+      this.destinationRouteName = "LoginPage",
       this.displayText =
           'The page you have requested requires you to be an authenticated user!',
       this.callToActionBtnText = 'Go login now!'});

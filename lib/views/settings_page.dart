@@ -41,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _authWrapper.handleRefreshUser();
+    // _authWrapper.handleRefreshUser();
     Future.microtask(
         () => context.read<PackageInfoProvider>().loadPackageInfo());
 
@@ -76,7 +76,10 @@ class _SettingsPageState extends State<SettingsPage> {
             flex: 2,
             child: Scaffold(
                 extendBody: true,
-                body: profileSection(),
+                body: Padding(
+                  padding: UiConsts.PaddingHorizontal_large,
+                  child: profileSection(),
+                ),
                 extendBodyBehindAppBar: true)),
         Expanded(
             flex: 5,
@@ -405,6 +408,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Container profileSection() {
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(
             bottom: Radius.elliptical(

@@ -17,7 +17,6 @@ import 'package:ourjourneys/services/pref/shared_pref_service.dart';
 final GetIt getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  setupLogger();
   setupAuthServices();
   setupCloudObjectStorageServices();
   // getIt.registerLazySingleton(() => FirestoreService());
