@@ -4,23 +4,19 @@ from verify_mock import verify_handler
 import json
 import os
 from auth_mock import get_mock_authorizer
-# from verify import verify_handler as real_verify_handler
-from verify import lambda_handler as real_verify_handler
+from verify import verify_handler as real_verify_handler
+# from verify import lambda_handler as real_verify_handler
 from uploads import handler as upload_handler
 from downloads import handler as download_handler
 from deletes import handler as delete_handler
 import ssl
 
 # Create a custom SSL context for local testing only
-
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
 # Set env variables for testing
-os.environ["R2_ACCESS_KEY"] = "your-access-key"
-os.environ["R2_SECRET_KEY"] = "your-secret-key"
-os.environ["R2_BUCKET_NAME"] = "your-bucket-name"
-os.environ["R2_ENDPOINT"] = "https://your-account-id.r2.cloudflarestorage.com"
+
 TOKEN = os.environ['REAL_TOKEN'] = "valid-token"
 
 
@@ -57,37 +53,37 @@ def test_verify_invalid_token():
 def test_upload():
     event = get_mock_authorizer()
     event["body"] = json.dumps({
-        "filenames": ["test1.jpg", "test2.jpg"],
+        "fileNames": ["test1.jpg", "test2.jpg"],
         "folder": "albums/test"
     })
     result = upload_handler(event, None)
-    print("UPLOAD RESULT:", result)
+    print("UPLOAD RESULT:", json.dumps(result, indent=2))
 
 
 def test_download():
     event = get_mock_authorizer()
     event["body"] = json.dumps({
-        "filenames": ["test1.jpg", "test2.jpg"],
+        "fileNames": ["test1.jpg", "test2.jpg"],
         "folder": "albums/test"
     })
     result = download_handler(event, None)
-    print("DOWNLOAD RESULT:", result)
+    print("DOWNLOAD RESULT:", json.dumps(result, indent=2))
 
 
 def test_delete():
     event = get_mock_authorizer()
     event["body"] = json.dumps({
-        "filenames": ["test1.jpg", "test2.jpg"],
+        "fileNames": ["test1.jpg", "test2.jpg"],
         "folder": "albums/test"
     })
     result = delete_handler(event, None)
-    print("DELETE RESULT:", result)
+    print("DELETE RESULT:", json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":
-    test_verify_real_token()
+    # test_verify_real_token()
     # test_verify_valid_token()
     # test_verify_invalid_token()
     # test_upload()
-    # test_download()
+    test_download()
     # test_delete()

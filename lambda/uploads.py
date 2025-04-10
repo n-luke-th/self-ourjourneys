@@ -1,47 +1,56 @@
-import os
+from r2configs import R2_BUCKET_NAME, s3
 import json
-import boto3
+
 
 def handler(event, context):
-    uid = event["requestContext"]["authorizer"]["uid"]
-    body = json.loads(event["body"])
-    folder = body.get("folder", "")
-    folder = f"{uid}/{folder}".strip("/")
+    try:
+        # Get requestContext or empty dict if missing
+        request_context = event.get('requestContext', {})
+        # Get authorizer or empty dict if missing
+        authorizer = request_context.get('authorizer', {})
+        uid = authorizer.get('uid')  # Get uid or None if missing
+        body = json.loads(event["body"])
+        folder = body.get("folder", "")
 
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.environ["R2_ACCESS_KEY"],
-        aws_secret_access_key=os.environ["R2_SECRET_KEY"],
-        endpoint_url=os.environ["R2_ENDPOINT"]
-    )
+        filenames = []
+        if "fileName" in body:  # Single file upload
+            filenames = [body["fileName"]]
+        elif "fileNames" in body:  # Multiple file uploads
+            filenames = body["fileNames"]
+        else:
+            return {
+                "statusCode": 400,
+                "headers": {"Content-Type": "application/json"},
+                "body": json.dumps({"error": "Missing 'fileName' or 'fileNames'"})
+            }
 
-    filenames = []
-    if "filename" in body:  # Single file upload
-        filenames = [body["filename"]]
-    elif "filenames" in body:  # Multiple file uploads
-        filenames = body["filenames"]
-    else:
+        results = []
+        for filename in filenames:
+            key = f"{folder}/{filename}".strip("/")
+            url = s3.generate_presigned_url(
+                "put_object",
+                Params={"Bucket": R2_BUCKET_NAME,
+                        "Key": key},
+                ExpiresIn=600,
+                HttpMethod="PUT"
+            )
+            results.append({
+                "fileName": filename,
+                "key": key,
+                "url": url
+            })
+
+        returning_results = {"results": (results if len(results) > 1 else results[0]), "requestContext": {
+            "authorizer": authorizer}}
+
         return {
-            "statusCode": 400,
-            "body": json.dumps({"error": "Missing 'filename' or 'filenames'"})
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(returning_results, indent=2)
         }
-
-    results = []
-    for filename in filenames:
-        key = f"{folder}/{filename}".strip("/")
-        url = s3.generate_presigned_url(
-            "put_object",
-            Params={"Bucket": os.environ["R2_BUCKET_NAME"], "Key": key},
-            ExpiresIn=600,
-            HttpMethod="PUT"
-        )
-        results.append({
-            "filename": filename,
-            "url": url,
-            "key": key
-        })
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps(results if len(results) > 1 else results[0])
-    }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"error": str(e)})
+        }

@@ -40,7 +40,6 @@ lib/git_stamp
 # lambda
 lambda/lambda
 lambda/__pycache__
-lambda/tests/__pycache__
 
 # service account
 lambda/serviceAccountKey.json

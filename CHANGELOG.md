@@ -37,3 +37,4 @@
 - Initial Development: Setting backend integration (cloud media), and other improvements on April 8, 2025 -> **0.2.8** by Luke
 - Initial Development: Lambda functions draft (verify is working) connected to the api gateway, and other improvements on April 10, 2025 -> **0.2.8+1** by Luke
 - Initial Development: Removed support for iOS and Android temporarily on April 10, 2025 -> **0.2.8+2** by Luke
+- Initial Development: All Lambda functions (verify, gen_uploads, gen_downloads, deletes) are working on basic features, and other improvements on April 11, 2025 -> **0.2.8+3** by Luke
