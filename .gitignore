@@ -38,12 +38,9 @@ lib/git_stamp
 
 
 # lambda
-lambda/cloudfront_block_viewers/function.zip
 lambda/lambda
-lambda/cloudfront_block_viewers/bin
-lambda/cloudfront_block_viewers/jwt
-lambda/cloudfront_block_viewers/pyasn1
-lambda/cloudfront_block_viewers/pyasn1-0.6.1.dist-info
-lambda/cloudfront_block_viewers/PyJWT-2.10.1.dist-info
-lambda/cloudfront_block_viewers/rsa
-lambda/cloudfront_block_viewers/rsa-4.9.dist-info
+lambda/__pycache__
+lambda/tests/__pycache__
+
+# service account
+lambda/serviceAccountKey.json

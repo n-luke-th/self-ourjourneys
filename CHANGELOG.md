@@ -35,3 +35,4 @@
 - Initial Development: Updated the localization method, upgraded the dependency constraints, and other improvements on April 3, 2025 -> **0.2.6** by Luke
 - Initial Development: Changed app & package name, and other improvements on April 7, 2025 -> **0.2.7** by Luke
 - Initial Development: Setting backend integration (cloud media), and other improvements on April 8, 2025 -> **0.2.8** by Luke
+- Initial Development: Lambda functions draft (verify is working) connected to the api gateway, and other improvements on April 10, 2025 -> **0.2.8+1** by Luke
