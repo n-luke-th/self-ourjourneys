@@ -11,10 +11,22 @@ import 'package:ourjourneys/errors/base/base_error_enum.dart';
 ///
 /// and value is the error msg
 enum CloudObjectStorageErrors implements ErrorType {
+  // Client-side errors (CLOS_C)
+  ///
+  /// The provided object is not valid.
+  CLOS_C01('The provided object is not valid.'),
+
+  ///  The provided object is too large.
+  CLOS_C02('The provided object is too large.'),
+
+  /// Invalid object key, same object already exists or incorrect object key format.
+  CLOS_C03(
+      'Invalid object key, same object already exists or incorrect object key format.'),
+
   // Server-side errors (CLOS_S)
 
-  /// Failed to load the image from the cloud object storage.
-  CLOS_S01('Failed to load the image from the cloud object storage.'),
+  /// Failed to load the object from the cloud object storage.
+  CLOS_S01('Failed to load the object from the cloud object storage.'),
 
   // unknown/unsure origin errors (CLOS_U)
 

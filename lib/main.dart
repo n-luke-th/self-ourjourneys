@@ -23,7 +23,7 @@ import 'package:ourjourneys/services/pref/shared_pref_service.dart';
 import 'package:provider/provider.dart';
 
 Future<void> _configureServices() async {
-  setupLogger();
+  setupLoggers();
   await _configureFirebaseService();
   await setupDependencies();
 }

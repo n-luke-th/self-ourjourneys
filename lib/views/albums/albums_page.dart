@@ -4,10 +4,10 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/cloud_image.dart';
+import 'package:ourjourneys/components/cloud_file_uploader.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
-import 'package:ourjourneys/shared/common/general.dart';
 
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
@@ -17,7 +17,7 @@ class AlbumsPage extends StatefulWidget {
 }
 
 class _AlbumsPageState extends State<AlbumsPage> {
-  final String objectKey = "user-uploads/john-doe/IMG_8592.JPG";
+  String objectKey = "albums/test/test1.jpg";
   final AuthService _auth = getIt<AuthService>();
   final Logger _logger = getIt<Logger>();
 
@@ -27,7 +27,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
     getIdToken();
   }
 
-  getIdToken() async {
+  void getIdToken() async {
     try {
       final user = _auth.authInstance!.currentUser;
       final idToken = await user!.getIdToken();
@@ -56,6 +56,12 @@ class _AlbumsPageState extends State<AlbumsPage> {
                 shimmerBaseOpacity: 0.3,
                 errorWidget: Icon(Icons.error_outline),
               ),
+              CloudFileUploader(
+                folderPath: "test",
+                onUploaded: (results) {
+                  _logger.d("on uploaded results: $results");
+                },
+              )
             ],
           ),
         )));

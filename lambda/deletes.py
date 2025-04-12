@@ -4,29 +4,40 @@ import json
 
 def handler(event, context):
     try:
-        # Get requestContext or empty dict if missing
+        # Extract user context
         request_context = event.get('requestContext', {})
-        # Get authorizer or empty dict if missing
         authorizer = request_context.get('authorizer', {})
-        uid = authorizer.get('uid')  # Get uid or None if missing
+        uid = authorizer.get('uid')
+
+        # Parse input
         body = json.loads(event["body"])
-        filenames = body["fileNames"]  # Accepts list
+        filenames = body["fileNames"]  # Expecting a list
         folder = body.get("folder", "")
 
-        result = []
-        for filename in filenames:
-            key = f"{folder}/{filename}".strip("/")
-            s3.delete_object(Bucket=R2_BUCKET_NAME, Key=key)
-            result.append({"deleted": key})
+        # Prepare objects to delete
+        objects_to_delete = [
+            {"Key": f"{folder}/{filename}".strip("/")}
+            for filename in filenames
+        ]
 
-        returning_results = {"results": result, "requestContext": {
-            "authorizer": authorizer}}
+        # Perform batch delete
+        response = s3.delete_objects(
+            Bucket=R2_BUCKET_NAME,
+            Delete={"Objects": objects_to_delete}
+        )
+
+        returning_results = {
+            "deleted": response.get("Deleted", []),
+            "errors": response.get("Errors", []),
+            "requestContext": {"authorizer": authorizer}
+        }
 
         return {
             "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps(returning_results, indent=2)
         }
+
     except Exception as e:
         return {
             "statusCode": 500,
