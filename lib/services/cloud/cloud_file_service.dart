@@ -32,7 +32,9 @@ class CloudFileService {
       final contentType =
           lookupMimeType(fileName) ?? 'application/octet-stream';
 
-      final response = await Dio().put(
+      final Dio dio = await _dioHandler.getClient(withAuth: false);
+
+      final response = await dio.put(
         uploadTarget.url,
         data: fileBytes,
         onSendProgress: onSendProgress,
