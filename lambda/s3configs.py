@@ -1,5 +1,6 @@
 import os
 import boto3
+from botocore.client import Config
 
 TESTING = True
 
@@ -9,5 +10,6 @@ if TESTING:
 else:
     S3_BUCKET_NAME = os.environ["S3_BUCKET_NAME"]
 
+SIGNATURE_VERSION = "s3v4"
 
-s3 = boto3.client("s3")
+s3 = boto3.client("s3", config=Config(signature_version=SIGNATURE_VERSION))
