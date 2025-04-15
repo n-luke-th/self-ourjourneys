@@ -9,4 +9,5 @@ enum PermissionEnum {
   calendarFullAccess,
   calendarWriteOnly,
   notifications,
+  location
 }

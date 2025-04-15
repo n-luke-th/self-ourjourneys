@@ -113,7 +113,6 @@ class AuthWrapper {
     _logger.d("user prefs data deleted");
     // end deleting prefs data
     await _auth.signOut();
-    context.goNamed('AuthFlow');
     context.loaderOverlay.hide();
   }
 
@@ -144,7 +143,6 @@ class AuthWrapper {
       _logger.i("user: '$_displayName' login success!");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
-      context.pushReplacementNamed('AuthFlow');
     } on FirebaseAuthException catch (e) {
       if (!suppressNotification) {
         _errorMessage = AuthService.getReadableErrorMessage(e);

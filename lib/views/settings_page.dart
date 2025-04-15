@@ -287,7 +287,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: Text("Current permission"),
+          title: const Text("Current permission status"),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -302,7 +302,7 @@ class _SettingsPageState extends State<SettingsPage> {
               return Column(
                 children: [
                   Text(
-                    "Current permission",
+                    "Current permission status",
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const Divider(),
@@ -473,7 +473,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   value.authInstance!.currentUser?.displayName ??
                       value.authInstance!.currentUser?.email ??
-                      "Xiaokeai user",
+                      "OurJourneys user",
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ],

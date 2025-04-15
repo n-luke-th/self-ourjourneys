@@ -3,7 +3,7 @@
 /// the authentication service of the app with the help of Firebase Auth
 ///
 
-// TODO: edit this auth service file
+import 'dart:async' show StreamSubscription;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
@@ -20,6 +20,25 @@ class AuthService with ChangeNotifier {
 
   FirebaseAuth? get authInstance => _auth;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  User? _currentUser;
+  User? get currentUser => _currentUser;
+
+  late final StreamSubscription<User?> _authSub;
+
+  AuthService() {
+    _currentUser = _auth.currentUser;
+    _authSub = _auth.authStateChanges().listen((user) {
+      _currentUser = user;
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSub.cancel();
+    super.dispose();
+  }
 
   static String getReadableErrorMessage(FirebaseAuthException e) {
     switch (e.code) {

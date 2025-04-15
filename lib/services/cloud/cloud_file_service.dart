@@ -57,7 +57,7 @@ class CloudFileService {
       }
     } on DioException catch (e) {
       _logger.d('DioError response: ${e.response}');
-      _logger.d('DioError request: ${e.requestOptions}');
+      _logger.d('DioError request: ${e.requestOptions.toString()}');
     } catch (e, st) {
       _logger.e('Upload failed', error: e, stackTrace: st);
 

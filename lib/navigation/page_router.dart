@@ -4,10 +4,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/navigation/nav_bar.dart';
+import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/views/albums/albums_page.dart';
 import 'package:ourjourneys/views/anniversaries/anniversary_page.dart';
-import 'package:ourjourneys/views/auth_views/auth_flow.dart';
 import 'package:ourjourneys/views/auth_views/change_password_page.dart';
 import 'package:ourjourneys/views/auth_views/login_page.dart';
 import 'package:ourjourneys/views/auth_views/protected_auth_view_wrapper.dart';
@@ -19,12 +20,33 @@ import 'package:ourjourneys/views/memories/memories_page.dart';
 import 'package:ourjourneys/views/memories/new_memory_page.dart';
 import 'package:ourjourneys/views/settings_page.dart';
 
+final AuthService _auth = getIt<AuthService>();
+
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final _navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
 
+const String _initialAuthLocation = '/auth';
+const String _landingLocation = '/anniversaries';
+
 final router = GoRouter(
-  initialLocation: '/auth',
+  initialLocation: _initialAuthLocation,
   navigatorKey: _rootNavigatorKey,
+  refreshListenable: _auth,
+  redirect: (context, state) {
+    final user = _auth.currentUser;
+    final isAuthRoute = state.matchedLocation == _initialAuthLocation ||
+        state.matchedLocation == '/login';
+
+    if (user == null && !isAuthRoute) {
+      return _initialAuthLocation;
+    }
+
+    if (user != null && isAuthRoute) {
+      return _landingLocation;
+    }
+
+    return null;
+  },
   routes: [
     ShellRoute(
       navigatorKey: _navbarNavigatorKey,
@@ -39,9 +61,10 @@ final router = GoRouter(
         //       ProtectedAuthViewWrapper(child: const HomePage()),
         // ),
         GoRoute(
-            path: "/anniversaries",
+            path: _landingLocation,
             name: "AnniversaryPage",
-            builder: (context, state) => const AnniversaryPage()),
+            builder: (context, state) =>
+                ProtectedAuthViewWrapper(child: const AnniversaryPage())),
         GoRoute(
             path: '/settings',
             name: 'SettingsPage',
@@ -92,38 +115,32 @@ final router = GoRouter(
           path: '/collections',
           name: 'CollectionsPage',
           builder: (context, state) =>
-              ProtectedAuthViewWrapper(child: CollectionsPage()),
+              ProtectedAuthViewWrapper(child: const CollectionsPage()),
         ),
         GoRoute(
             path: '/memories',
             name: 'MemoriesPage',
             builder: (context, state) =>
-                ProtectedAuthViewWrapper(child: MemoriesPage()),
+                ProtectedAuthViewWrapper(child: const MemoriesPage()),
             routes: [
               GoRoute(
                 path: 'new/memory',
                 name: 'NewMemory',
                 builder: (context, state) =>
-                    ProtectedAuthViewWrapper(child: NewMemoryPage()),
+                    ProtectedAuthViewWrapper(child: const NewMemoryPage()),
               ),
             ]),
         GoRoute(
           path: '/albums',
           name: 'AlbumsPage',
           builder: (context, state) =>
-              ProtectedAuthViewWrapper(child: AlbumsPage()),
+              ProtectedAuthViewWrapper(child: const AlbumsPage()),
         ),
       ],
     ),
     GoRoute(
-      path: '/auth',
-      name: 'AuthFlow',
-      parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => AuthFlow(),
-    ),
-    GoRoute(
-      path: '/login',
-      name: 'LoginPage',
+      path: _initialAuthLocation,
+      name: 'AuthPage',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const LoginPage(),
     ),

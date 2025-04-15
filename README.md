@@ -1,5 +1,13 @@
 # OurJourneys
 
+## Features
+
+- TODO
+
+## Tech Stack & System Architecture
+
+- TODO
+
 ## Getting Started
 
 0. make sure you have config the latest changes of the app by run command: `git pull`
@@ -8,7 +16,7 @@
 
 2. run app on another terminal by using command `flutter run -d chrome --web-port 5555` (this will run on Chrome with port 5555)
 
-## Notable config
+## Notable Configurations
 
 ### Splash screen
 

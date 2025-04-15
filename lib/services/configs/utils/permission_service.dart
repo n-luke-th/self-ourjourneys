@@ -11,6 +11,7 @@ class PermissionsService {
     if (Platform.isAndroid || Platform.isIOS) Permission.locationWhenInUse,
     if (Platform.isAndroid || Platform.isIOS) Permission.calendarFullAccess,
     if (Platform.isAndroid || Platform.isIOS) Permission.calendarWriteOnly,
+    if (kIsWeb) Permission.location,
     Permission.notification,
   ];
 
@@ -66,8 +67,12 @@ class PermissionsService {
         return await Permission.calendarWriteOnly.status;
       case PermissionEnum.notifications:
         return await Permission.notification.status;
-      default:
-        throw ArgumentError('Unsupported permission: $permission');
+      case PermissionEnum.location:
+        if (kIsWeb) {
+          return await Permission.location.status;
+        } else {
+          throw UnsupportedError('Unsupported for permission : $permission');
+        }
     }
   }
 }
