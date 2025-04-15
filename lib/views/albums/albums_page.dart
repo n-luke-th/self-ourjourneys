@@ -57,7 +57,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                 errorWidget: Icon(Icons.error_outline),
               ),
               CloudFileUploader(
-                folderPath: "test",
+                folderPath: "uploads/test",
                 onUploaded: (results) {
                   _logger.d("on uploaded results: $results");
                 },

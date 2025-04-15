@@ -17,7 +17,6 @@ import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/services/notifications/notification_manager.dart';
 import 'package:ourjourneys/services/notifications/notification_service.dart';
-import 'package:ourjourneys/services/object_storage/cloud_object_storage_wrapper.dart';
 import 'package:ourjourneys/services/pref/shared_pref_service.dart'
     show SharedPreferencesService;
 import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart'
@@ -26,8 +25,6 @@ import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart'
 class AuthWrapper {
   final Logger _logger = getIt<Logger>();
   final AuthService _auth = getIt<AuthService>();
-  final CloudObjectStorageWrapper _cloudObjectStorageWrapper =
-      getIt<CloudObjectStorageWrapper>();
   final SharedPreferencesService _sharedPreferencesService =
       getIt<SharedPreferencesService>();
   String _uid = "";

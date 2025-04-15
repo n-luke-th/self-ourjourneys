@@ -4,6 +4,7 @@ import 'dart:typed_data' show Uint8List;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
+import 'package:ourjourneys/shared/common/file_picker_enum.dart';
 
 class CloudFileUploader extends StatefulWidget {
   final String folderPath;
@@ -34,21 +35,16 @@ class _CloudFileUploaderState extends State<CloudFileUploader> {
     });
 
     try {
+      final List<String> listOfAllowedExtensions = [
+        ...AllowedExtensions.imageExtensions,
+        ...AllowedExtensions.audioExtensions,
+        ...AllowedExtensions.videoExtensions,
+        ...AllowedExtensions.documentExtensions
+      ];
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: true,
         type: FileType.custom,
-        allowedExtensions: [
-          'jpg',
-          'jpeg',
-          'png',
-          'gif',
-          'mp4',
-          'mov',
-          'avi',
-          'txt',
-          'json',
-          'pdf'
-        ],
+        allowedExtensions: listOfAllowedExtensions,
         withData: true,
       );
 

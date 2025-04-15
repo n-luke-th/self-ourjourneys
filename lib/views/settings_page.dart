@@ -154,7 +154,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: Text("Update Profile"),
+          title: const Text("Update Profile"),
           onTap: () => context.pushReplacementNamed("UpdateProfilePage"),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -208,16 +208,17 @@ class _SettingsPageState extends State<SettingsPage> {
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            // TODO: implement update email back
+                            // ListTile(
+                            //   title: Text("Update email"),
+                            //   onTap: () => context.pushReplacementNamed(
+                            //       "ReauthPage",
+                            //       pathParameters: <String, String>{
+                            //         "next": "ChangeEmailPage"
+                            //       }),
+                            // ),
                             ListTile(
-                              title: Text("Update email"),
-                              onTap: () => context.pushReplacementNamed(
-                                  "ReauthPage",
-                                  pathParameters: <String, String>{
-                                    "next": "ChangeEmailPage"
-                                  }),
-                            ),
-                            ListTile(
-                              title: Text("Update password"),
+                              title: const Text("Update password"),
                               onTap: () => context.pushReplacementNamed(
                                   "ReauthPage",
                                   pathParameters: {
@@ -363,7 +364,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
       ListTile(
-        title: Text("Biometric protection"),
+        title: const Text("Biometric protection"),
         onTap: () => {},
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -390,10 +391,49 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ),
+      // ListTile(
+      //   title: const Text("Git Stamps"),
+      //   onTap: () {
+      //     context.pushReplacementNamed("GitStampPage");
+      //   },
+      //   trailing: Row(
+      //     mainAxisSize: MainAxisSize.min,
+      //     children: [
+      //       UiConsts.spaceForTextAndElement,
+      //       const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+      //     ],
+      //   ),
+      // ),
+      // ListTile(
+      //   title: Text("Privacy Policy"),
+      //   onTap: () {
+      //     context.pushReplacementNamed("PrivacyPolicyPage");
+      //   },
+      //   trailing: Row(
+      //     mainAxisSize: MainAxisSize.min,
+      //     children: [
+      //       UiConsts.spaceForTextAndElement,
+      //       const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+      //     ],
+      //   ),
+      // ),
+      // ListTile(
+      //   title: Text("Terms of Service"),
+      //   onTap: () {
+      //     context.pushReplacementNamed("TermsOfServicePage");
+      //   },
+      //   trailing: Row(
+      //     mainAxisSize: MainAxisSize.min,
+      //     children: [
+      //       UiConsts.spaceForTextAndElement,
+      //       const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+      //     ],
+      //   ),
+      // ),
       ListTile(
-        title: Text("Git Stamps"),
+        title: const Text("Licenses"),
         onTap: () {
-          context.pushReplacementNamed("GitStampPage");
+          showLicensePage(context: context);
         },
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

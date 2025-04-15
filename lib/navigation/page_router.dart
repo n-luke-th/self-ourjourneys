@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ourjourneys/navigation/nav_bar.dart';
 import 'package:ourjourneys/views/albums/albums_page.dart';
+import 'package:ourjourneys/views/anniversaries/anniversary_page.dart';
 import 'package:ourjourneys/views/auth_views/auth_flow.dart';
 import 'package:ourjourneys/views/auth_views/change_password_page.dart';
 import 'package:ourjourneys/views/auth_views/login_page.dart';
@@ -38,10 +39,14 @@ final router = GoRouter(
         //       ProtectedAuthViewWrapper(child: const HomePage()),
         // ),
         GoRoute(
+            path: "/anniversaries",
+            name: "AnniversaryPage",
+            builder: (context, state) => const AnniversaryPage()),
+        GoRoute(
             path: '/settings',
             name: 'SettingsPage',
             builder: (context, state) {
-              return ProtectedAuthViewWrapper(child: SettingsPage());
+              return ProtectedAuthViewWrapper(child: const SettingsPage());
             },
             routes: [
               GoRoute(

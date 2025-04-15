@@ -10,15 +10,12 @@ import 'package:logger/logger.dart';
 
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
-import 'package:ourjourneys/services/pref/shared_pref_service.dart';
 import 'package:ourjourneys/views/auth_views/login_page.dart';
 
 class AuthFlow extends StatelessWidget {
   AuthFlow({super.key});
   final AuthService _auth = getIt<AuthService>();
   final Logger _logger = getIt<Logger>();
-  final SharedPreferencesService _preferencesService =
-      getIt<SharedPreferencesService>();
 
   @override
   Widget build(BuildContext context) {

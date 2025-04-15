@@ -6,7 +6,6 @@ import 'package:logger/logger.dart';
 import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
 import 'package:ourjourneys/errors/object_storage_exception/cloud_object_storage_exception.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/services/api/api_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/services/network/dio_handler.dart';
 import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
@@ -43,7 +42,6 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
   final cache = DefaultCacheManager();
   final AuthService _auth = getIt<AuthService>();
   final Logger _logger = getIt<Logger>();
-  // final ApiService _api = getIt<ApiService>();
   final DioHandler _dioHandler = getIt<DioHandler>();
 
   @override
@@ -70,20 +68,12 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
       );
     }
 
-    // final downloadUrls = await _api.getDownloadUrls('', [widget.objectKey]);
-    // if (downloadUrls.isEmpty) {
-    //   throw CloudObjectStorageException(
-    //     st: StackTrace.current,
-    //     errorDetailsFromDependency: 'Empty download URL list',
-    //     errorEnum: CloudObjectStorageErrors.CLOS_S01,
-    //   );
-    // }
     final objectUrl = "${NetworkConsts.cdnUrl}/${widget.objectKey}";
     _logger.d('objectKey: ${widget.objectKey} | object URL: $objectUrl');
 
     try {
       final Dio dio = await _dioHandler.getClient(
-          withAuth: true,
+          withAuth: false,
           jsonContentTypeForAuth: false,
           baseUrl: NetworkConsts.cdnUrl);
       final response = await dio.get<List<int>>(

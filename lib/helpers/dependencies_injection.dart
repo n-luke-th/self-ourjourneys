@@ -11,9 +11,9 @@ import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/auth/local/local_auth_service.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
 import 'package:ourjourneys/services/configs/utils/permission_service.dart';
+import 'package:ourjourneys/services/db/firestore_service.dart';
+import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/services/network/dio_handler.dart';
-import 'package:ourjourneys/services/object_storage/cloud_object_storage_service.dart';
-import 'package:ourjourneys/services/object_storage/cloud_object_storage_wrapper.dart';
 import 'package:ourjourneys/services/package/package_info_provider.dart';
 import 'package:ourjourneys/services/package/package_info_service.dart';
 import 'package:ourjourneys/services/pref/shared_pref_service.dart';
@@ -23,25 +23,21 @@ final GetIt getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
   setupAuthServices();
-  setupCloudObjectStorageServices();
   setupDio();
   setupApiServices();
   setupCloudFileServices();
-  // getIt.registerLazySingleton(() => FirestoreService());
-  // getIt.registerLazySingleton(() => FirestoreWrapper());
-  getIt.registerLazySingleton(() => PackageInfoService());
-  getIt.registerLazySingleton(
-      () => PackageInfoProvider(getIt<PackageInfoService>()));
+  setupFirestoreServices();
+  setupPackageInfoServices();
   await setupSharedPref();
   getIt.registerSingleton<PermissionsService>(PermissionsService());
   getIt.registerSingleton<PlatformDetectionService>(PlatformDetectionService());
   getIt.registerLazySingleton<LocalAuthService>(() => LocalAuthService());
-  // getIt.registerLazySingleton(() => SpeechService());
 }
 
-void setupCloudObjectStorageServices() {
-  getIt.registerLazySingleton(() => CloudObjectStorageService());
-  getIt.registerLazySingleton(() => CloudObjectStorageWrapper());
+void setupPackageInfoServices() {
+  getIt.registerLazySingleton(() => PackageInfoService());
+  getIt.registerLazySingleton(
+      () => PackageInfoProvider(getIt<PackageInfoService>()));
 }
 
 Future<void> setupSharedPref() async {
@@ -70,4 +66,9 @@ void setupDio() {
 
 void setupCloudFileServices() {
   getIt.registerLazySingleton(() => CloudFileService());
+}
+
+setupFirestoreServices() {
+  getIt.registerLazySingleton(() => FirestoreService());
+  getIt.registerLazySingleton(() => FirestoreWrapper());
 }

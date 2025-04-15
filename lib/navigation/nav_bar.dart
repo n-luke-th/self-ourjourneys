@@ -16,7 +16,7 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  int currentIndex = 3;
+  int currentIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,15 @@ class _NavBarState extends State<NavBar> {
               ),
               label: "Albums",
             ),
-
+            // Anniversaries
+            NavigationDestination(
+              icon: const Icon(Icons.cake_outlined),
+              selectedIcon: Icon(
+                Icons.cake_rounded,
+                color: ThemeData.light().colorScheme.tertiaryContainer,
+              ),
+              label: "Anniversaries",
+            ),
             // collections
             NavigationDestination(
               icon: const Icon(Icons.collections_bookmark_outlined),
@@ -88,12 +96,6 @@ class _NavBarState extends State<NavBar> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: "Create a new memory",
-        onPressed: () => context.pushNamed('NewMemory'),
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
     );
   }
 
@@ -106,13 +108,16 @@ class _NavBarState extends State<NavBar> {
         GoRouter.of(context).go('/albums');
         break;
       case 2:
-        context.goNamed("CollectionsPage");
+        context.goNamed("AnniversaryPage");
         break;
       case 3:
+        context.goNamed("CollectionsPage");
+        break;
+      case 4:
         GoRouter.of(context).go('/settings');
         break;
       default:
-        GoRouter.of(context).go('/settings');
+        context.goNamed("AniversaryPage");
         break;
     }
     setState(() {

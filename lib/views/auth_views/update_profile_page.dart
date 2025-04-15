@@ -14,7 +14,6 @@ import 'package:ourjourneys/components/quick_settings_menu.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
-import 'package:ourjourneys/services/object_storage/cloud_object_storage_wrapper.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 import 'package:universal_io/io.dart';
 
@@ -30,7 +29,6 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
   final _platformDetectionService = PlatformDetectionService();
-  final _cloudObjectStorageWrapper = getIt<CloudObjectStorageWrapper>();
   final Logger _logger = getIt<Logger>();
   File? _image;
   PlatformFile? _picToBeUploaded;
@@ -131,7 +129,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                         borderRadius: UiConsts.BorderRadiusCircular_standard,
                       ),
                     ),
-                    child: Text("update profile".toUpperCase()),
+                    child: const Text("Update Profile"),
                   ),
                 ],
               ),
