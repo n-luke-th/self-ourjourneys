@@ -17,7 +17,7 @@ class AlbumsPage extends StatefulWidget {
 }
 
 class _AlbumsPageState extends State<AlbumsPage> {
-  String objectKey = "albums/test/test1.jpg";
+  String objectKey = "bmc_qr.png";
   final AuthService _auth = getIt<AuthService>();
   final Logger _logger = getIt<Logger>();
 

@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
-import 'package:ourjourneys/shared/services/api_const.dart';
+import 'package:ourjourneys/shared/services/network_const.dart';
 import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
 import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
 import 'package:logger/logger.dart';
@@ -29,8 +29,7 @@ class DioHandler {
       _RetryInterceptor(),
     ]);
 
-    // Set base URL and timeouts on baseDio
-    _baseDio.options.baseUrl = ApiConsts.apiBaseUrl;
+    // Set timeouts on baseDio
     _baseDio.options.connectTimeout = const Duration(seconds: 10);
     _baseDio.options.receiveTimeout = const Duration(seconds: 10);
   }
@@ -38,14 +37,15 @@ class DioHandler {
   /// Get a fresh Dio client with optional auth and contentType
   Future<Dio> getClient({
     bool withAuth = true,
-    String? contentType,
+    required String baseUrl,
+    bool jsonContentTypeForAuth = true,
   }) async {
     // Create a new Dio instance with the same options as the baseDio
     final Dio dio = Dio()
-      ..options = _baseDio.options.copyWith()
+      ..options = _baseDio.options.copyWith(baseUrl: baseUrl)
       ..interceptors.addAll(_baseDio.interceptors);
 
-    _logger.i('Getting new Dio client with auth: $withAuth');
+    _logger.i("Getting new Dio client for '$baseUrl' with auth: '$withAuth'");
 
     if (withAuth) {
       if (!_auth.isUserLoggedIn()) {
@@ -57,17 +57,17 @@ class DioHandler {
       }
 
       final token = await _auth.authInstance!.currentUser!.getIdToken();
-      contentType ??= ApiConsts.headerContentTypeJson;
 
-      dio.options.headers = {
-        ApiConsts.headerAuthorization:
-            '${ApiConsts.headerAuthorizationBearer} $token',
-        ApiConsts.headerContentType: contentType,
-      };
-    } else {
-      if (contentType != null) {
+      if (jsonContentTypeForAuth) {
         dio.options.headers = {
-          ApiConsts.headerContentType: contentType,
+          NetworkConsts.headerAuthorization:
+              '${NetworkConsts.headerAuthorizationBearer} $token',
+          NetworkConsts.headerContentType: NetworkConsts.headerContentTypeJson,
+        };
+      } else {
+        dio.options.headers = {
+          NetworkConsts.headerAuthorization:
+              '${NetworkConsts.headerAuthorizationBearer} $token',
         };
       }
     }

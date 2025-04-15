@@ -39,4 +39,5 @@
 - Initial Development: Removed support for iOS and Android temporarily on April 10, 2025 -> **0.2.8+2** by Luke
 - Initial Development: All Lambda functions (verify, gen_uploads, gen_downloads, deletes) are working on basic features, and other improvements on April 11, 2025 -> **0.2.8+3** by Luke
 - Initial Development: Enhanced deletes Lambda function, tested the ability to retrieve and upload image, and other improvements on April 12, 2025 -> **0.2.9** by Luke
-- Initial Development: Added the JS code for verify Firebase token for viewing files as backend for object storage use has update [issue#2](https://github.com/n-luke-th/self-xiaokeai/issues/2#issuecomment-2800049499), and other improvements on April 14, 2025 -> **0.2.10** by Luke
+- Initial Development: Added the JS code for verify Firebase token for viewing files as backend for object storage use has update [(issue #2)](https://github.com/n-luke-th/self-xiaokeai/issues/2#issuecomment-2800049499), and other improvements on April 14, 2025 -> **0.2.10** by Luke
+- Initial Development: Edited the JS code for verify token for CORS, adjusted the client side code to test viewing with the new backend (api v2) [(issue #2)](https://github.com/n-luke-th/self-xiaokeai/issues/2#issuecomment-2800049499), and other improvements on April 15, 2025 -> **0.2.11** by Luke

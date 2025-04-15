@@ -11,6 +11,7 @@ import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/services/network/dio_handler.dart';
 import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
 import 'package:ourjourneys/shared/errors_code_and_msg/cloud_object_storage_errors.dart';
+import 'package:ourjourneys/shared/services/network_const.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CloudImage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
   final cache = DefaultCacheManager();
   final AuthService _auth = getIt<AuthService>();
   final Logger _logger = getIt<Logger>();
-  final ApiService _api = getIt<ApiService>();
+  // final ApiService _api = getIt<ApiService>();
   final DioHandler _dioHandler = getIt<DioHandler>();
 
   @override
@@ -69,22 +70,24 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
       );
     }
 
-    final downloadUrls = await _api.getDownloadUrls('', [widget.objectKey]);
-    if (downloadUrls.isEmpty) {
-      throw CloudObjectStorageException(
-        st: StackTrace.current,
-        errorDetailsFromDependency: 'Empty download URL list',
-        errorEnum: CloudObjectStorageErrors.CLOS_S01,
-      );
-    }
-
-    final signedUrl = downloadUrls.first.url;
-    _logger.d('objectKey: ${widget.objectKey} | Signed URL: $signedUrl');
+    // final downloadUrls = await _api.getDownloadUrls('', [widget.objectKey]);
+    // if (downloadUrls.isEmpty) {
+    //   throw CloudObjectStorageException(
+    //     st: StackTrace.current,
+    //     errorDetailsFromDependency: 'Empty download URL list',
+    //     errorEnum: CloudObjectStorageErrors.CLOS_S01,
+    //   );
+    // }
+    final objectUrl = "${NetworkConsts.cdnUrl}/${widget.objectKey}";
+    _logger.d('objectKey: ${widget.objectKey} | object URL: $objectUrl');
 
     try {
-      final Dio dio = await _dioHandler.getClient(withAuth: false);
+      final Dio dio = await _dioHandler.getClient(
+          withAuth: true,
+          jsonContentTypeForAuth: false,
+          baseUrl: NetworkConsts.cdnUrl);
       final response = await dio.get<List<int>>(
-        signedUrl,
+        objectUrl,
         options: Options(responseType: ResponseType.bytes),
       );
 

@@ -7,7 +7,8 @@ import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/api/api_service.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/services/network/dio_handler.dart';
-import 'package:ourjourneys/shared/services/api_const.dart' show ApiConsts;
+import 'package:ourjourneys/shared/services/network_const.dart'
+    show NetworkConsts;
 
 class CloudFileService {
   final ApiService _apiService = getIt<ApiService>();
@@ -32,7 +33,8 @@ class CloudFileService {
       final contentType =
           lookupMimeType(fileName) ?? 'application/octet-stream';
 
-      final Dio dio = await _dioHandler.getClient(withAuth: false);
+      final Dio dio = await _dioHandler.getClient(
+          withAuth: false, baseUrl: NetworkConsts.apiBaseUrl);
 
       final response = await dio.put(
         uploadTarget.url,
@@ -40,7 +42,7 @@ class CloudFileService {
         onSendProgress: onSendProgress,
         options: Options(
           headers: {
-            ApiConsts.headerContentType: contentType,
+            NetworkConsts.headerContentType: contentType,
           },
         ),
       );
@@ -80,7 +82,8 @@ class CloudFileService {
       }
 
       final uploadedUrls = <String>[];
-      final dio = await _dioHandler.getClient(withAuth: false);
+      final dio = await _dioHandler.getClient(
+          withAuth: false, baseUrl: NetworkConsts.apiBaseUrl);
       for (int i = 0; i < fileBytesList.length; i++) {
         final result = signedUrls[i];
         final response = await dio.put(
@@ -89,9 +92,8 @@ class CloudFileService {
           onSendProgress: onSendProgress,
           options: Options(
             headers: {
-              ApiConsts.headerContentType: lookupMimeType(result.fileName,
-                      headerBytes: fileBytesList[i]) ??
-                  'application/octet-stream',
+              NetworkConsts.headerContentType:
+                  lookupMimeType(result.fileName) ?? 'application/octet-stream',
             },
           ),
         );

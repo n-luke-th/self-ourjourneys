@@ -1,3 +1,4 @@
+/* verify Firebase token as viewer request to restrict access to the CloudFront distribution */
 import jwt from "jsonwebtoken";
 
 let certsCache = null;
@@ -50,6 +51,19 @@ function unauthorized(message) {
     headers: {
       "content-type": [{ key: "Content-Type", value: "application/json" }],
       "www-authenticate": [{ key: "WWW-Authenticate", value: "Bearer" }],
+      // 🛡️ Add CORS headers even on auth errors
+      "access-control-allow-origin": [
+        { key: "Access-Control-Allow-Origin", value: "*" },
+      ],
+      "access-control-allow-methods": [
+        { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS" },
+      ],
+      "access-control-allow-headers": [
+        {
+          key: "Access-Control-Allow-Headers",
+          value: "Authorization,Content-Type",
+        },
+      ],
     },
   };
 }
@@ -58,6 +72,31 @@ export const handler = async (event) => {
   const request = event.Records[0].cf.request;
   const headers = request.headers;
   const authHeader = headers.authorization?.[0]?.value;
+
+  // ✅ Bypass token verification for OPTIONS (CORS preflight)
+  if (request.method === "OPTIONS") {
+    return {
+      status: "200",
+      statusDescription: "OK",
+      headers: {
+        "access-control-allow-origin": [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+        ],
+        "access-control-allow-methods": [
+          { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS" },
+        ],
+        "access-control-allow-headers": [
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "Authorization,Content-Type",
+          },
+        ],
+        "access-control-max-age": [
+          { key: "Access-Control-Max-Age", value: "86400" },
+        ],
+      },
+    };
+  }
 
   if (!authHeader?.startsWith("Bearer ")) {
     return unauthorized("Missing or malformed Authorization header");
