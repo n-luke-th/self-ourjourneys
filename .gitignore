@@ -36,6 +36,9 @@ doc/api/
 # git stamp
 lib/git_stamp
 
+# firebase
+firebase/firebase_options.dart
+firebase.json
 
 # lambda
 lambda/lambda

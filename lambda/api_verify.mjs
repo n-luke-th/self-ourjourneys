@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 let cachedCerts = null;
 let certsExpireAt = 0;
 
-const PROJ_ID = "surprise-xiaokeai";
+const PROJ_ID = process.env.PROJ_ID;
 // @ts-ignore
 const JWK_URL =
   "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com";

@@ -8,6 +8,7 @@ import 'package:ourjourneys/components/cloud_file_uploader.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
@@ -43,7 +44,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
         appBarTitle: "Albums".toUpperCase(),
         body: Center(
             child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: UiConsts.PaddingAll_standard,
           child: Wrap(
             alignment: WrapAlignment.spaceAround,
             runAlignment: WrapAlignment.center,
@@ -54,7 +55,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                 height: 200,
                 fit: BoxFit.cover,
                 shimmerBaseOpacity: 0.3,
-                errorWidget: Icon(Icons.error_outline),
+                errorWidget: const Icon(Icons.error_outline),
               ),
               CloudFileUploader(
                 folderPath: "uploads/test",

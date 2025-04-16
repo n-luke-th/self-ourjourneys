@@ -44,3 +44,4 @@
 - Initial Development: Added Python code for the new backend (api v2) [(issue #2)](https://github.com/n-luke-th/self-xiaokeai/issues/2#issuecomment-2800049499), setup some backend underlying, and other improvements on April 16, 2025 -> **0.2.12** by Luke
 - Initial Development: Improved the Python code for Lambda functions on April 16, 2025 -> **0.2.12+1** by Luke
 - Initial Development: Enhanced the authentication flow, tested the ability to upload with api v2, and other improvements on April 16, 2025 -> **0.2.13** by Luke
+- Initial Development: Hidden project id, upgraded dependency constraints, and improvements on April 16, 2025 -> **0.2.13+1** by Luke

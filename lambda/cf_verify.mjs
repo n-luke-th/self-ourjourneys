@@ -1,6 +1,8 @@
 /* verify Firebase token as viewer request to restrict access to the CloudFront distribution */
 import jwt from "jsonwebtoken";
 
+const PROJ_ID = process.env.PROJ_ID; // in real deployment, use actual id cause it can't access env var
+
 let certsCache = null;
 let certsExpiry = null;
 
@@ -103,10 +105,9 @@ export const handler = async (event) => {
   }
 
   const token = authHeader.slice(7);
-  const projectId = "surprise-xiaokeai";
 
   try {
-    const decoded = await verifyFirebaseToken(token, projectId);
+    const decoded = await verifyFirebaseToken(token, PROJ_ID);
 
     //// Optional: inject Firebase UID/email into headers
     // request.headers["x-firebase-uid"] = [
