@@ -12,9 +12,11 @@
 
 0. make sure you have config the latest changes of the app by run command: `git pull`
 
-1. run `flutter clean && flutter pub get` to clean up and get dependencies
+1. run `dart pub global activate flutterfire_cli` then `flutterfire configure` to configure the firebase options
 
-2. run app on another terminal by using command `flutter run -d chrome --web-port 5555` (this will run on Chrome with port 5555)
+2. run `flutter clean && flutter pub get` to clean up and get dependencies
+
+3. run app on another terminal by using command `flutter run -d chrome --web-port 5555` (this will run on Chrome with port 5555)
 
 ## Notable Configurations
 

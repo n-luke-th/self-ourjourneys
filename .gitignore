@@ -37,7 +37,7 @@ doc/api/
 lib/git_stamp
 
 # firebase
-# lib/firebase_options.dart
+lib/firebase_options.dart
 firebase.json
 
 # lambda
@@ -47,3 +47,6 @@ lambda/node_modules
 
 # service account
 lambda/serviceAccountKey.json
+
+# models documentation
+OurJourneys_v1-models-documentation.pdf

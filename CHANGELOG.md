@@ -45,3 +45,4 @@
 - Initial Development: Improved the Python code for Lambda functions on April 16, 2025 -> **0.2.12+1** by Luke
 - Initial Development: Enhanced the authentication flow, tested the ability to upload with api v2, and other improvements on April 16, 2025 -> **0.2.13** by Luke
 - Initial Development: Hidden project id, upgraded dependency constraints, and improvements on April 16, 2025 -> **0.2.13+1** by Luke
+- Initial Development: Added the data models for the database, and other improvements on April 16, 2025 -> **0.2.13+2** by Luke

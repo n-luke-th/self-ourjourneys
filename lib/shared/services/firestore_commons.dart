@@ -19,10 +19,10 @@ enum FirestoreCollections {
   /// this collection meant to be the location to store data for the 'anniversaries' feature
   anniversaries('anniversaries'),
 
-  /// mediaData('mediaData')
+  /// objectsData('objectsData')
   ///
   /// this collection meant to be the location to store information about the media that user uploaded to the application
-  mediaData('mediaData'),
+  objectsData('objectsData'),
 
   /// feedback = '_userFeedback'
   ///
