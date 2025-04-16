@@ -37,7 +37,7 @@ doc/api/
 lib/git_stamp
 
 # firebase
-firebase/firebase_options.dart
+lib/firebase_options.dart
 firebase.json
 
 # lambda
