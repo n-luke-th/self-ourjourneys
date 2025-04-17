@@ -44,20 +44,7 @@
           "name": "geoPoint",
           "hackoladeMeta": {},
           "isActivated": true,
-          "properties": [
-            {
-              "name": "New field",
-              "hackoladeMeta": {},
-              "isActivated": true,
-              "primaryKey": false,
-              "type": "string",
-              "GUID": "8dad998e-9218-4222-b326-451f1fe40b84",
-              "error": {
-                "name": false,
-                "code": false
-              }
-            }
-          ],
+          "properties": [],
           "additionalProperties": false,
           "subTypes": [
             {
@@ -241,66 +228,10 @@
           "error": {}
         },
         {
-          "name": "linkedResources",
+          "name": "linkedAlbums",
           "hackoladeMeta": {},
           "isActivated": true,
-          "properties": [
-            {
-              "hackoladeMeta": {},
-              "isActivated": true,
-              "primaryKey": false,
-              "properties": [
-                {
-                  "hackoladeMeta": {},
-                  "isActivated": true,
-                  "primaryKey": false,
-                  "type": "string",
-                  "GUID": "e762f1a6-6038-4029-90b2-a30cca4b4268",
-                  "name": "resourceType",
-                  "enum": [
-                    "memory",
-                    "album"
-                  ],
-                  "required": true,
-                  "error": {
-                    "enum": false,
-                    "enums": false
-                  }
-                },
-                {
-                  "name": "resourceId",
-                  "hackoladeMeta": {},
-                  "isActivated": true,
-                  "primaryKey": false,
-                  "type": "string",
-                  "GUID": "af8e2454-393b-40ad-813c-659156e8b28a",
-                  "comments": "Wed Apr 16 2025 16:44:47 GMT+0700 (Indochina Time): the firestore document id of referencing resource",
-                  "required": true,
-                  "error": {}
-                },
-                {
-                  "name": "linkedTime",
-                  "hackoladeMeta": {},
-                  "isActivated": true,
-                  "primaryKey": false,
-                  "type": "timestamp",
-                  "GUID": "c1c6c29f-1c29-424b-baf7-5d9407dd076d",
-                  "required": true,
-                  "error": {}
-                }
-              ],
-              "additionalProperties": false,
-              "childType": "object",
-              "type": "document",
-              "documentId": false,
-              "containerLevelKey": false,
-              "hasERDDivider": false,
-              "GUID": "01479b08-6cdc-4fce-ad6b-5e78d5cc307b",
-              "arrayItem": true,
-              "displayName": "resourceData",
-              "error": {}
-            }
-          ],
+          "properties": [],
           "primaryKey": false,
           "additionalItems": true,
           "uniqueItems": false,
@@ -308,29 +239,22 @@
           "type": "array",
           "required": true,
           "GUID": "1f4cfd32-de7e-40cf-9678-a00c429fbdd9",
+          "comments": "Thu Apr 17 2025 15:15:20 GMT+0700 (Indochina Time): a list of albums id that is referring this object",
           "error": {}
         },
         {
-          "name": "tags",
+          "name": "linkedMemories",
           "hackoladeMeta": {},
           "isActivated": true,
-          "properties": [
-            {
-              "hackoladeMeta": {},
-              "isActivated": true,
-              "primaryKey": false,
-              "type": "string",
-              "GUID": "bf4a42f9-d4f5-4187-ba49-86268b31e9e0",
-              "arrayItem": true
-            }
-          ],
+          "properties": [],
           "primaryKey": false,
           "additionalItems": true,
           "uniqueItems": false,
           "childType": "array",
           "type": "array",
-          "GUID": "17e7908a-d32c-4d67-a660-22fd91de7878",
           "required": true,
+          "GUID": "35f931a5-f405-4eee-b18b-7632b5a2990b",
+          "comments": "Thu Apr 17 2025 15:15:59 GMT+0700 (Indochina Time): a list of memories id that is referring this object",
           "error": {}
         },
         {
@@ -340,6 +264,20 @@
           "primaryKey": false,
           "type": "timestamp",
           "GUID": "139eb133-140d-4286-9114-0f43a57edc0b",
+          "required": true,
+          "error": {}
+        },
+        {
+          "name": "tags",
+          "hackoladeMeta": {},
+          "isActivated": true,
+          "properties": [],
+          "primaryKey": false,
+          "additionalItems": true,
+          "uniqueItems": false,
+          "childType": "array",
+          "type": "array",
+          "GUID": "17e7908a-d32c-4d67-a660-22fd91de7878",
           "required": true,
           "error": {}
         }
@@ -388,26 +326,16 @@
           "name": "linkedObjects",
           "hackoladeMeta": {},
           "isActivated": true,
-          "properties": [
-            {
-              "hackoladeMeta": {},
-              "isActivated": true,
-              "primaryKey": false,
-              "type": "string",
-              "GUID": "a48ed9e3-2719-413d-bf7c-f0929e2b4295",
-              "arrayItem": true,
-              "displayName": "objectKey",
-              "error": {}
-            }
-          ],
+          "properties": [],
           "primaryKey": false,
           "additionalItems": true,
           "uniqueItems": false,
           "childType": "array",
           "type": "array",
-          "error": {},
           "required": true,
-          "GUID": "d184f367-aec4-4432-a9d6-aef31a831255"
+          "GUID": "d184f367-aec4-4432-a9d6-aef31a831255",
+          "comments": "Thu Apr 17 2025 15:16:58 GMT+0700 (Indochina Time): a list of objects that this album referring to",
+          "error": {}
         },
         {
           "name": "modificationData",
@@ -470,23 +398,6 @@
           },
           "foreignCollection": "",
           "foreignField": []
-        },
-        {
-          "name": "albumType",
-          "hackoladeMeta": {},
-          "isActivated": true,
-          "primaryKey": false,
-          "type": "string",
-          "GUID": "062af11c-58a1-4d0f-8be9-ad0a41bc6846",
-          "required": true,
-          "error": {
-            "enum": false,
-            "enums": false
-          },
-          "enum": [
-            "userDefined",
-            "systemDefined"
-          ]
         }
       ],
       "definitions": {
@@ -593,23 +504,7 @@
   "views": [],
   "relationships": [],
   "users": [],
-  "diagramViews": [
-    {
-      "GUID": "3b3a634f-b25e-48ca-a254-83efba93caf1",
-      "name": "all",
-      "buckets": [
-        "943b9a5f-94e4-4d50-86d9-b10d80398465"
-      ],
-      "comments": "",
-      "description": "",
-      "entities": [
-        "42dd9b7a-b8f2-47ef-b919-524559fe9f9f",
-        "2c63f901-5636-4054-98a1-7a1fbb066742",
-        "58f50c8a-551c-4fcc-b399-02a9d826f48a",
-        "c42eb684-4a57-482b-9b84-d5980c1dd141"
-      ]
-    }
-  ],
+  "diagramViews": [],
   "idToNameHashTable": {
     "943b9a5f-94e4-4d50-86d9-b10d80398465": "default",
     "c65dd55b-1eb6-497a-af10-de6ff7af56be": "^[a-zA-Z0-9_.-]{20}$",
@@ -633,11 +528,7 @@
     "cfaefe62-7379-44d5-ae92-36b08920ae44": "contentType",
     "d823a3ac-634e-44b1-86c6-3aac5f5e5bab": "objectUrl",
     "17e7908a-d32c-4d67-a660-22fd91de7878": "tags",
-    "139eb133-140d-4286-9114-0f43a57edc0b": "objectUploadRequestedAt",
     "76dd2582-3e94-4226-acb7-e5191a8ebb40": "",
-    "1f4cfd32-de7e-40cf-9678-a00c429fbdd9": "linkedResources",
-    "c1c6c29f-1c29-424b-baf7-5d9407dd076d": "linkedTime",
-    "8dad998e-9218-4222-b326-451f1fe40b84": "New field",
     "f9865b9c-babe-461a-9f8f-023a7bd3d61a": "linkedObjects",
     "f6a7ae57-1413-4dd2-86a5-bb3248cbbf56": "modificationData",
     "ce223dae-5680-4ac1-9ee6-4dcd9a0286e2": "createdAt",
@@ -649,9 +540,10 @@
     "1ba824ae-d211-403d-868f-40c2ff1b79de": "createdAt",
     "36b9fa25-cad4-4376-bef5-404f7999a036": "lastModifiedByUserId",
     "701084e3-0722-43d6-b738-5a2d9c375981": "lastModifiedAt",
-    "062af11c-58a1-4d0f-8be9-ad0a41bc6846": "albumType",
     "c240c868-fc1c-4815-8a1e-a2f06310760f": "memoryName",
-    "3b3a634f-b25e-48ca-a254-83efba93caf1": "all"
+    "35f931a5-f405-4eee-b18b-7632b5a2990b": "linkedMemories",
+    "1f4cfd32-de7e-40cf-9678-a00c429fbdd9": "linkedAlbums",
+    "139eb133-140d-4286-9114-0f43a57edc0b": "objectUploadRequestedAt"
   },
   "definitions": {
     "type": "definitions",
@@ -683,8 +575,7 @@
   "author": "Kittipich Aiumbhornsin",
   "projectName": "OurJourneys",
   "publicFacingName": "OurJourneys",
-  "version": "1",
-  "lastModifTS": "2025-04-16T10:53:48.476Z",
+  "lastModifTS": "2025-04-17T08:32:08.731Z",
   "persistenceSchemaVersion": "8",
   "isCreatedByPlugin": true,
   "pluginInformation": {
@@ -695,6 +586,7 @@
   "applicationInformation": {
     "version": "8.1.2"
   },
+  "version": "2",
   "settings": {
     "centralPane": {
       "dbLevel": {
@@ -704,29 +596,29 @@
             "x": 809,
             "y": 935,
             "width": 308,
-            "height": 249,
+            "height": 231,
             "color": {}
           },
           {
             "GUID": "c42eb684-4a57-482b-9b84-d5980c1dd141",
             "x": 1161,
-            "y": 951,
+            "y": 943.0835411471322,
             "width": 315,
-            "height": 285,
-            "color": {}
-          },
-          {
-            "GUID": "42dd9b7a-b8f2-47ef-b919-524559fe9f9f",
-            "x": 811,
-            "y": 1231,
-            "width": 308,
             "height": 213,
             "color": {}
           },
           {
+            "GUID": "42dd9b7a-b8f2-47ef-b919-524559fe9f9f",
+            "x": 1164.9788029925169,
+            "y": 1177.8466334164564,
+            "width": 308,
+            "height": 177,
+            "color": {}
+          },
+          {
             "GUID": "2c63f901-5636-4054-98a1-7a1fbb066742",
-            "x": 1172.5,
-            "y": 1318,
+            "x": 829.8304239401496,
+            "y": 1219.6097256857836,
             "width": 284,
             "height": 105,
             "color": {}
@@ -760,64 +652,12 @@
           "forceLayout": true,
           "defaultLinkLength": 300
         },
-        "diagramViews": [
-          {
-            "GUID": "3b3a634f-b25e-48ca-a254-83efba93caf1",
-            "entities": [
-              {
-                "GUID": "42dd9b7a-b8f2-47ef-b919-524559fe9f9f",
-                "x": 1650,
-                "y": 1050,
-                "width": 301,
-                "height": 210,
-                "color": {}
-              },
-              {
-                "GUID": "2c63f901-5636-4054-98a1-7a1fbb066742",
-                "x": 1050,
-                "y": 1350,
-                "width": 277,
-                "height": 102,
-                "color": {}
-              },
-              {
-                "GUID": "58f50c8a-551c-4fcc-b399-02a9d826f48a",
-                "x": 1250,
-                "y": 1050,
-                "width": 301,
-                "height": 246,
-                "color": {}
-              },
-              {
-                "GUID": "c42eb684-4a57-482b-9b84-d5980c1dd141",
-                "x": 1400,
-                "y": 1350,
-                "width": 307,
-                "height": 282,
-                "color": {}
-              }
-            ],
-            "buckets": [
-              {
-                "x": 1010,
-                "y": 1010,
-                "GUID": "943b9a5f-94e4-4d50-86d9-b10d80398465"
-              }
-            ],
-            "graphView": {
-              "erd": [],
-              "buckets": [],
-              "decorativeSymbols": [],
-              "forceLayout": true,
-              "defaultLinkLength": 300
-            },
-            "displayOptions": {}
-          }
-        ],
+        "diagramViews": [],
         "decorativeSymbols": [],
         "nestedCollectionsLayout": "horizontal",
         "options": [],
-        "relationshipUpdateDisabled": false
+        "relationshipUpdateDisabled": false,
+        "displayOptions": {}
       },
       "collectionLevel": {},
       "changed": false

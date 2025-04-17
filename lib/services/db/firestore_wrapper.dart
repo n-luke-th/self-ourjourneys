@@ -201,6 +201,7 @@ class FirestoreWrapper {
   void _showSuccessNotification(
       BuildContext context, String message, bool suppressNotification,
       {NotificationData? overrideNotiData}) {
+    _logger.d(message);
     if (!suppressNotification) {
       context.read<NotificationManager>().showNotification(
             context,
