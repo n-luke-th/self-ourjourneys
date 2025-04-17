@@ -62,18 +62,7 @@
           "name": "linkedObjects",
           "hackoladeMeta": {},
           "isActivated": true,
-          "properties": [
-            {
-              "hackoladeMeta": {},
-              "isActivated": true,
-              "primaryKey": false,
-              "type": "string",
-              "GUID": "72c3d11e-6de2-4006-bf6b-3fc8dd9788b0",
-              "arrayItem": true,
-              "displayName": "ObjectKey",
-              "error": {}
-            }
-          ],
+          "properties": [],
           "primaryKey": false,
           "additionalItems": true,
           "uniqueItems": false,
@@ -81,6 +70,7 @@
           "type": "array",
           "GUID": "f9865b9c-babe-461a-9f8f-023a7bd3d61a",
           "required": true,
+          "comments": "Thu Apr 17 2025 15:37:16 GMT+0700 (Indochina Time): a list of objects that this memory is referring to",
           "error": {}
         },
         {
@@ -334,7 +324,7 @@
           "type": "array",
           "required": true,
           "GUID": "d184f367-aec4-4432-a9d6-aef31a831255",
-          "comments": "Thu Apr 17 2025 15:16:58 GMT+0700 (Indochina Time): a list of objects that this album referring to",
+          "comments": "Thu Apr 17 2025 15:16:58 GMT+0700 (Indochina Time): a list of objects that this album is referring to",
           "error": {}
         },
         {
@@ -575,7 +565,7 @@
   "author": "Kittipich Aiumbhornsin",
   "projectName": "OurJourneys",
   "publicFacingName": "OurJourneys",
-  "lastModifTS": "2025-04-17T08:32:08.731Z",
+  "lastModifTS": "2025-04-17T08:37:39.940Z",
   "persistenceSchemaVersion": "8",
   "isCreatedByPlugin": true,
   "pluginInformation": {
@@ -596,7 +586,7 @@
             "x": 809,
             "y": 935,
             "width": 308,
-            "height": 231,
+            "height": 213,
             "color": {}
           },
           {
