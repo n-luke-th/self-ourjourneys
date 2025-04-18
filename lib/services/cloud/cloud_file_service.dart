@@ -1,16 +1,26 @@
 /// lib/services/cloud/cloud_file_service.dart
 
 import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:dio/dio.dart';
-import 'package:mime/mime.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/services/api/api_service.dart';
+import 'package:flutter/widgets.dart' show BuildContext;
 import 'package:logger/logger.dart';
+import 'package:mime/mime.dart';
+
+import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/models/storage/objects_data.dart';
+import 'package:ourjourneys/services/api/api_service.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/services/network/dio_handler.dart';
+import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/services/network_const.dart'
     show NetworkConsts;
 
 class CloudFileService {
+  final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final ApiService _apiService = getIt<ApiService>();
   final Logger _logger = getIt<Logger>();
   final DioHandler _dioHandler = getIt<DioHandler>();
@@ -49,7 +59,7 @@ class CloudFileService {
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         _logger.i("Successfully uploaded $fileName to ${uploadTarget.url}");
-        return uploadTarget.url;
+        return uploadTarget.key;
       } else {
         _logger.e(
             "Upload failed: ${response.statusCode} ${response.statusMessage}");
@@ -68,46 +78,113 @@ class CloudFileService {
     return null;
   }
 
-  Future<List<String>> uploadMultipleFiles({
+  Future<(List<String> successKeys, Set<String> failedFileNames)>
+      uploadMultipleFiles({
+    required BuildContext context,
     required List<Uint8List> fileBytesList,
     required List<String> fileNames,
     required String folderPath,
+    required void Function(int fileIndex) onFileIndexChanged,
     Null Function(int sent, int total)? onSendProgress,
   }) async {
-    try {
-      final signedUrls = await _apiService.getUploadUrls(folderPath, fileNames);
+    final successKeys = <String>[];
+    final failedFileNames = <String>{};
+    final dio = await _dioHandler.getClient(
+        withAuth: false, baseUrl: NetworkConsts.apiBaseUrl);
 
-      if (signedUrls.length != fileBytesList.length) {
+    try {
+      final requestedTime = Timestamp.now();
+      final fileResults =
+          await _apiService.getUploadUrls(folderPath, fileNames);
+
+      if (fileResults.length != fileBytesList.length) {
         throw Exception("Mismatch in file count vs signed URL count");
       }
 
-      final uploadedUrls = <String>[];
-      final dio = await _dioHandler.getClient(
-          withAuth: false, baseUrl: NetworkConsts.apiBaseUrl);
-      for (int i = 0; i < fileBytesList.length; i++) {
-        final result = signedUrls[i];
-        final response = await dio.put(
-          result.url,
-          data: fileBytesList[i],
-          onSendProgress: onSendProgress,
-          options: Options(
-            headers: {
-              NetworkConsts.headerContentType:
-                  lookupMimeType(result.fileName) ?? 'application/octet-stream',
-            },
-          ),
-        );
+      final aggregateTotal =
+          fileBytesList.fold<int>(0, (sum, file) => sum + file.length);
 
-        if (response.statusCode == 200 || response.statusCode == 204) {
-          uploadedUrls.add(result.url);
-        } else {
-          _logger.w("Failed to upload ${fileNames[i]}: ${response.statusCode}");
+      for (int i = 0; i < fileBytesList.length; i++) {
+        final result = fileResults[i];
+        onFileIndexChanged(i);
+        try {
+          final response = await dio.put(
+            result.url,
+            data: fileBytesList[i],
+            onSendProgress: (sent, total) {
+              final previousTotalSent = fileBytesList
+                  .sublist(0, i)
+                  .fold<int>(0, (sum, file) => sum + file.length);
+
+              final aggregateSent = previousTotalSent + sent;
+              onSendProgress?.call(aggregateSent, aggregateTotal);
+            },
+            // onSendProgress: onSendProgress,
+            options: Options(
+              headers: {
+                NetworkConsts.headerContentType:
+                    lookupMimeType(result.fileName) ??
+                        'application/octet-stream',
+              },
+            ),
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 204) {
+            successKeys.add(result.key);
+            await _saveToFirestore(
+              // ignore: use_build_context_synchronously
+              context,
+              objectKey: result.key,
+              fileName: result.fileName,
+              contentType:
+                  lookupMimeType(result.fileName) ?? 'application/octet-stream',
+              objectUrl: "${NetworkConsts.cdnUrl}/${result.key}",
+              objectUploadRequestedAt: requestedTime,
+              tags: [],
+              linkedAlbums: [],
+              linkedMemories: [],
+            );
+          } else {
+            failedFileNames.add(fileNames[i]);
+          }
+        } catch (e) {
+          failedFileNames.add(fileNames[i]);
         }
       }
-      return uploadedUrls;
+
+      return (successKeys, failedFileNames);
     } catch (e, st) {
       _logger.e("Exception uploading multiple files", error: e, stackTrace: st);
-      return [];
+      return (successKeys, failedFileNames);
     }
+  }
+
+  Future<void> _saveToFirestore(
+    BuildContext context, {
+    required String objectKey,
+    required String fileName,
+    required String contentType,
+    required String objectUrl,
+    required Timestamp objectUploadRequestedAt,
+    List<String> tags = const [],
+    List<String> linkedAlbums = const [],
+    List<String> linkedMemories = const [],
+  }) async {
+    _authWrapper.refreshAttributes();
+    final objectData = ObjectsData(
+      objectKey: objectKey,
+      fileName: fileName,
+      contentType: contentType,
+      objectUrl: objectUrl,
+      userId: _authWrapper.uid,
+      objectUploadRequestedAt: objectUploadRequestedAt,
+      tags: tags,
+      linkedAlbums: linkedAlbums,
+      linkedMemories: linkedMemories,
+    );
+
+    await _firestoreWrapper.handleCreateDocument(
+        context, FirestoreCollections.objectsData, objectData.toMap(),
+        suppressNotification: true);
   }
 }

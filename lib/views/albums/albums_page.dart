@@ -1,14 +1,21 @@
 /// lib/views/albums/albums_page.dart
 ///
 ///
+import 'package:cloud_firestore/cloud_firestore.dart'
+    show DocumentSnapshot, Query;
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/cloud_file_uploader.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/services/auth/acc/auth_service.dart';
+import 'package:ourjourneys/helpers/utils.dart';
+import 'package:ourjourneys/models/modification_model.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/services/db/firestore_wrapper.dart';
+import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/views/albums/all_files_page.dart';
 
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
@@ -18,53 +25,173 @@ class AlbumsPage extends StatefulWidget {
 }
 
 class _AlbumsPageState extends State<AlbumsPage> {
-  String objectKey = "bmc_qr.png";
-  final AuthService _auth = getIt<AuthService>();
+  // String objectKey = "bmc_qr.png";
+  // final AuthService _auth = getIt<AuthService>();
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
+  final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
   final Logger _logger = getIt<Logger>();
+  final List<DocumentSnapshot> _docs = [];
+  final ScrollController _scrollController = ScrollController();
+
+  bool _isLoading = false;
+  bool _hasMore = true;
+  DocumentSnapshot? _lastDoc;
+
+  static const _pageSize = 20;
 
   @override
   initState() {
     super.initState();
-    getIdToken();
+    // getIdToken();
+    _fetch();
+    _scrollController.addListener(_onScroll);
   }
 
-  void getIdToken() async {
-    try {
-      final user = _auth.authInstance!.currentUser;
-      final idToken = await user!.getIdToken();
-      _logger.d("idToken: $idToken");
-    } catch (e) {
-      _logger.e(e);
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // void getIdToken() async {
+  //   try {
+  //     final user = _auth.authInstance!.currentUser;
+  //     final idToken = await user!.getIdToken();
+  //     _logger.d("idToken: $idToken");
+  //   } catch (e) {
+  //     _logger.e(e);
+  //   }
+  // }
+
+  void _onScroll() async {
+    if (_scrollController.position.pixels >
+            _scrollController.position.maxScrollExtent - 300 &&
+        !_isLoading &&
+        _hasMore) {
+      await _fetch();
     }
+  }
+
+  Future<void> _fetch() async {
+    setState(() => _isLoading = true);
+    Query query = _firestoreWrapper.queryCollection(
+        FirestoreCollections.albums,
+          [ 
+          ],
+        orderBy: "albumName", descending: false, limit: _pageSize);
+
+    if (_lastDoc != null) {
+      query = query.startAfterDocument(_lastDoc!);
+    }
+
+    final snapshot = await query.get();
+
+    if (snapshot.docs.isNotEmpty) {
+      _lastDoc = snapshot.docs.last;
+      _docs.addAll(snapshot.docs);
+    }
+
+    if (snapshot.docs.length < _pageSize) _hasMore = false;
+
+    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return mainView(context,
         appBarTitle: "Albums".toUpperCase(),
+        showFloatingActionButton: true,
+        onFloatingActionButtonPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CloudFileUploader(
+                      folderPath: "uploads/test",
+                      onUploaded: (results) {
+                        _logger.d("on uploaded results: $results");
+                      },
+                    ))),
         body: Center(
             child: Padding(
-          padding: UiConsts.PaddingAll_standard,
-          child: Wrap(
-            alignment: WrapAlignment.spaceAround,
-            runAlignment: WrapAlignment.center,
-            children: [
-              CloudImage(
-                objectKey: objectKey,
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
-                shimmerBaseOpacity: 0.3,
-                errorWidget: const Icon(Icons.error_outline),
-              ),
-              CloudFileUploader(
-                folderPath: "uploads/test",
-                onUploaded: (results) {
-                  _logger.d("on uploaded results: $results");
-                },
-              )
-            ],
-          ),
-        )));
+                padding: UiConsts.PaddingAll_standard,
+                child: GridView.builder(
+                  controller: _scrollController,
+                  padding: UiConsts.PaddingAll_standard,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 2,
+                  ),
+                  itemCount: _docs.length + (_hasMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == _docs.length) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final data = _docs[index].data() as Map<String, dynamic>;
+                    // final name = data['albumName'] as String;
+                    // final modData = ModificationData.fromMap(
+                    //     data['modificationData'] as Map<String, dynamic>);
+                    // final contentType = data['contentType'] as String;
+                    // final url = data['objectUrl'] as String;
+                    // return GridTile(
+                    //   footer: Text(modData.toMap().toString()),
+                    //   child: Text(name),
+                    // );
+                    return _albumTile(data, index);
+                  },
+                )
+                // AllFilesPage()
+                // Wrap(
+                //   alignment: WrapAlignment.spaceAround,
+                //   runAlignment: WrapAlignment.center,
+                //   children: [
+                //     CloudImage(
+                //       objectKey: objectKey,
+                //       width: 200,
+                //       height: 200,
+                //       fit: BoxFit.cover,
+                //       shimmerBaseOpacity: 0.3,
+                //       errorWidget: const Icon(Icons.error_outline),
+                //     ),
+                //   ],
+                // ),
+
+                )));
+  }
+
+  Widget _albumTile(Map<String, dynamic> data, int index) {
+    final name = data['albumName'] as String;
+    final modData = ModificationData.fromMap(
+        data['modificationData'] as Map<String, dynamic>);
+    if (_authWrapper.uid == "") {
+      _authWrapper.refreshAttributes();
+    }
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: UiConsts.BorderRadiusCircular_standard,
+      ),
+      child: ListTile(
+        enableFeedback: true,
+        contentPadding: UiConsts.PaddingAll_standard,
+        titleAlignment: ListTileTitleAlignment.center,
+        isThreeLine: true,
+        leading: Text((index + 1).toString()),
+        trailing: Text(
+          "${data["linkedObjects"].length.toString()}\n${index == 0 ? 'item' : 'items'}",
+          maxLines: 2,
+          softWrap: true,
+          textAlign: TextAlign.center,
+        ),
+        title: Text(
+          name,
+          textAlign: TextAlign.justify,
+        ),
+        subtitle: Text(
+            "Created by ${modData.createdByUserId == _authWrapper.uid ? "You" : "Someone else"} ${Utils.getTimeAgoFromTimestamp(modData.createdAt)}\nLast modified by ${modData.lastModifiedByUserId == _authWrapper.uid ? "You" : "Someone else"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @ H:m")}"),
+        style: ListTileStyle.drawer,
+      ),
+    );
   }
 }

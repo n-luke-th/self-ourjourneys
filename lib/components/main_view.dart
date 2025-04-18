@@ -9,6 +9,7 @@ Scaffold mainView(
   String? appBarTitle = 'changeMe',
   required Widget body,
   List<Widget>? appbarActions = const [],
+  PreferredSizeWidget? appbarBottom,
   Color? appBarBackgroundColor,
   Color? backgroundColor,
   bool? extendBodyBehindAppBar = false,
@@ -31,6 +32,7 @@ Scaffold mainView(
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
       actions: appbarActions,
+      bottom: appbarBottom,
     ),
     backgroundColor:
         backgroundColor ?? Theme.of(context).colorScheme.secondaryContainer,

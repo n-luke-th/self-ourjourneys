@@ -42,6 +42,13 @@ class FirestoreWrapper {
         descending: descending, orderBy: orderBy, limit: queryLimit);
   }
 
+  Query queryCollection(
+      FirestoreCollections collection, List<QueryFilter> filters,
+      {int? limit, String? orderBy, bool descending = false}) {
+    return _firestoreService.queryCollectionAsQuery(collection.value, filters,
+        descending: descending, orderBy: orderBy, limit: limit);
+  }
+
   Future<DocumentSnapshot<Object?>> getDocumentById(
       FirestoreCollections collection, String docId) async {
     return await _firestoreService.getDocument(collection.value, docId);

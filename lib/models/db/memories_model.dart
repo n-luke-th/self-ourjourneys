@@ -27,6 +27,9 @@ class MemoriesModel {
       'id': id,
       'memoryName': memoryName,
       'memoryDes': memoryDes,
+      'geoPoint': geoPoint,
+      'linkedObjects': linkedObjects,
+      'modificationData': modificationData
     };
   }
 

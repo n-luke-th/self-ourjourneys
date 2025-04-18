@@ -19,18 +19,18 @@ class ModificationData {
   Map<String, dynamic> toMap() {
     return {
       'createdByUserId': createdByUserId,
-      'createdAt': createdAt.toString(),
+      'createdAt': createdAt,
       'lastModifiedByUserId': lastModifiedByUserId,
-      'lastModifiedAt': lastModifiedAt.toString(),
+      'lastModifiedAt': lastModifiedAt,
     };
   }
 
   factory ModificationData.fromMap(Map<String, dynamic> map) {
     return ModificationData(
       createdByUserId: map['createdByUserId'] ?? '',
-      createdAt: map['createdAt'],
+      createdAt: map['createdAt'] as Timestamp,
       lastModifiedByUserId: map['lastModifiedByUserId'],
-      lastModifiedAt: map['lastModifiedAt'],
+      lastModifiedAt: map['lastModifiedAt'] as Timestamp,
     );
   }
 

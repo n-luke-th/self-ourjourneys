@@ -29,7 +29,7 @@ class CloudImage extends StatefulWidget {
     this.width,
     this.height,
     this.fadeDuration = const Duration(milliseconds: 500),
-    this.errorWidget,
+    this.errorWidget = const Icon(Icons.error_outline),
     this.shimmerBaseOpacity = 0.5,
   });
 
@@ -73,6 +73,7 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
 
     try {
       final Dio dio = await _dioHandler.getClient(
+          // TODO: change 'withAuth' to true
           withAuth: false,
           jsonContentTypeForAuth: false,
           baseUrl: NetworkConsts.cdnUrl);

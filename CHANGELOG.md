@@ -48,3 +48,4 @@
 - Initial Development: Added the data models for the database, and other improvements on April 16, 2025 -> **0.2.13+2** by Luke
 - Initial Development: Updated the data models for the database to v1.1 & 2, added some data classes, and other improvements on April 17, 2025 -> **0.2.13+3** by Luke
 - Initial Development: Updated the data models for the database to v2 on April 17, 2025 -> **0.2.13+4** by Luke
+- Initial Development: Implementation of the integration of the database, tested multiple files upload with progress, and other improvements on April 18, 2025 -> **0.2.14** by Luke

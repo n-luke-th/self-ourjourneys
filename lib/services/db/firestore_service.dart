@@ -16,7 +16,8 @@ class FirestoreService {
   }
 
   /// Get a collection of documents
-  Stream<QuerySnapshot<Map<String, dynamic>>> getCollection(String collection) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getCollectionAsStream(
+      String collection) {
     return _firestore.collection(collection).snapshots();
   }
 
@@ -94,6 +95,23 @@ class FirestoreService {
     }
 
     return query.snapshots();
+  }
+
+  Query queryCollectionAsQuery(String collection, List<QueryFilter> filters,
+      {int? limit, String? orderBy, bool descending = false}) {
+    Query query = _firestore.collection(collection);
+
+    query = _applyQueryConditions(query, filters);
+
+    if (orderBy != null) {
+      query = query.orderBy(orderBy, descending: descending);
+    }
+
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+
+    return query;
   }
 
   // BATCH OPERATIONS
