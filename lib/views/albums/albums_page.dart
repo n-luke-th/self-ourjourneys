@@ -25,8 +25,6 @@ class AlbumsPage extends StatefulWidget {
 }
 
 class _AlbumsPageState extends State<AlbumsPage> {
-  // String objectKey = "bmc_qr.png";
-  // final AuthService _auth = getIt<AuthService>();
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
   final Logger _logger = getIt<Logger>();
@@ -129,11 +127,6 @@ class _AlbumsPageState extends State<AlbumsPage> {
                     }
 
                     final data = _docs[index].data() as Map<String, dynamic>;
-                    // final name = data['albumName'] as String;
-                    // final modData = ModificationData.fromMap(
-                    //     data['modificationData'] as Map<String, dynamic>);
-                    // final contentType = data['contentType'] as String;
-                    // final url = data['objectUrl'] as String;
                     // return GridTile(
                     //   footer: Text(modData.toMap().toString()),
                     //   child: Text(name),

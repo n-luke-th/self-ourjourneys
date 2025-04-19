@@ -21,10 +21,16 @@ class FirestoreService {
     return _firestore.collection(collection).snapshots();
   }
 
-  /// Add a new document
+  /// Add a new document with an auto-generated ID
   Future<DocumentReference> addDocument(
       String collection, Map<String, dynamic> data) async {
     return await _firestore.collection(collection).add(data);
+  }
+
+  /// add a new document with custom document ID
+  Future<void> addDocumentWithId(
+      String collection, String docId, Map<String, dynamic> data) async {
+    return await _firestore.collection(collection).doc(docId).set(data);
   }
 
   /// Update a document

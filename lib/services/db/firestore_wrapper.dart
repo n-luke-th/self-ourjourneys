@@ -59,21 +59,38 @@ class FirestoreWrapper {
   Future<DocumentReference?> handleCreateDocument(BuildContext context,
       FirestoreCollections collectionName, Map<String, dynamic> data,
       {bool suppressNotification = false,
+      bool useCustomDocID = false,
+      String? customDocID,
       NotificationData? overrideNotiData,
       NotificationData? overrideErrorNotiData}) async {
-    _logger.d("Creating document with data: $data");
-    try {
-      final doc =
-          await _firestoreService.addDocument(collectionName.value, data);
-      _showSuccessNotification(
-          context, 'Document created', suppressNotification,
-          overrideNotiData: overrideNotiData);
-      return doc;
-    } catch (e) {
-      _handleError(context, e, suppressNotification,
-          overrideNotiData: overrideErrorNotiData);
-      return null;
+    if (!useCustomDocID) {
+      _logger.d("Creating auto-gen ID document with data: $data");
+      try {
+        final doc =
+            await _firestoreService.addDocument(collectionName.value, data);
+        _showSuccessNotification(
+            context, 'Document created', suppressNotification,
+            overrideNotiData: overrideNotiData);
+        return doc;
+      } catch (e) {
+        _handleError(context, e, suppressNotification,
+            overrideNotiData: overrideErrorNotiData);
+        return null;
+      }
+    } else {
+      assert(customDocID != null,
+          "customDocID must not be null when useCustomDocID is true");
+      _logger.d("Creating custom ID document with data: $data");
+      try {
+        await _firestoreService.addDocumentWithId(
+            collectionName.value, customDocID!, data);
+      } catch (e) {
+        _handleError(context, e, suppressNotification,
+            overrideNotiData: overrideErrorNotiData);
+        return null;
+      }
     }
+    return null;
   }
 
   Future<void> handleUpdateDocument(
