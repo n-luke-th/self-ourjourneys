@@ -4,6 +4,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart'
     show DocumentSnapshot, Query;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/cloud_file_uploader.dart';
@@ -15,7 +16,6 @@ import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
-import 'package:ourjourneys/views/albums/all_files_page.dart';
 
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
@@ -98,16 +98,32 @@ class _AlbumsPageState extends State<AlbumsPage> {
   Widget build(BuildContext context) {
     return mainView(context,
         appBarTitle: "Albums".toUpperCase(),
+        appbarActions: [
+          Padding(
+            padding: UiConsts.PaddingAll_standard,
+            child: IconButton.outlined(
+              onPressed: () => context.pushNamed("ViewAllFilesPage"),
+              enableFeedback: true,
+              tooltip: "View all uploaded files",
+              icon: const Icon(
+                Icons.folder_outlined,
+              ),
+            ),
+          )
+        ],
         showFloatingActionButton: true,
-        onFloatingActionButtonPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => CloudFileUploader(
-                      folderPath: "uploads/test",
-                      onUploaded: (results) {
-                        _logger.d("on uploaded results: $results");
-                      },
-                    ))),
+        floatingActionButtonTooltip: "Create new album",
+        floatingActionButtonIcon: Icons.add_to_photos_outlined,
+        onFloatingActionButtonPressed: () => context.pushNamed("NewAlbumPage"),
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => CloudFileUploader(
+        //               folderPath: "uploads/test",
+        //               onUploaded: (results) {
+        //                 _logger.d("on uploaded results: $results");
+        //               },
+        //             ))),
         body: Center(
             child: Padding(
                 padding: UiConsts.PaddingAll_standard,
@@ -115,7 +131,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                   controller: _scrollController,
                   padding: UiConsts.PaddingAll_standard,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
+                    crossAxisCount: 2,
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
                     childAspectRatio: 2,
@@ -124,17 +140,15 @@ class _AlbumsPageState extends State<AlbumsPage> {
                   itemBuilder: (context, index) {
                     if (index == _docs.length) {
                       return const Center(child: CircularProgressIndicator());
+                    } else if (_docs.isEmpty) {
+                      return const Center(child: Text("No albums yet"));
+                    } else {
+                      final data = _docs[index].data() as Map<String, dynamic>;
+                      return _albumTile(data, index);
                     }
-
-                    final data = _docs[index].data() as Map<String, dynamic>;
-                    // return GridTile(
-                    //   footer: Text(modData.toMap().toString()),
-                    //   child: Text(name),
-                    // );
-                    return _albumTile(data, index);
                   },
                 )
-                // AllFilesPage()
+
                 // Wrap(
                 //   alignment: WrapAlignment.spaceAround,
                 //   runAlignment: WrapAlignment.center,
@@ -167,7 +181,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
       ),
       child: ListTile(
         enableFeedback: true,
-        contentPadding: UiConsts.PaddingAll_standard,
+        contentPadding: UiConsts.PaddingHorizontal_small,
         titleAlignment: ListTileTitleAlignment.center,
         isThreeLine: true,
         leading: Text((index + 1).toString()),
@@ -182,7 +196,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
           textAlign: TextAlign.justify,
         ),
         subtitle: Text(
-            "Created by ${modData.createdByUserId == _authWrapper.uid ? "You" : "Someone else"} ${Utils.getTimeAgoFromTimestamp(modData.createdAt)}\nLast modified by ${modData.lastModifiedByUserId == _authWrapper.uid ? "You" : "Someone else"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @ H:m")}"),
+            "Created by ${modData.createdByUserId == _authWrapper.uid ? "You" : "Your lover"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @H:mm")}\nLast modified by ${modData.lastModifiedByUserId == _authWrapper.uid ? "You" : "Your lover"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @H:mm")}"),
         style: ListTileStyle.drawer,
       ),
     );

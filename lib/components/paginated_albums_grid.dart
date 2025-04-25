@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+// import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart';
@@ -20,12 +21,13 @@ class _PaginatedAlbumsGridState extends State<PaginatedAlbumsGrid> {
   final List<DocumentSnapshot> _docs = [];
   final ScrollController _scrollController = ScrollController();
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
+  // final Logger _logger = getIt<Logger>();
 
   bool _isLoading = false;
   bool _hasMore = true;
   DocumentSnapshot? _lastDoc;
 
-  static const _pageSize = 30;
+  static const _pageSize = 20;
 
   @override
   void initState() {
@@ -102,7 +104,7 @@ class _PaginatedAlbumsGridState extends State<PaginatedAlbumsGrid> {
       controller: _scrollController,
       padding: UiConsts.PaddingAll_standard,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+        crossAxisCount: 2,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
         childAspectRatio: 1,
@@ -113,9 +115,10 @@ class _PaginatedAlbumsGridState extends State<PaginatedAlbumsGrid> {
           return const Center(child: CircularProgressIndicator());
         }
 
+        // _logger.d(_docs[index].data());
+
         final objectsData =
             ObjectsData.fromMap(_docs[index].data() as Map<String, dynamic>);
-
         if (objectsData.contentType.startsWith('image/')) {
           return CloudImage(objectKey: objectsData.objectKey);
         } else if (objectsData.contentType.startsWith('video/')) {
@@ -123,7 +126,7 @@ class _PaginatedAlbumsGridState extends State<PaginatedAlbumsGrid> {
         } else {
           // return const Icon(Icons.insert_drive_file, size: 48);
           return ListTile(
-            leading: Text(index.toString()),
+            leading: Text((index + 1).toString()),
             title: Text(objectsData.toMap().toString()),
           );
         }

@@ -39,6 +39,12 @@ class CloudFileService {
         _logger.w("No upload URL received for $fileName");
         return null;
       }
+      final isAlreadyExisting = await _firestoreWrapper.getDocumentById(
+          FirestoreCollections.objectsData, uploadUrls[0].key);
+      if (isAlreadyExisting.exists) {
+        _logger.w("File '$fileName' already exists");
+        return null;
+      }
       final uploadTarget = uploadUrls.first;
       final contentType =
           lookupMimeType(fileName) ?? 'application/octet-stream';
@@ -107,6 +113,13 @@ class CloudFileService {
       for (int i = 0; i < fileBytesList.length; i++) {
         final result = fileResults[i];
         onFileIndexChanged(i);
+        final isAlreadyExisting = await _firestoreWrapper.getDocumentById(
+            FirestoreCollections.objectsData, result.key);
+        if (isAlreadyExisting.exists) {
+          _logger.w("File '${fileNames[i]}' already exists, skipping");
+          failedFileNames.add(fileNames[i]);
+          continue;
+        }
         try {
           final response = await dio.put(
             result.url,
@@ -185,6 +198,8 @@ class CloudFileService {
 
     await _firestoreWrapper.handleCreateDocument(
         context, FirestoreCollections.objectsData, objectData.toMap(),
+        useCustomDocID: true,
+        customDocID: objectKey,
         suppressNotification: true);
   }
 }

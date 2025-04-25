@@ -14,8 +14,9 @@ class MemoriesPage extends StatelessWidget {
     return mainView(context,
         appBarTitle: "Memories".toUpperCase(),
         showFloatingActionButton: true,
-        onFloatingActionButtonPressed: () => context.pushNamed("NewMemory"),
+        onFloatingActionButtonPressed: () => context.pushNamed("NewMemoryPage"),
         floatingActionButtonTooltip: "Create new memory",
+        floatingActionButtonIcon: Icons.volunteer_activism_outlined,
         body: Center(child: Text("memories page under development")));
   }
 }

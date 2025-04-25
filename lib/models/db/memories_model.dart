@@ -3,14 +3,14 @@
 /// memories model
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart' show GeoPoint;
+import 'package:ourjourneys/models/db/place_data.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 
 class MemoriesModel {
   final String id;
   final String memoryName;
   final String? memoryDes;
-  final GeoPoint? geoPoint;
+  final PlaceData placeData;
   final List<String> linkedObjects;
   final ModificationData modificationData;
 
@@ -18,7 +18,7 @@ class MemoriesModel {
       {required this.id,
       required this.memoryName,
       required this.memoryDes,
-      required this.geoPoint,
+      required this.placeData,
       required this.linkedObjects,
       required this.modificationData});
 
@@ -27,9 +27,9 @@ class MemoriesModel {
       'id': id,
       'memoryName': memoryName,
       'memoryDes': memoryDes,
-      'geoPoint': geoPoint,
+      'placeData': placeData.toMap(),
       'linkedObjects': linkedObjects,
-      'modificationData': modificationData
+      'modificationData': modificationData.toMap()
     };
   }
 
@@ -39,8 +39,8 @@ class MemoriesModel {
         id: docId,
         memoryName: map['memoryName'] ?? '',
         memoryDes: map['memoryDes'],
-        geoPoint: map['geoPoint'],
-        linkedObjects: map['linkedObjects'] ?? [],
+        placeData: PlaceData.fromMap(map['placeData']),
+        linkedObjects: List<String>.from(map['linkedObjects'] ?? []),
         modificationData: ModificationData.fromMap(map['modificationData']));
   }
 

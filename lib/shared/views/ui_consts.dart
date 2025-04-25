@@ -100,4 +100,7 @@ class UiConsts {
   ///  EdgeInsets.symmetric(horizontal: 50, vertical: 15)
   static const PaddingElevBtn =
       EdgeInsets.symmetric(horizontal: 50, vertical: 15);
+
+  /// Duration(milliseconds: 500);
+  static const animationDuration = Duration(milliseconds: 500);
 }

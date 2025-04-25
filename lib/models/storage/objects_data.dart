@@ -42,16 +42,18 @@ class ObjectsData {
 
   factory ObjectsData.fromMap(Map<String, dynamic> map) {
     final AuthWrapper authWrapper = getIt<AuthWrapper>();
+    authWrapper.refreshAttributes();
     return ObjectsData(
-        objectKey: map['objectKey'] ?? '',
-        fileName: map['fileName'] ?? '',
-        contentType: map['contentType'] ?? '',
-        objectUrl: map['objectUrl'] ?? '',
-        userId: authWrapper.uid,
-        objectUploadRequestedAt: map['objectUploadRequestedAt'],
-        linkedAlbums: map["linkedAlbums"] ?? [],
-        linkedMemories: map['linkedMemories'] ?? [],
-        tags: map['tags'] ?? []);
+      objectKey: map['objectKey'] ?? '',
+      fileName: map['fileName'] ?? '',
+      contentType: map['contentType'] ?? '',
+      objectUrl: map['objectUrl'] ?? '',
+      userId: authWrapper.uid,
+      objectUploadRequestedAt: map['objectUploadRequestedAt'] as Timestamp,
+      linkedAlbums: List<String>.from(map['linkedAlbums'] ?? []),
+      linkedMemories: List<String>.from(map['linkedMemories'] ?? []),
+      tags: List<String>.from(map['tags'] ?? []),
+    );
   }
 
   String toJson() => json.encode(toMap());

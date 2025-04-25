@@ -41,21 +41,56 @@
           "error": {}
         },
         {
-          "name": "geoPoint",
+          "name": "placeData",
           "hackoladeMeta": {},
           "isActivated": true,
-          "properties": [],
-          "additionalProperties": false,
-          "subTypes": [
+          "primaryKey": false,
+          "properties": [
             {
-              "name": "object",
-              "snippet": "geopoint-object"
+              "name": "geoPoint",
+              "hackoladeMeta": {},
+              "isActivated": true,
+              "properties": [],
+              "additionalProperties": false,
+              "subTypes": [
+                {
+                  "name": "object",
+                  "snippet": "geopoint-object"
+                }
+              ],
+              "childType": "geopoint",
+              "type": "document",
+              "primaryKey": false,
+              "GUID": "70db5f42-d8d4-4826-a96f-de774aceefa8",
+              "error": {}
+            },
+            {
+              "hackoladeMeta": {},
+              "isActivated": true,
+              "primaryKey": false,
+              "type": "string",
+              "GUID": "d2e5179f-1f22-46af-843f-ceeb8683512f",
+              "name": "placeName",
+              "error": {}
+            },
+            {
+              "name": "placeDes",
+              "hackoladeMeta": {},
+              "isActivated": true,
+              "primaryKey": false,
+              "type": "string",
+              "GUID": "472c1d8c-ba31-4dff-beb1-af3f09cfb410",
+              "error": {}
             }
           ],
-          "childType": "geopoint",
+          "additionalProperties": true,
+          "childType": "object",
           "type": "document",
-          "primaryKey": false,
-          "GUID": "70db5f42-d8d4-4826-a96f-de774aceefa8",
+          "documentId": false,
+          "containerLevelKey": false,
+          "hasERDDivider": false,
+          "GUID": "d2280652-8363-4cc4-a224-e3f1b57039fa",
+          "comments": "Fri Apr 25 2025 23:53:56 GMT+0700 (Indochina Time): \r\ncontains the information about the place and location",
           "error": {}
         },
         {
@@ -500,7 +535,6 @@
     "c65dd55b-1eb6-497a-af10-de6ff7af56be": "^[a-zA-Z0-9_.-]{20}$",
     "58f50c8a-551c-4fcc-b399-02a9d826f48a": "memories",
     "70b6fc1b-1923-41c5-b4e5-a1e6c576d4f0": "memDes",
-    "70db5f42-d8d4-4826-a96f-de774aceefa8": "geoPoint",
     "51db96c1-06ff-46d3-96ae-78c2f18fba6b": "^[a-zA-Z0-9_.-]{20}$",
     "c42eb684-4a57-482b-9b84-d5980c1dd141": "objectsData",
     "76dfa06e-f71b-44c6-8950-b43d6e7e73b7": "objectKey",
@@ -533,7 +567,8 @@
     "c240c868-fc1c-4815-8a1e-a2f06310760f": "memoryName",
     "35f931a5-f405-4eee-b18b-7632b5a2990b": "linkedMemories",
     "1f4cfd32-de7e-40cf-9678-a00c429fbdd9": "linkedAlbums",
-    "139eb133-140d-4286-9114-0f43a57edc0b": "objectUploadRequestedAt"
+    "139eb133-140d-4286-9114-0f43a57edc0b": "objectUploadRequestedAt",
+    "d2280652-8363-4cc4-a224-e3f1b57039fa": "placeData"
   },
   "definitions": {
     "type": "definitions",
@@ -565,7 +600,7 @@
   "author": "Kittipich Aiumbhornsin",
   "projectName": "OurJourneys",
   "publicFacingName": "OurJourneys",
-  "lastModifTS": "2025-04-17T08:37:39.940Z",
+  "lastModifTS": "2025-04-25T17:09:31.555Z",
   "persistenceSchemaVersion": "8",
   "isCreatedByPlugin": true,
   "pluginInformation": {
@@ -576,7 +611,7 @@
   "applicationInformation": {
     "version": "8.1.2"
   },
-  "version": "2",
+  "version": "2.1",
   "settings": {
     "centralPane": {
       "dbLevel": {
@@ -586,7 +621,7 @@
             "x": 809,
             "y": 935,
             "width": 308,
-            "height": 213,
+            "height": 267,
             "color": {}
           },
           {
@@ -607,8 +642,8 @@
           },
           {
             "GUID": "2c63f901-5636-4054-98a1-7a1fbb066742",
-            "x": 829.8304239401496,
-            "y": 1219.6097256857836,
+            "x": 821.8304239401496,
+            "y": 1227.6097256857836,
             "width": 284,
             "height": 105,
             "color": {}
@@ -653,12 +688,7 @@
       "changed": false
     },
     "dtDiagram": {
-      "collapsedNodes": [
-        [
-          "58f50c8a-551c-4fcc-b399-02a9d826f48a",
-          "70db5f42-d8d4-4826-a96f-de774aceefa8"
-        ]
-      ],
+      "collapsedNodes": [],
       "shouldDistributeCollections": false
     }
   }

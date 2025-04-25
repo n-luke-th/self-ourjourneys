@@ -8,6 +8,8 @@ import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/navigation/nav_bar.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/views/albums/albums_page.dart';
+import 'package:ourjourneys/views/albums/all_files_page.dart';
+import 'package:ourjourneys/views/albums/new_album_page.dart';
 import 'package:ourjourneys/views/anniversaries/anniversary_page.dart';
 import 'package:ourjourneys/views/auth_views/change_password_page.dart';
 import 'package:ourjourneys/views/auth_views/login_page.dart';
@@ -37,6 +39,14 @@ final router = GoRouter(
     final isAuthRoute = state.matchedLocation == _initialAuthLocation ||
         state.matchedLocation == '/login';
 
+    if (state.matchedLocation == '/' && user == null) {
+      return _initialAuthLocation;
+    }
+
+    if (user != null && state.matchedLocation == '/') {
+      return _landingLocation;
+    }
+
     if (user == null && !isAuthRoute) {
       return _initialAuthLocation;
     }
@@ -51,7 +61,17 @@ final router = GoRouter(
     ShellRoute(
       navigatorKey: _navbarNavigatorKey,
       builder: (context, state, child) {
-        return NavBar(child: child);
+        if (state.topRoute!.name == "ReauthPage" ||
+            state.topRoute!.name == "ChangePasswordPage" ||
+            state.topRoute!.name == "NewAlbumPage" ||
+            state.topRoute!.name == "NewMemoryPage") {
+          return NavBar(
+            hideNavBar: true,
+            child: child,
+          );
+        } else {
+          return NavBar(child: child);
+        }
       },
       routes: [
         // GoRoute(
@@ -61,11 +81,15 @@ final router = GoRouter(
         //       ProtectedAuthViewWrapper(child: const HomePage()),
         // ),
         GoRoute(
+
+            /// '/anniversaries'
             path: _landingLocation,
             name: "AnniversaryPage",
             builder: (context, state) =>
                 ProtectedAuthViewWrapper(child: const AnniversaryPage())),
         GoRoute(
+
+            /// '/settings'
             path: '/settings',
             name: 'SettingsPage',
             builder: (context, state) {
@@ -73,6 +97,7 @@ final router = GoRouter(
             },
             routes: [
               GoRoute(
+                /// '/settings/change-password'
                 path: 'change-password',
                 name: 'ChangePasswordPage',
                 parentNavigatorKey: _navbarNavigatorKey,
@@ -87,6 +112,7 @@ final router = GoRouter(
               //       ProtectedAuthViewWrapper(child: const ChangeEmailPage()),
               // ),
               GoRoute(
+                /// '/settings/update-profile'
                 path: 'update-profile',
                 name: 'UpdateProfilePage',
                 parentNavigatorKey: _navbarNavigatorKey,
@@ -94,6 +120,7 @@ final router = GoRouter(
                     ProtectedAuthViewWrapper(child: const UpdateProfilePage()),
               ),
               GoRoute(
+                /// '/settings/reauth/next=:next',
                 path: 'reauth/next=:next',
                 name: 'ReauthPage',
                 parentNavigatorKey: _navbarNavigatorKey,
@@ -112,43 +139,67 @@ final router = GoRouter(
               // ),
             ]),
         GoRoute(
+          /// '/collections'
           path: '/collections',
           name: 'CollectionsPage',
           builder: (context, state) =>
               ProtectedAuthViewWrapper(child: const CollectionsPage()),
         ),
         GoRoute(
+
+            /// '/memories'
             path: '/memories',
             name: 'MemoriesPage',
             builder: (context, state) =>
                 ProtectedAuthViewWrapper(child: const MemoriesPage()),
             routes: [
               GoRoute(
+                /// '/memories/new/memory'
                 path: 'new/memory',
-                name: 'NewMemory',
+                name: 'NewMemoryPage',
                 builder: (context, state) =>
                     ProtectedAuthViewWrapper(child: const NewMemoryPage()),
               ),
             ]),
+
         GoRoute(
-          path: '/albums',
-          name: 'AlbumsPage',
-          builder: (context, state) =>
-              ProtectedAuthViewWrapper(child: const AlbumsPage()),
-        ),
+
+            /// '/albums'
+            path: '/albums',
+            name: 'AlbumsPage',
+            builder: (context, state) =>
+                ProtectedAuthViewWrapper(child: const AlbumsPage()),
+            routes: [
+              GoRoute(
+                /// '/albums/new/album'
+                path: 'new/album',
+                name: 'NewAlbumPage',
+                builder: (context, state) =>
+                    ProtectedAuthViewWrapper(child: const NewAlbumPage()),
+              ),
+            ]),
       ],
     ),
     GoRoute(
+      /// '/auth'
       path: _initialAuthLocation,
       name: 'AuthPage',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const LoginPage(),
     ),
     GoRoute(
+      /// '/reset-password'
       path: '/reset-password',
       name: 'ResetPasswordPage',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const ResetPasswordPage(),
+    ),
+    GoRoute(
+      /// '/view-all-files'
+      path: '/view-all-files',
+      name: 'ViewAllFilesPage',
+      builder: (context, state) =>
+          ProtectedAuthViewWrapper(child: const AllFilesPage()),
     ),
   ],
 );

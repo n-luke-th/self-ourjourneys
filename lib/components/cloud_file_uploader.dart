@@ -123,7 +123,7 @@ class _CloudFileUploaderState extends State<CloudFileUploader> {
   }) {
     return '''
 ✅ Uploaded: $uploaded / $total
-❌ Failed: $failed ${_failedFiles.isNotEmpty ? "->" : ""} ${_failedFiles.map((f) => f.name).join(', ')}
+❌ Failed/Skipped: $failed ${_failedFiles.isNotEmpty ? "->" : ""} ${_failedFiles.map((f) => f.name).join(', ')}
 📦 Object Keys:
 ${_uploadedKeys.map((k) => '- $k').join('\n')}
 ''';

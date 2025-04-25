@@ -10,7 +10,7 @@ class NewMemoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return mainView(context,
-        appBarTitle: "Create New Memory".toUpperCase(),
+        appBarTitle: "Create New Memory",
         body: Center(child: Text("new memory page under development")));
   }
 }
