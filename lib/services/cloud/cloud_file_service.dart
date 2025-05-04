@@ -1,4 +1,7 @@
 /// lib/services/cloud/cloud_file_service.dart
+///
+//// lower level cloud file service for uploading files to cloud storage
+//// it will not directly be used by the app but rather by the wrapper class
 
 import 'dart:typed_data';
 
@@ -9,6 +12,7 @@ import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/services/api/api_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
@@ -25,13 +29,18 @@ class CloudFileService {
   final Logger _logger = getIt<Logger>();
   final DioHandler _dioHandler = getIt<DioHandler>();
 
-  Future<String?> uploadFile({
+  Future<String?> uploadFile(
+    BuildContext context, {
     required Uint8List fileBytes,
     required String fileName,
     required String folderPath,
     Null Function(int sent, int total)? onSendProgress,
+    List<String> tags = const [],
+    List<String> linkedAlbums = const [],
+    List<String> linkedMemories = const [],
   }) async {
     try {
+      final requestedTime = Timestamp.now();
       // Request signed URL from backend
       final uploadUrls =
           await _apiService.getUploadUrls(folderPath, [fileName]);
@@ -50,10 +59,10 @@ class CloudFileService {
           lookupMimeType(fileName) ?? 'application/octet-stream';
 
       final Dio dio = await _dioHandler.getClient(
-          withAuth: false, baseUrl: NetworkConsts.apiBaseUrl);
+          withAuth: false, baseUrl: uploadTarget.url);
 
-      final response = await dio.put(
-        uploadTarget.url,
+      final response = await dio.putUri(
+        Uri.parse(uploadTarget.url),
         data: fileBytes,
         onSendProgress: onSendProgress,
         options: Options(
@@ -65,6 +74,19 @@ class CloudFileService {
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         _logger.i("Successfully uploaded $fileName to ${uploadTarget.url}");
+        await _saveToFirestore(
+          // ignore: use_build_context_synchronously
+          context,
+          objectKey: uploadTarget.key,
+          fileName: uploadTarget.fileName,
+          contentType: lookupMimeType(uploadTarget.fileName) ??
+              'application/octet-stream',
+          objectUrl: "${NetworkConsts.cdnUrl}/${uploadTarget.key}",
+          objectUploadRequestedAt: requestedTime,
+          tags: tags,
+          linkedAlbums: linkedAlbums,
+          linkedMemories: linkedMemories,
+        );
         return uploadTarget.key;
       } else {
         _logger.e(
@@ -92,18 +114,23 @@ class CloudFileService {
     required String folderPath,
     required void Function(int fileIndex) onFileIndexChanged,
     Null Function(int sent, int total)? onSendProgress,
+    List<String> tags = const [],
+    List<String> linkedAlbums = const [],
+    List<String> linkedMemories = const [],
   }) async {
     final successKeys = <String>[];
     final failedFileNames = <String>{};
-    final dio = await _dioHandler.getClient(
-        withAuth: false, baseUrl: NetworkConsts.apiBaseUrl);
 
     try {
       final requestedTime = Timestamp.now();
       final fileResults =
           await _apiService.getUploadUrls(folderPath, fileNames);
 
-      if (fileResults.length != fileBytesList.length) {
+      if (fileBytesList.length != fileResults.length) {
+        _logger.d("signed urls: [${fileResults.map((e) => e.url).toList()}]");
+        _logger.d("file amount: ${fileBytesList.length}");
+        _logger.w(
+            "Mismatch in file count vs signed URL count: ${fileBytesList.length} vs ${fileResults.length}");
         throw Exception("Mismatch in file count vs signed URL count");
       }
 
@@ -121,8 +148,10 @@ class CloudFileService {
           continue;
         }
         try {
-          final response = await dio.put(
-            result.url,
+          final dio =
+              await _dioHandler.getClient(withAuth: false, baseUrl: result.url);
+          final response = await dio.putUri(
+            Uri.parse(result.url),
             data: fileBytesList[i],
             onSendProgress: (sent, total) {
               final previousTotalSent = fileBytesList
@@ -153,9 +182,9 @@ class CloudFileService {
                   lookupMimeType(result.fileName) ?? 'application/octet-stream',
               objectUrl: "${NetworkConsts.cdnUrl}/${result.key}",
               objectUploadRequestedAt: requestedTime,
-              tags: [],
-              linkedAlbums: [],
-              linkedMemories: [],
+              tags: tags,
+              linkedAlbums: linkedAlbums,
+              linkedMemories: linkedMemories,
             );
           } else {
             failedFileNames.add(fileNames[i]);
@@ -183,7 +212,7 @@ class CloudFileService {
     List<String> linkedAlbums = const [],
     List<String> linkedMemories = const [],
   }) async {
-    _authWrapper.refreshAttributes();
+    _authWrapper.refreshUid();
     final objectData = ObjectsData(
       objectKey: objectKey,
       fileName: fileName,
@@ -196,10 +225,11 @@ class CloudFileService {
       linkedMemories: linkedMemories,
     );
 
-    await _firestoreWrapper.handleCreateDocument(
-        context, FirestoreCollections.objectsData, objectData.toMap(),
+    await _firestoreWrapper.handleCreateDocument(context,
+        collectionName: FirestoreCollections.objectsData,
+        data: objectData.toMap(),
         useCustomDocID: true,
-        customDocID: objectKey,
+        customDocID: Utils.reformatObjectKey(objectKey),
         suppressNotification: true);
   }
 }

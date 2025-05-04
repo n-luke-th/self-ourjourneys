@@ -51,3 +51,4 @@
 - Initial Development: Implementation of the integration of the database, tested multiple files upload with progress, and other improvements on April 18, 2025 -> **0.2.14** by Luke
 - Initial Development: Added the extension to create the document with custom ID on the database handler underlying system, upgraded the dependencies constraints, and other improvement on April 19, 2025 -> **0.2.14+1** by Luke
 - Initial Development: Setup underlying system for Albums feature and Memories feature, updated the data models for the database to v2.1, upgraded the dependencies constraints, and other improvement on April 26, 2025 -> **0.2.15** by Luke
+- Initial Development: Added the Albums feature (able to list and create albums as well as upload local or existing files), upgraded the dependencies constraints, and other improvements on May 4, 2025 -> **0.3.0** by Luke

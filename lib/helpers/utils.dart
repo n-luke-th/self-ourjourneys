@@ -32,4 +32,28 @@ class Utils {
   static String getTimeAgoFromDateTime(DateTime dateTime) {
     return GetTimeAgo.parse(dateTime);
   }
+
+  /// Returns UTC timestamp string in modified ISO 8601 format.
+  static String getUtcTimestampString() {
+    final timestamp =
+        DateFormat("yyyyMMdd'T'HHmmss'Z'").format(DateTime.now().toUtc());
+    return timestamp;
+  }
+
+  /// Returns a custom document ID with a given type, user ID, and UTC timestamp.
+  ///
+  /// Example: "type-userId-timestamp"
+  static String genCustomDocId({required String type, required String userId}) {
+    return '$type-$userId-${getUtcTimestampString()}';
+  }
+
+  static String reformatObjectKey(String objectKey,
+      {bool forFirestore = true}) {
+    // final regex = r'\\|/'; // Matches either a backslash or a forward slash
+    if (forFirestore) {
+      return objectKey.replaceAll(RegExp(r'/'), r'\'); // Replace '/' with '\'
+    } else {
+      return objectKey.replaceAll(RegExp(r'\\'), r'/'); // Replace '\' with '/'
+    }
+  }
 }

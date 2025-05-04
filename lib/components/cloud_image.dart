@@ -73,8 +73,7 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
 
     try {
       final Dio dio = await _dioHandler.getClient(
-          // TODO: change 'withAuth' to true
-          withAuth: false,
+          withAuth: true,
           jsonContentTypeForAuth: false,
           baseUrl: NetworkConsts.cdnUrl);
       final response = await dio.get<List<int>>(

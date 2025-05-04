@@ -15,8 +15,8 @@ enum FilePickerMode {
 }
 
 class AllowedExtensions {
-  /// List of allowed image extensions
-  static const List<String> imageExtensions = [
+  /// List of allowed image extensions: jpg, jpeg, png, gif, webp, svg
+  static const List<String> imagePlusExtensions = [
     'jpg',
     'jpeg',
     'png',
@@ -25,12 +25,20 @@ class AllowedExtensions {
     'svg'
   ];
 
-  /// List of allowed video extensions
+  /// List of allowed image extensions: jpg, jpeg, png, gif
+  static const List<String> imageCompactExtensions = [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+  ];
+
+  /// List of allowed video extensions: mp4, mov, avi, mpeg
   static const List<String> videoExtensions = ['mp4', 'mov', 'avi', 'mpeg'];
 
-  /// List of allowed audio extensions
+  /// List of allowed audio extensions: mp3, wav
   static const List<String> audioExtensions = ['mp3', 'wav'];
 
-  /// List of allowed document extensions
+  /// List of allowed document extensions:  txt, json, pdf
   static const List<String> documentExtensions = ['txt', 'json', 'pdf'];
 }

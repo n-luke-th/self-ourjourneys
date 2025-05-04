@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
-// TODO: add the ui consistency for the whole file
 class BottomSheetService {
   static Future<T?> showCustomBottomSheet<T>({
     required BuildContext context,
@@ -17,15 +16,17 @@ class BottomSheetService {
     double borderRadius = UiConsts.borderRadius,
     bool isDraggable = true,
     bool isDismissible = true,
-    Duration snapAnimationDuration = const Duration(milliseconds: 350),
-    double minWidth = 500.0, //  property for minimum width
+    Duration snapAnimationDuration = const Duration(milliseconds: 300),
+    double minWidth = 350.0, //  property for minimum width
     bool expandToContentWidth = false, //  property for flexible width expansion
-  }) {
+  }) async {
+    assert(initialChildSize <= 1);
+
     backgroundColor ??
         Theme.of(context)
             .colorScheme
             .primaryContainer; // override the color if none provide when calling (provided `null`)
-    return showModalBottomSheet<T>(
+    return await showModalBottomSheet<T>(
       context: context,
       isScrollControlled: scrollable,
       enableDrag: isDraggable,
@@ -39,6 +40,7 @@ class BottomSheetService {
         minChildSize: minChildSize,
         maxChildSize: maxChildSize,
         expand: false,
+        snap: true,
         snapAnimationDuration: snapAnimationDuration,
         builder: (BuildContext context, ScrollController scrollController) {
           return SizedBox(
@@ -83,5 +85,11 @@ class BottomSheetService {
         },
       ),
     );
+  }
+
+  static Future<T?> showOverrideBuilderBottomSheet<T>(
+      {required BuildContext context, required Widget child}) async {
+    return await showModalBottomSheet(
+        context: context, builder: (context) => child);
   }
 }

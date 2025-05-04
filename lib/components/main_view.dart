@@ -8,6 +8,9 @@ Scaffold mainView(
   BuildContext context, {
   String? appBarTitle = 'changeMe',
   required Widget body,
+  Widget? appBarLeading,
+  double? leadingWidth,
+  bool automaticallyImplyLeading = true,
   List<Widget>? appbarActions = const [],
   PreferredSizeWidget? appbarBottom,
   Color? appBarBackgroundColor,
@@ -17,6 +20,13 @@ Scaffold mainView(
   IconData? floatingActionButtonIcon = Icons.add,
   String? floatingActionButtonTooltip = "Create new",
   void Function()? onFloatingActionButtonPressed,
+  FloatingActionButtonLocation floatingActionButtonLocation =
+      FloatingActionButtonLocation.miniEndFloat,
+  Widget? bottomSheet,
+  Widget? bottomNavigationBar,
+  AlignmentDirectional persistentFooterAlignment =
+      AlignmentDirectional.bottomCenter,
+  List<Widget>? persistentFooterButtons,
 }) {
   if (showFloatingActionButton) {
     assert(onFloatingActionButtonPressed != null);
@@ -31,12 +41,19 @@ Scaffold mainView(
         appBarTitle!,
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
+      automaticallyImplyLeading: automaticallyImplyLeading,
+      leading: appBarLeading,
+      leadingWidth: leadingWidth,
       actions: appbarActions,
       bottom: appbarBottom,
     ),
     backgroundColor:
         backgroundColor ?? Theme.of(context).colorScheme.secondaryContainer,
     body: body,
+    bottomSheet: bottomSheet,
+    bottomNavigationBar: bottomNavigationBar,
+    persistentFooterAlignment: AlignmentDirectional.bottomCenter,
+    persistentFooterButtons: persistentFooterButtons,
     floatingActionButton: showFloatingActionButton == true
         ? FloatingActionButton(
             tooltip: floatingActionButtonTooltip,
@@ -44,6 +61,6 @@ Scaffold mainView(
             child: Icon(floatingActionButtonIcon),
           )
         : null,
-    floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+    floatingActionButtonLocation: floatingActionButtonLocation,
   );
 }

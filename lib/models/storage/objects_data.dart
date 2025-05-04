@@ -42,7 +42,7 @@ class ObjectsData {
 
   factory ObjectsData.fromMap(Map<String, dynamic> map) {
     final AuthWrapper authWrapper = getIt<AuthWrapper>();
-    authWrapper.refreshAttributes();
+    authWrapper.refreshUid();
     return ObjectsData(
       objectKey: map['objectKey'] ?? '',
       fileName: map['fileName'] ?? '',

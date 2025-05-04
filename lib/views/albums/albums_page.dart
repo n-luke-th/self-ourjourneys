@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/cloud_image.dart';
-import 'package:ourjourneys/components/cloud_file_uploader.dart';
+import 'package:ourjourneys/views/cloud_file_uploader.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/utils.dart';
@@ -72,10 +72,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
 
   Future<void> _fetch() async {
     setState(() => _isLoading = true);
-    Query query = _firestoreWrapper.queryCollection(
-        FirestoreCollections.albums,
-          [ 
-          ],
+    Query query = _firestoreWrapper.queryCollection(FirestoreCollections.albums,
         orderBy: "albumName", descending: false, limit: _pageSize);
 
     if (_lastDoc != null) {
@@ -115,15 +112,6 @@ class _AlbumsPageState extends State<AlbumsPage> {
         floatingActionButtonTooltip: "Create new album",
         floatingActionButtonIcon: Icons.add_to_photos_outlined,
         onFloatingActionButtonPressed: () => context.pushNamed("NewAlbumPage"),
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) => CloudFileUploader(
-        //               folderPath: "uploads/test",
-        //               onUploaded: (results) {
-        //                 _logger.d("on uploaded results: $results");
-        //               },
-        //             ))),
         body: Center(
             child: Padding(
                 padding: UiConsts.PaddingAll_standard,
@@ -172,7 +160,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
     final modData = ModificationData.fromMap(
         data['modificationData'] as Map<String, dynamic>);
     if (_authWrapper.uid == "") {
-      _authWrapper.refreshAttributes();
+      _authWrapper.refreshUid();
     }
     return Container(
       decoration: BoxDecoration(

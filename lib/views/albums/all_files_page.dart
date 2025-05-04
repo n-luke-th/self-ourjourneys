@@ -54,6 +54,12 @@ class _AllFilesPageState extends State<AllFilesPage>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return mainView(
       context,

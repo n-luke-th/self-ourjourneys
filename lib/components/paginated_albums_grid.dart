@@ -1,3 +1,5 @@
+/// lib/components/paginated_albums_grid.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // import 'package:logger/logger.dart';
@@ -56,23 +58,23 @@ class _PaginatedAlbumsGridState extends State<PaginatedAlbumsGrid> {
     Query query;
 
     if (widget.filterContentTypePrefix != null) {
-      query = _firestoreWrapper.queryCollection(
-          FirestoreCollections.objectsData,
-          [
-            QueryFilter("contentType", widget.filterContentTypePrefix,
-                QueryCondition.isGreaterThanOrEqualTo),
-            QueryFilter(
-                "contentType",
-                // ignore: prefer_interpolation_to_compose_strings
-                widget.filterContentTypePrefix! + '\uf8ff',
-                QueryCondition.isLessThan)
-          ],
-          orderBy: "objectUploadRequestedAt",
-          descending: true,
-          limit: _pageSize);
+      query =
+          _firestoreWrapper.queryCollection(FirestoreCollections.objectsData,
+              filters: [
+                QueryFilter("contentType", widget.filterContentTypePrefix,
+                    QueryCondition.isGreaterThanOrEqualTo),
+                QueryFilter(
+                    "contentType",
+                    // ignore: prefer_interpolation_to_compose_strings
+                    widget.filterContentTypePrefix! + '\uf8ff',
+                    QueryCondition.isLessThan)
+              ],
+              orderBy: "objectUploadRequestedAt",
+              descending: true,
+              limit: _pageSize);
     } else {
       query = _firestoreWrapper.queryCollection(
-          FirestoreCollections.objectsData, [],
+          FirestoreCollections.objectsData,
           orderBy: "objectUploadRequestedAt",
           descending: true,
           limit: _pageSize);

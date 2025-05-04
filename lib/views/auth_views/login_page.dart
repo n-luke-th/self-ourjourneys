@@ -278,7 +278,7 @@ class _LoginPage extends State<LoginPage> {
                                 UiConsts.BorderRadiusCircular_standard,
                           ),
                         ),
-                        child: Text("login".toUpperCase()),
+                        child: const Text("LOGIN"),
                       ),
                     ],
                   ),

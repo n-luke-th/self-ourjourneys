@@ -42,9 +42,11 @@ class FirestoreWrapper {
         descending: descending, orderBy: orderBy, limit: queryLimit);
   }
 
-  Query queryCollection(
-      FirestoreCollections collection, List<QueryFilter> filters,
-      {int? limit, String? orderBy, bool descending = false}) {
+  Query queryCollection(FirestoreCollections collection,
+      {List<QueryFilter> filters = const [],
+      int? limit,
+      String? orderBy,
+      bool descending = false}) {
     return _firestoreService.queryCollectionAsQuery(collection.value, filters,
         descending: descending, orderBy: orderBy, limit: limit);
   }
@@ -57,8 +59,9 @@ class FirestoreWrapper {
   // SINGLE DOCUMENT OPERATIONS
 
   Future<DocumentReference?> handleCreateDocument(BuildContext context,
-      FirestoreCollections collectionName, Map<String, dynamic> data,
-      {bool suppressNotification = false,
+      {required FirestoreCollections collectionName,
+      required Map<String, dynamic> data,
+      bool suppressNotification = false,
       bool useCustomDocID = false,
       String? customDocID,
       NotificationData? overrideNotiData,
@@ -93,15 +96,15 @@ class FirestoreWrapper {
     return null;
   }
 
-  Future<void> handleUpdateDocument(
-      BuildContext context,
-      FirestoreCollections collectionName,
-      String docId,
-      Map<String, dynamic> data,
-      {bool suppressNotification = false,
+  Future<void> handleUpdateDocument(BuildContext context,
+      {required FirestoreCollections collectionName,
+      required String docId,
+      required Map<String, dynamic> data,
+      bool suppressNotification = false,
       NotificationData? overrideNotiData,
       NotificationData? overrideErrorNotiData}) async {
-    _logger.d("Updating document '$docId' with data: $data");
+    _logger.i(
+        "Updating document '$docId' in '${collectionName.value}' with data: $data");
     try {
       if (docId != "_") {
         await _firestoreService.updateDocument(

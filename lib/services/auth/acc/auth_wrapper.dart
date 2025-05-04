@@ -40,6 +40,7 @@ class AuthWrapper {
 
   AuthWrapper();
 
+  /// refresh all attributes of the user
   void refreshAttributes() {
     if (_auth.isUserLoggedIn()) {
       _uid = _auth.getCurrentUserAttributes()!['uid'];
@@ -55,6 +56,15 @@ class AuthWrapper {
       _displayName = "_Unauthenticated user_";
       _profilePicURL =
           "https://ui-avatars.com/api/?background=F2BE22&color=fff&name=$_emailAddress";
+    }
+  }
+
+  /// refresh the uid of the user
+  void refreshUid() {
+    if (_auth.isUserLoggedIn()) {
+      _uid = _auth.getCurrentUserAttributes()!['uid'];
+    } else {
+      _uid = "";
     }
   }
 

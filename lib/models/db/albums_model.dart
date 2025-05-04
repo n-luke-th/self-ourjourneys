@@ -14,12 +14,12 @@ class AlbumsModel {
       required this.linkedObjects,
       required this.modificationData});
 
+  /// Converts the [AlbumsModel] to a map without the ID.
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'albumName': albumName,
       'linkedObjects': linkedObjects,
-      'modificationData': modificationData,
+      'modificationData': modificationData.toMap(),
     };
   }
 
