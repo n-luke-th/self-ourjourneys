@@ -1,16 +1,16 @@
 /// lib/views/albums/albums_page.dart
 ///
 ///
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart'
     show DocumentSnapshot, Query;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:logger/logger.dart';
-import 'package:ourjourneys/components/cloud_image.dart';
-import 'package:ourjourneys/views/cloud_file_uploader.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
@@ -41,6 +41,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
   initState() {
     super.initState();
     // getIdToken();
+    _authWrapper.refreshUid();
     _fetch();
     _scrollController.addListener(_onScroll);
   }
@@ -71,6 +72,8 @@ class _AlbumsPageState extends State<AlbumsPage> {
   }
 
   Future<void> _fetch() async {
+    context.loaderOverlay.show();
+    _logger.i("fetching albums...");
     setState(() => _isLoading = true);
     Query query = _firestoreWrapper.queryCollection(FirestoreCollections.albums,
         orderBy: "albumName", descending: false, limit: _pageSize);
@@ -89,6 +92,8 @@ class _AlbumsPageState extends State<AlbumsPage> {
     if (snapshot.docs.length < _pageSize) _hasMore = false;
 
     setState(() => _isLoading = false);
+
+    context.loaderOverlay.hide();
   }
 
   @override
@@ -127,7 +132,13 @@ class _AlbumsPageState extends State<AlbumsPage> {
                   itemCount: _docs.length + (_hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == _docs.length) {
-                      return const Center(child: CircularProgressIndicator());
+                      // if (_isLoading) {
+                      //   context.loaderOverlay.show();
+                      // } else if (!_isLoading) {
+                      //   context.loaderOverlay.hide();
+                      // }
+
+                      return const Center(child: SizedBox.shrink());
                     } else if (_docs.isEmpty) {
                       return const Center(child: Text("No albums yet"));
                     } else {
@@ -159,6 +170,9 @@ class _AlbumsPageState extends State<AlbumsPage> {
     final name = data['albumName'] as String;
     final modData = ModificationData.fromMap(
         data['modificationData'] as Map<String, dynamic>);
+    final (String createdString, String modifiedString) =
+        ModificationData.getModificationDataString(
+            modData: modData, uid: _authWrapper.uid);
     if (_authWrapper.uid == "") {
       _authWrapper.refreshUid();
     }
@@ -183,9 +197,9 @@ class _AlbumsPageState extends State<AlbumsPage> {
           name,
           textAlign: TextAlign.justify,
         ),
-        subtitle: Text(
-            "Created by ${modData.createdByUserId == _authWrapper.uid ? "You" : "Your lover"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @H:mm")}\nLast modified by ${modData.lastModifiedByUserId == _authWrapper.uid ? "You" : "Your lover"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @H:mm")}"),
+        subtitle: Text("$createdString\n$modifiedString"),
         style: ListTileStyle.drawer,
+        onTap: () => context.goNamed("AlbumDetailsPage", extra: data),
       ),
     );
   }

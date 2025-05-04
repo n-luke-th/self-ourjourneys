@@ -1,6 +1,8 @@
+/// lib/views/albums/all_files_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/main_view.dart';
-import 'package:ourjourneys/components/paginated_albums_grid.dart';
+import 'package:ourjourneys/components/paginated_files_grid.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class AllFilesPage extends StatefulWidget {
@@ -84,7 +86,7 @@ class _AllFilesPageState extends State<AllFilesPage>
         controller: _tabController,
         children: _tabs
             .map((tab) =>
-                PaginatedAlbumsGrid(filterContentTypePrefix: tab.contentType))
+                PaginatedFilesGrid(filterContentTypePrefix: tab.contentType))
             .toList(),
       ),
     );

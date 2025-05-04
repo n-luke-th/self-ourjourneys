@@ -1,6 +1,7 @@
 /// lib/components/existing_file_selector.dart
 
 import 'package:flutter/material.dart';
+import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart';
@@ -37,11 +38,17 @@ class _ExistingFileSelectorState extends State<ExistingFileSelector> {
             orderBy: 'objectUploadRequestedAt',
             descending: false)
         .get();
-    // .then((value) => value.docs.removeWhere(test)  value.docs.map((d)=> d.id));
 
     setState(() {
       _allFiles = data.docs
-          .map((doc) => ObjectsData.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) {
+            if (doc.id == "_") {
+              return null;
+            } else {
+              return ObjectsData.fromMap(doc.data() as Map<String, dynamic>);
+            }
+          })
+          .whereType<ObjectsData>()
           .toList();
     });
   }
@@ -93,6 +100,9 @@ class _ExistingFileSelectorState extends State<ExistingFileSelector> {
                       final isSelected =
                           _selected.any((o) => o.objectKey == obj.objectKey);
                       return ChoiceChip(
+                        avatar: CircleAvatar(
+                          child: CloudImage(objectKey: obj.objectKey),
+                        ),
                         label: Text(obj.fileName),
                         selected: isSelected,
                         onSelected: (_) => _toggleSelection(obj),

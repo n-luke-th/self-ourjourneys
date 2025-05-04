@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/navigation/nav_bar.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
+import 'package:ourjourneys/views/albums/album_details_page.dart';
 import 'package:ourjourneys/views/albums/albums_page.dart';
 import 'package:ourjourneys/views/albums/all_files_page.dart';
 import 'package:ourjourneys/views/albums/new_album_page.dart';
@@ -64,7 +65,8 @@ final router = GoRouter(
         if (state.topRoute!.name == "ReauthPage" ||
             state.topRoute!.name == "ChangePasswordPage" ||
             state.topRoute!.name == "NewAlbumPage" ||
-            state.topRoute!.name == "NewMemoryPage") {
+            state.topRoute!.name == "NewMemoryPage" ||
+            state.topRoute!.name == "AlbumDetailsPage") {
           return NavBar(
             hideNavBar: true,
             child: child,
@@ -176,6 +178,15 @@ final router = GoRouter(
                 name: 'NewAlbumPage',
                 builder: (context, state) =>
                     ProtectedAuthViewWrapper(child: const NewAlbumPage()),
+              ),
+              GoRoute(
+                /// '/albums/album-details'
+                path: 'album-details',
+                name: 'AlbumDetailsPage',
+                builder: (context, state) => ProtectedAuthViewWrapper(
+                    child: AlbumDetailsPage(
+                  album: state.extra as Map<String, dynamic>?,
+                )),
               ),
             ]),
       ],

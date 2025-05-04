@@ -4,13 +4,12 @@
 
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:typed_data' show Uint8List;
-
 import 'package:file_picker/file_picker.dart' show FileType;
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart'
     show FormBuilderValidators;
 import 'package:logger/logger.dart';
+import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/file_picker_preview.dart';
 import 'package:ourjourneys/models/storage/selected_file.dart';
 import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart';
@@ -61,7 +60,8 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         .toList();
 
     setState(() => _selectedFiles.addAll(picked));
-    _logger.d("Picked files: [${picked.map((i) => i.file.name).join(', ')}]");
+    _logger.d(
+        "Picked local files: [${picked.map((i) => i.file.name).join(', ')}]");
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -129,9 +129,11 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         ),
         showFloatingActionButton: true,
         floatingActionButtonIcon: Icons.add_photo_alternate_outlined,
-        floatingActionButtonTooltip: "Add Photo",
-        onFloatingActionButtonPressed: () {
-      // TODO: implement add photo
+        floatingActionButtonTooltip: "Add/Edit Media File(s) From Source",
+        floatingActionButtonProps: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+        ), onFloatingActionButtonPressed: () {
       BottomSheetService.showCustomBottomSheet(
           context: context,
           initialChildSize: 0.3,
@@ -253,6 +255,16 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                         onSelectedFilesChanged: (files) =>
                             _onFilesSelected(files),
                       ),
+                      Text("Existing files selected:"),
+                      ..._selectedExistingObjects.map((obj) {
+                        return ChoiceChip(
+                          avatar: CircleAvatar(
+                            child: CloudImage(objectKey: obj.objectKey),
+                          ),
+                          label: Text(obj.fileName),
+                          selected: true,
+                        );
+                      }),
                       UiConsts.SizedBoxGapVertical_large,
                       const Divider(
                         color: Colors.grey,

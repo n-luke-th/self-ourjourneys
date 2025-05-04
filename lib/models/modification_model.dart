@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+import 'package:ourjourneys/helpers/utils.dart' show Utils;
 
 class ModificationData {
   final String createdByUserId;
@@ -38,4 +39,19 @@ class ModificationData {
 
   factory ModificationData.fromJson(String source) =>
       ModificationData.fromMap(json.decode(source));
+
+  /// Returns a modification data string from a given modification data object.
+  ///
+  /// Returns `(createdString, modifiedString)`
+  ///
+  /// Example: 'Created by You on 2022.01.01 @12:00'
+  /// or 'Last modified by Your lover on 2022.01.01 @12:00'
+  static (String createdString, String modifiedString)
+      getModificationDataString(
+          {required ModificationData modData, required String uid}) {
+    return (
+      "Created by ${modData.createdByUserId == uid ? "You" : "Your lover"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.createdAt, pattern: "y.MM.d @H:mm")}",
+      "Last modified by ${modData.lastModifiedByUserId == uid ? "You" : "Your lover"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @H:mm")}"
+    );
+  }
 }

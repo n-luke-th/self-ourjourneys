@@ -1,4 +1,4 @@
-/// lib/components/paginated_albums_grid.dart
+/// lib/components/paginated_files_grid.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -10,16 +10,16 @@ import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
-class PaginatedAlbumsGrid extends StatefulWidget {
+class PaginatedFilesGrid extends StatefulWidget {
   final String? filterContentTypePrefix;
 
-  const PaginatedAlbumsGrid({super.key, this.filterContentTypePrefix});
+  const PaginatedFilesGrid({super.key, this.filterContentTypePrefix});
 
   @override
-  State<PaginatedAlbumsGrid> createState() => _PaginatedAlbumsGridState();
+  State<PaginatedFilesGrid> createState() => _PaginatedFilesGridState();
 }
 
-class _PaginatedAlbumsGridState extends State<PaginatedAlbumsGrid> {
+class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
   final List<DocumentSnapshot> _docs = [];
   final ScrollController _scrollController = ScrollController();
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();

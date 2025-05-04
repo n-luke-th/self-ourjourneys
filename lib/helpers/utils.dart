@@ -4,6 +4,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:get_time_ago/get_time_ago.dart' show GetTimeAgo;
 import 'package:intl/intl.dart' show DateFormat;
+import 'package:mime/mime.dart' show lookupMimeType;
+import 'package:path/path.dart' as path show extension;
 
 class Utils {
   /// Returns a human readable date string from a DateTime object with a given pattern.
@@ -47,6 +49,8 @@ class Utils {
     return '$type-$userId-${getUtcTimestampString()}';
   }
 
+  /// Returns a reformatted object key
+  /// replaces either a backslash or a forward slash with the other
   static String reformatObjectKey(String objectKey,
       {bool forFirestore = true}) {
     // final regex = r'\\|/'; // Matches either a backslash or a forward slash
@@ -54,6 +58,47 @@ class Utils {
       return objectKey.replaceAll(RegExp(r'/'), r'\'); // Replace '/' with '\'
     } else {
       return objectKey.replaceAll(RegExp(r'\\'), r'/'); // Replace '\' with '/'
+    }
+  }
+
+  /// Returns a detected file type from a file path.
+  ///
+  /// Returns `others` if the file type is not recognized.
+  /// Returns `image` if the file type is an image.
+  /// Returns `video` if the file type is a video.
+  /// Returns `document` if the file type is a document.
+  static String detectFileTypeFromFilepath(String filePath) {
+    final filename = filePath.split('/').last;
+    final mimeType = lookupMimeType(filename);
+
+    if (mimeType == null) {
+      return 'others';
+    }
+
+    if (mimeType.startsWith('image/')) {
+      return 'image';
+    } else if (mimeType.startsWith('video/')) {
+      return 'video';
+    } else if (mimeType.startsWith('application/') ||
+        mimeType.startsWith('text/')) {
+      final extension = path.extension(filename).toLowerCase();
+      if ([
+        '.pdf',
+        '.doc',
+        '.docx',
+        '.xls',
+        '.xlsx',
+        '.ppt',
+        '.pptx',
+        '.txt',
+        '.csv'
+      ].contains(extension)) {
+        return 'document';
+      } else {
+        return 'others';
+      }
+    } else {
+      return 'others';
     }
   }
 }
