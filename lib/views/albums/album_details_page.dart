@@ -2,13 +2,16 @@
 ///
 
 import 'package:flutter/material.dart';
-import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/media_item_container.dart'
+    show MediaItemContainer;
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/services/dialog/dialog_service.dart';
+import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 import 'package:ourjourneys/views/albums/full_media_view.dart';
 import 'package:shimmer/shimmer.dart';
@@ -29,7 +32,7 @@ class AlbumDetailsPage extends StatelessWidget {
             child: Text('Album not found, please try again'),
           )));
     } else {
-      if (_authWrapper.uid == "_") _authWrapper.refreshUid();
+      if (_authWrapper.uid == "") _authWrapper.refreshUid();
       AlbumsModel albumData = AlbumsModel.fromMap(map: album!, docId: "");
       final (String createdString, String modifiedString) =
           ModificationData.getModificationDataString(
@@ -40,8 +43,19 @@ class AlbumDetailsPage extends StatelessWidget {
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(createdString),
-              Text(modifiedString),
+              ...[
+                Padding(
+                  padding: UiConsts.PaddingHorizontal_small,
+                  child: Text(createdString),
+                ),
+                Text(modifiedString),
+                Padding(
+                  padding: UiConsts.PaddingAll_standard,
+                  child: const Divider(
+                    height: 2,
+                  ),
+                ),
+              ],
               Expanded(
                 child: SingleChildScrollView(
                   child: Wrap(
@@ -51,21 +65,43 @@ class AlbumDetailsPage extends StatelessWidget {
                       if (Utils.detectFileTypeFromFilepath(objectKey) ==
                           "image") {
                         return SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.2,
-                            child: InkWell(
-                              child: CloudImage(objectKey: objectKey),
-                              onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (b) => FullMediaView(
-                                            objectKey: objectKey,
-                                            objectType: "image",
-                                          ))),
-                            ));
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          child: MediaItemContainer(
+                            mimeType: "image/",
+                            fetchSourceMethod: FetchSourceMethod.online,
+                            mediaItem: objectKey,
+                            mediaAndDescriptionBarFlexValue: (8, 1),
+                            descriptionTxtMaxLines: 1,
+                            extraMapData: {
+                              "description": objectKey.split("/").last
+                            },
+                            onLongPress: () {
+                              DialogService.showCustomDialog(
+                                context,
+                                type: DialogType.information,
+                                title: "Information",
+                                message:
+                                    "Media type: ${Utils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
+                              );
+                            },
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (b) => FullMediaView(
+                                          objectKey: objectKey,
+                                          objectType: "image",
+                                        ))),
+                          ),
+                        );
                       } else {
-                        return ListTile(
-                          title: Text(objectKey),
-                          leading: const Icon(Icons.document_scanner_rounded),
+                        return SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          child: MediaItemContainer(
+                            mimeType: "text/",
+                            fetchSourceMethod: FetchSourceMethod.online,
+                            mediaItem: null,
+                            extraMapData: {"description": objectKey},
+                          ),
                         );
                       }
                     }).toList(),

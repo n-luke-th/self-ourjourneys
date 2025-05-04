@@ -11,8 +11,12 @@ import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class ExistingFileSelector extends StatefulWidget {
   final void Function(List<ObjectsData>) onSelectionChanged;
+  final List<ObjectsData> selectedFiles;
 
-  const ExistingFileSelector({super.key, required this.onSelectionChanged});
+  const ExistingFileSelector(
+      {super.key,
+      required this.onSelectionChanged,
+      required this.selectedFiles});
 
   @override
   State<ExistingFileSelector> createState() => _ExistingFileSelectorState();
@@ -21,13 +25,15 @@ class ExistingFileSelector extends StatefulWidget {
 class _ExistingFileSelectorState extends State<ExistingFileSelector> {
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
   List<ObjectsData> _allFiles = [];
-  List<ObjectsData> _selected = [];
+
+  late List<ObjectsData> _selected;
   String _searchText = '';
 
   @override
   void initState() {
     super.initState();
     _loadFiles();
+    _selected = widget.selectedFiles;
   }
 
   void _loadFiles() async {
@@ -73,7 +79,7 @@ class _ExistingFileSelectorState extends State<ExistingFileSelector> {
 
     return mainView(
       context,
-      appBarTitle: "Add from Existing files",
+      appBarTitle: "Edit Selected Existing files",
       body: Padding(
         padding: UiConsts.PaddingAll_large,
         child: Column(

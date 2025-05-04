@@ -1,0 +1,1 @@
+enum FetchSourceMethod { online, local }

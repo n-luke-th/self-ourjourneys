@@ -53,3 +53,4 @@
 - Initial Development: Setup underlying system for Albums feature and Memories feature, updated the data models for the database to v2.1, upgraded the dependencies constraints, and other improvement on April 26, 2025 -> **0.2.15** by Luke
 - Initial Development: Added the Albums feature (able to list and create albums as well as upload local or existing files), upgraded the dependencies constraints, and other improvements on May 4, 2025 -> **0.3.0** by Luke
 - Initial Development: Enhanced the Albums feature (able to see the album's details, see the enlarged images, enhanced the create new album), and other improvements on May 4, 2025 -> **0.3.1** by Luke
+- Initial Development: Enhanced the Albums feature (able to see the album's file details, enhanced the file selection for create new album and its picking file), added new all-in-one media file container, and other improvements on May 5, 2025 -> **0.3.2** by Luke

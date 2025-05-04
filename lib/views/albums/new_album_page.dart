@@ -39,8 +39,8 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
   final _nameKey = GlobalKey<FormFieldState>();
   final _nameController = TextEditingController();
 
-  List<SelectedFile> _selectedFiles = [];
-  List<ObjectsData> _selectedExistingObjects = [];
+  Set<SelectedFile> _selectedLocalFiles = {};
+  List<ObjectsData> _selectedServerObjects = [];
 
   Future<void> _pickLocalFiles() async {
     final result = await FilesPickerUtils.pickFiles(
@@ -59,7 +59,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         .map((f) => SelectedFile(file: f, bytes: f.bytes!))
         .toList();
 
-    setState(() => _selectedFiles.addAll(picked));
+    _onLocalFilesSelected(picked);
     _logger.d(
         "Picked local files: [${picked.map((i) => i.file.name).join(', ')}]");
     if (Navigator.canPop(context)) {
@@ -67,17 +67,55 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
     }
   }
 
-  void _onFilesSelected(List<SelectedFile> files) {
-    setState(() => _selectedFiles = files);
+  void _onLocalFilesSelected(List<SelectedFile> files,
+      {bool isReplacing = false}) {
+    setState(() {
+      if (!isReplacing) {
+        if (_selectedLocalFiles.isNotEmpty) {
+          _selectedLocalFiles.addAll(files.where((f) => _selectedLocalFiles
+              .where((i) => i.file.name == f.file.name)
+              .isEmpty));
+        } else {
+          _selectedLocalFiles.addAll(files);
+        }
+      } else {
+        _selectedLocalFiles = files.toSet();
+      }
+    });
+    _logger.d(
+        "Selected files: [${_selectedLocalFiles.map((i) => i.file.name).join(', ')}]");
+  }
+
+  void _onServerObjectDeleted(ObjectsData object) {
+    setState(() {
+      _selectedServerObjects
+          .removeWhere((o) => o.objectKey == object.objectKey);
+    });
+    _logger.d(
+        "Deleted server object: [${object.objectKey}] from selected server objects");
+  }
+
+  void _onClearServerObject() {
+    setState(() {
+      _selectedServerObjects.clear();
+    });
+    _logger.d("Cleared selected server objects");
+  }
+
+  void _onClearSelectedLocalFiles() {
+    setState(() {
+      _selectedLocalFiles.clear();
+    });
+    _logger.d("Cleared selected local files");
   }
 
   Future<void> _createAlbum() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedFiles.isEmpty) {
+    if (_selectedLocalFiles.isEmpty) {
       return;
     }
     _logger.d(
-        "Creating album: '${_nameController.text}' with files: [${_selectedFiles.map((i) => i.file.name).join(', ')}]");
+        "Creating album: '${_nameController.text}' with files: [${_selectedLocalFiles.map((i) => i.file.name).join(', ')}]");
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -85,10 +123,10 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
           albumName: _nameController.text,
           folderPath:
               "uploads/${Utils.getUtcTimestampString()}-${_authWrapper.uid}",
-          fileBytesList: _selectedFiles.map((f) => f.bytes).toList(),
-          fileNames: _selectedFiles.map((e) => e.file.name).toList(),
+          fileBytesList: _selectedLocalFiles.map((f) => f.bytes).toList(),
+          fileNames: _selectedLocalFiles.map((e) => e.file.name).toList(),
           selectedExistingObjectKeys:
-              _selectedExistingObjects.map((e) => e.objectKey).toList(),
+              _selectedServerObjects.map((e) => e.objectKey).toList(),
         ),
       ),
     );
@@ -128,8 +166,9 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
           ),
         ),
         showFloatingActionButton: true,
-        floatingActionButtonIcon: Icons.add_photo_alternate_outlined,
+        floatingActionButtonIcon: Icons.upload_file_outlined,
         floatingActionButtonTooltip: "Add/Edit Media File(s) From Source",
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButtonProps: FloatingActionButton(
           onPressed: () {},
           backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
@@ -146,7 +185,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: UiConsts.BorderRadiusCircular_standard),
                   title: const Text(
-                    "Existing Files",
+                    "Server Files",
                     textAlign: TextAlign.center,
                   ),
                   onTap: () {
@@ -157,12 +196,13 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ExistingFileSelector(
+                              selectedFiles: [..._selectedServerObjects],
                               onSelectionChanged:
                                   (List<ObjectsData> selectedObjects) {
-                            setState(() {
-                              _selectedExistingObjects = selectedObjects;
-                            });
-                          }),
+                                setState(() {
+                                  _selectedServerObjects = selectedObjects;
+                                });
+                              }),
                         ));
                   },
                 ),
@@ -194,77 +234,11 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       UiConsts.SizedBoxGapVertical_large,
-                      TextFormField(
-                          key: _nameKey,
-                          controller: _nameController,
-                          textInputAction: TextInputAction.done,
-                          keyboardType: TextInputType.text,
-                          validator: FormBuilderValidators.required(),
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          onChanged: (value) {},
-                          decoration: InputDecoration(
-                              prefixIcon:
-                                  const Icon(Icons.library_books_outlined),
-                              labelText: "name",
-                              hintText: "name",
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              floatingLabelAlignment:
-                                  FloatingLabelAlignment.center,
-                              filled: true,
-                              floatingLabelStyle: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge!
-                                  .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                              errorStyle: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inverseSurface),
-                              errorBorder: UnderlineInputBorder(
-                                  borderRadius:
-                                      UiConsts.BorderRadiusCircular_standard,
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).colorScheme.error,
-                                  )),
-                              focusedErrorBorder: UnderlineInputBorder(
-                                borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).colorScheme.error),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).focusColor),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
-                                borderSide: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimary),
-                              ),
-                              border: InputBorder.none)),
+                      _buildTextInputField(),
                       UiConsts.SizedBoxGapVertical_large,
-                      FilePickerPreview(
-                        files: _selectedFiles,
-                        onSelectedFilesChanged: (files) =>
-                            _onFilesSelected(files),
-                      ),
-                      Text("Existing files selected:"),
-                      ..._selectedExistingObjects.map((obj) {
-                        return ChoiceChip(
-                          avatar: CircleAvatar(
-                            child: CloudImage(objectKey: obj.objectKey),
-                          ),
-                          label: Text(obj.fileName),
-                          selected: true,
-                        );
-                      }),
+                      ..._buildSelectedLocalFiles(),
+                      UiConsts.SizedBoxGapVertical_standard,
+                      ..._buildSelectedServerFiles(),
                       UiConsts.SizedBoxGapVertical_large,
                       const Divider(
                         color: Colors.grey,
@@ -277,5 +251,120 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             ),
           ),
         ));
+  }
+
+  List<Widget> _buildSelectedServerFiles() {
+    return [
+      Chip(
+          backgroundColor: Theme.of(context).colorScheme.secondaryFixed,
+          deleteButtonTooltipMessage: "Clear selected server files",
+          deleteIcon: Icon(
+            Icons.delete_outline_outlined,
+            size: UiConsts.standardIconSize,
+          ),
+          deleteIconColor: Theme.of(context).colorScheme.error,
+          onDeleted: () => _onClearServerObject(),
+          labelPadding: UiConsts.PaddingAll_standard,
+          labelStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSecondaryFixed,
+              ),
+          label: Text(
+            "Server files selected:",
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: UiConsts.BorderRadiusCircular_standard,
+          )),
+      UiConsts.SizedBoxGapVertical_small,
+      Wrap(
+        runAlignment: WrapAlignment.spaceAround,
+        runSpacing: 10,
+        spacing: 10,
+        children: [
+          ..._selectedServerObjects.map((obj) {
+            return Chip(
+              avatar: CircleAvatar(
+                child: CloudImage(objectKey: obj.objectKey),
+              ),
+              label: Text(obj.fileName),
+              onDeleted: () => _onServerObjectDeleted(obj),
+            );
+          })
+        ],
+      ),
+    ];
+  }
+
+  List<Widget> _buildSelectedLocalFiles() {
+    return [
+      Chip(
+          backgroundColor: Theme.of(context).colorScheme.secondaryFixed,
+          deleteButtonTooltipMessage: "Clear selected local files",
+          deleteIcon: Icon(
+            Icons.delete_outline_outlined,
+            size: UiConsts.standardIconSize,
+          ),
+          deleteIconColor: Theme.of(context).colorScheme.error,
+          onDeleted: () => _onClearSelectedLocalFiles(),
+          labelPadding: UiConsts.PaddingAll_standard,
+          labelStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSecondaryFixed,
+              ),
+          label: Text(
+            "Local files selected:",
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: UiConsts.BorderRadiusCircular_standard,
+          )),
+      UiConsts.SizedBoxGapVertical_small,
+      FilePickerPreview(
+        files: [..._selectedLocalFiles],
+        onSelectedFilesChanged: (files, {bool isReplacing = false}) =>
+            _onLocalFilesSelected(files, isReplacing: isReplacing),
+      ),
+    ];
+  }
+
+  TextFormField _buildTextInputField() {
+    return TextFormField(
+        key: _nameKey,
+        controller: _nameController,
+        textInputAction: TextInputAction.done,
+        keyboardType: TextInputType.text,
+        validator: FormBuilderValidators.required(),
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        onChanged: (value) {},
+        decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.library_books_outlined),
+            labelText: "name",
+            hintText: "name",
+            floatingLabelBehavior: FloatingLabelBehavior.auto,
+            floatingLabelAlignment: FloatingLabelAlignment.center,
+            filled: true,
+            floatingLabelStyle: Theme.of(context)
+                .textTheme
+                .labelLarge!
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
+            errorStyle:
+                TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+            errorBorder: UnderlineInputBorder(
+                borderRadius: UiConsts.BorderRadiusCircular_standard,
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.error,
+                )),
+            focusedErrorBorder: UnderlineInputBorder(
+              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderSide:
+                  BorderSide(color: Theme.of(context).colorScheme.error),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderSide: BorderSide(color: Theme.of(context).focusColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderSide:
+                  BorderSide(color: Theme.of(context).colorScheme.onPrimary),
+            ),
+            border: InputBorder.none));
   }
 }

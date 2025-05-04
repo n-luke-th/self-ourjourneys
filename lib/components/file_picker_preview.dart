@@ -7,7 +7,8 @@ import 'package:ourjourneys/models/storage/selected_file.dart';
 
 class FilePickerPreview extends StatelessWidget {
   final List<SelectedFile> files;
-  final void Function(List<SelectedFile>) onSelectedFilesChanged;
+  final void Function(List<SelectedFile>, {bool isReplacing})
+      onSelectedFilesChanged;
 
   const FilePickerPreview({
     super.key,
@@ -37,7 +38,7 @@ class FilePickerPreview extends StatelessWidget {
                 ),
           onDeleted: () {
             final updatedFiles = [...files]..remove(file);
-            onSelectedFilesChanged(updatedFiles);
+            onSelectedFilesChanged(updatedFiles, isReplacing: true);
           },
         );
       }).toList(),

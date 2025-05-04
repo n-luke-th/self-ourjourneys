@@ -9,6 +9,7 @@ import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/views/albums/full_media_view.dart';
 
 class PaginatedFilesGrid extends StatefulWidget {
   final String? filterContentTypePrefix;
@@ -122,7 +123,16 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
         final objectsData =
             ObjectsData.fromMap(_docs[index].data() as Map<String, dynamic>);
         if (objectsData.contentType.startsWith('image/')) {
-          return CloudImage(objectKey: objectsData.objectKey);
+          return InkWell(
+            child: CloudImage(objectKey: objectsData.objectKey),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (b) => FullMediaView(
+                          objectKey: objectsData.objectKey,
+                          objectType: "image",
+                        ))),
+          );
         } else if (objectsData.contentType.startsWith('video/')) {
           return const Icon(Icons.videocam, size: 48);
         } else {
