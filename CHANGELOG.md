@@ -54,3 +54,4 @@
 - Initial Development: Added the Albums feature (able to list and create albums as well as upload local or existing files), upgraded the dependencies constraints, and other improvements on May 4, 2025 -> **0.3.0** by Luke
 - Initial Development: Enhanced the Albums feature (able to see the album's details, see the enlarged images, enhanced the create new album), and other improvements on May 4, 2025 -> **0.3.1** by Luke
 - Initial Development: Enhanced the Albums feature (able to see the album's file details, enhanced the file selection for create new album and its picking file), added new all-in-one media file container, and other improvements on May 5, 2025 -> **0.3.2** by Luke
+- Initial Development: Enhanced the Albums feature (able to delete album's item, added the refresh albums button), able to delete image file from all files page, added support for both deleting files by keys and names, and other improvements on May 5, 2025 -> **0.3.3** by Luke

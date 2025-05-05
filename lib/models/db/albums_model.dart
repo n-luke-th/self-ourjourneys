@@ -38,4 +38,17 @@ class AlbumsModel {
   factory AlbumsModel.fromJson(
           {required String source, required String docId}) =>
       AlbumsModel.fromMap(map: json.decode(source), docId: docId);
+
+  AlbumsModel copyWith(
+      {ModificationData? modificationData,
+      String? id,
+      String? albumName,
+      List<String>? linkedObjects}) {
+    return AlbumsModel(
+      id: id ?? this.id,
+      albumName: albumName ?? this.albumName,
+      linkedObjects: linkedObjects ?? this.linkedObjects,
+      modificationData: modificationData ?? this.modificationData,
+    );
+  }
 }

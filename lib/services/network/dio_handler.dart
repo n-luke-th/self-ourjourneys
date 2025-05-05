@@ -1,9 +1,9 @@
 // ignore_for_file: unused_element_parameter
 
 import 'package:dio/dio.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/shared/services/network_const.dart';
 import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
 import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
@@ -12,7 +12,7 @@ import 'dart:math';
 
 class DioHandler {
   final Dio _baseDio;
-  final AuthService _auth = getIt<AuthService>();
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final Logger _logger = getIt<Logger>();
 
   DioHandler(Dio dio) : _baseDio = dio {
@@ -48,15 +48,15 @@ class DioHandler {
     _logger.i("Getting new Dio client for '$baseUrl' with auth: '$withAuth'");
 
     if (withAuth) {
-      if (!_auth.isUserLoggedIn()) {
+      if (!_authWrapper.isUserLoggedIn()) {
         throw AuthException(
           errorEnum: AuthErrors.AUTH_C12,
           errorDetailsFromDependency: 'User not authenticated',
           st: StackTrace.current,
         );
       }
-
-      final token = await _auth.authInstance!.currentUser!.getIdToken();
+      await _authWrapper.refreshIdToken();
+      final token = _authWrapper.idToken;
 
       if (jsonContentTypeForAuth) {
         dio.options.headers = {

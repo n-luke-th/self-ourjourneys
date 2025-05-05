@@ -105,4 +105,13 @@ class UiConsts {
   static const animationDuration = Duration(milliseconds: 500);
 }
 
-enum ActionWidgetPlace { topRight, topLeft, bottomRight, bottom }
+enum ActionWidgetPlace {
+  top,
+  topRight,
+  topLeft,
+  bottom,
+  bottomRight,
+  bottomLeft,
+  centerRight,
+  centerLeft
+}

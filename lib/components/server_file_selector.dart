@@ -1,4 +1,4 @@
-/// lib/components/existing_file_selector.dart
+/// lib/components/server_file_selector.dart
 
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/cloud_image.dart';
@@ -9,20 +9,20 @@ import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
-class ExistingFileSelector extends StatefulWidget {
+class ServerFileSelector extends StatefulWidget {
   final void Function(List<ObjectsData>) onSelectionChanged;
   final List<ObjectsData> selectedFiles;
 
-  const ExistingFileSelector(
+  const ServerFileSelector(
       {super.key,
       required this.onSelectionChanged,
       required this.selectedFiles});
 
   @override
-  State<ExistingFileSelector> createState() => _ExistingFileSelectorState();
+  State<ServerFileSelector> createState() => _ServerFileSelectorState();
 }
 
-class _ExistingFileSelectorState extends State<ExistingFileSelector> {
+class _ServerFileSelectorState extends State<ServerFileSelector> {
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
   List<ObjectsData> _allFiles = [];
 

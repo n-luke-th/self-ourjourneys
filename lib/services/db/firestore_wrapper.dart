@@ -197,8 +197,9 @@ class FirestoreWrapper {
   }
 
   Future<void> handleBatchDelete(BuildContext context,
-      FirestoreCollections collection, List<String> documentIds,
-      {bool suppressNotification = false,
+      {required FirestoreCollections collection,
+      required List<String> documentIds,
+      bool suppressNotification = false,
       NotificationData? overrideNotiData,
       NotificationData? overrideErrorNotiData}) async {
     _logger.d(

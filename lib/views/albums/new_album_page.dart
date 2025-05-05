@@ -15,7 +15,7 @@ import 'package:ourjourneys/models/storage/selected_file.dart';
 import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart';
 import 'package:ourjourneys/shared/common/file_picker_enum.dart';
 import 'package:ourjourneys/views/albums/album_creation_live_result_page.dart';
-import 'package:ourjourneys/components/existing_file_selector.dart';
+import 'package:ourjourneys/components/server_file_selector.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/utils.dart';
@@ -185,6 +185,15 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: UiConsts.BorderRadiusCircular_standard),
                   title: const Text(
+                    "Local Files",
+                    textAlign: TextAlign.center,
+                  ),
+                  onTap: () => _pickLocalFiles(),
+                ),
+                ListTile(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: UiConsts.BorderRadiusCircular_standard),
+                  title: const Text(
                     "Server Files",
                     textAlign: TextAlign.center,
                   ),
@@ -195,7 +204,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ExistingFileSelector(
+                          builder: (context) => ServerFileSelector(
                               selectedFiles: [..._selectedServerObjects],
                               onSelectionChanged:
                                   (List<ObjectsData> selectedObjects) {
@@ -205,15 +214,6 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                               }),
                         ));
                   },
-                ),
-                ListTile(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: UiConsts.BorderRadiusCircular_standard),
-                  title: const Text(
-                    "Local Files",
-                    textAlign: TextAlign.center,
-                  ),
-                  onTap: () => _pickLocalFiles(),
                 ),
               ],
             );

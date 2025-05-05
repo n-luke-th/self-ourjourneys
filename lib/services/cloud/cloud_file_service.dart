@@ -1,7 +1,8 @@
 /// lib/services/cloud/cloud_file_service.dart
 ///
-//// lower level cloud file service for uploading files to cloud storage
-//// it will not directly be used by the app but rather by the wrapper class
+/// cloud file service for uploading files to cloud storage
+
+// ignore_for_file: use_build_context_synchronously
 
 import 'dart:typed_data';
 
@@ -13,6 +14,7 @@ import 'package:mime/mime.dart';
 
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/utils.dart';
+import 'package:ourjourneys/models/storage/file_model.dart' show DeleteResult;
 import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/services/api/api_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
@@ -75,7 +77,6 @@ class CloudFileService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         _logger.i("Successfully uploaded $fileName to ${uploadTarget.url}");
         await _saveToFirestore(
-          // ignore: use_build_context_synchronously
           context,
           objectKey: uploadTarget.key,
           fileName: uploadTarget.fileName,
@@ -96,14 +97,14 @@ class CloudFileService {
     } on DioException catch (e) {
       _logger.d('DioError response: ${e.response}');
       _logger.d('DioError request: ${e.requestOptions.toString()}');
+      rethrow;
     } catch (e, st) {
       _logger.e('Upload failed', error: e, stackTrace: st);
 
       _logger.e("Exception uploading file '$fileName': ${e.toString()}",
           error: e, stackTrace: st);
-      return null;
+      rethrow;
     }
-    return null;
   }
 
   Future<(List<String> successKeys, Set<String> failedFileNames)>
@@ -174,7 +175,6 @@ class CloudFileService {
           if (response.statusCode == 200 || response.statusCode == 204) {
             successKeys.add(result.key);
             await _saveToFirestore(
-              // ignore: use_build_context_synchronously
               context,
               objectKey: result.key,
               fileName: result.fileName,
@@ -188,9 +188,11 @@ class CloudFileService {
             );
           } else {
             failedFileNames.add(fileNames[i]);
+            continue;
           }
         } catch (e) {
           failedFileNames.add(fileNames[i]);
+          continue;
         }
       }
 
@@ -198,6 +200,78 @@ class CloudFileService {
     } catch (e, st) {
       _logger.e("Exception uploading multiple files", error: e, stackTrace: st);
       return (successKeys, failedFileNames);
+    }
+  }
+
+  /// deletes objects from the server, files must be in the same folder to successful delete
+  Future<List<DeleteResult>> deleteObjectsSameFolder(BuildContext context,
+      {required List<String> objectKeys, required String folder}) async {
+    try {
+      _logger.d("Deleting objects from server by names");
+      final response = await _apiService.deleteFilesInTheSameFolder(
+          objectKeys: objectKeys, folder: folder);
+      final List<String> reformatedObjectKeys =
+          List.from(objectKeys.map((k) => Utils.reformatObjectKey(k)));
+      _logger.d("Deleting 'objectsData' documents from Firestore");
+      if (response.isNotEmpty && (response.length == objectKeys.length)) {
+        await _firestoreWrapper.handleBatchDelete(context,
+            collection: FirestoreCollections.objectsData,
+            documentIds: reformatedObjectKeys,
+            suppressNotification: true);
+      } else if (response.isNotEmpty && (response.length < objectKeys.length)) {
+        for (int i = 0; i < response.length; i++) {
+          await _firestoreWrapper.handleDeleteDocument(
+              context,
+              FirestoreCollections.objectsData,
+              Utils.reformatObjectKey(response[i].key),
+              suppressNotification: true);
+        }
+      }
+      _logger.i("Documents deleted: '${response.map((e) => e.key).toList()}'");
+      return response;
+    } on DioException catch (e) {
+      _logger.d('DioError response: ${e.response}');
+      _logger.d('DioError request: ${e.requestOptions.toString()}');
+      rethrow;
+    } catch (e, st) {
+      _logger.e('Delete failed', error: e, stackTrace: st);
+      rethrow;
+    }
+  }
+
+  /// deletes objects from the server by object keys
+  Future<List<DeleteResult>> deleteObjectsByKeys(BuildContext context,
+      {required List<String> objectKeys}) async {
+    try {
+      _logger.d("Deleting objects from server by keys");
+      final response =
+          await _apiService.deleteFilesByObjectKeys(objectKeys: objectKeys);
+      final List<String> reformatedObjectKeys =
+          List.from(objectKeys.map((k) => Utils.reformatObjectKey(k)));
+      _logger.d("Deleting 'objectsData' documents from Firestore");
+      if (response.isNotEmpty && (response.length == objectKeys.length)) {
+        await _firestoreWrapper.handleBatchDelete(context,
+            collection: FirestoreCollections.objectsData,
+            documentIds: reformatedObjectKeys,
+            suppressNotification: true);
+      } else if (response.isNotEmpty && (response.length < objectKeys.length)) {
+        for (int i = 0; i < response.length; i++) {
+          await _firestoreWrapper.handleDeleteDocument(
+              context,
+              FirestoreCollections.objectsData,
+              Utils.reformatObjectKey(response[i].key),
+              suppressNotification: true);
+        }
+      }
+      _logger.i("Documents deleted: '${response.map((e) => e.key).toList()}'");
+      return response;
+    } on DioException catch (e) {
+      _logger.d('DioError response: ${e.response}');
+      _logger.d('DioError request: ${e.requestOptions.toString()}');
+      rethrow;
+    } catch (e, st) {
+      _logger.e('Delete failed', error: e, stackTrace: st);
+      rethrow;
     }
   }
 

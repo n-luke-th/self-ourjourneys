@@ -17,6 +17,20 @@ class ModificationData {
       required this.lastModifiedByUserId,
       required this.lastModifiedAt});
 
+  ModificationData copyWith({
+    String? createdByUserId,
+    Timestamp? createdAt,
+    String? lastModifiedByUserId,
+    Timestamp? lastModifiedAt,
+  }) {
+    return ModificationData(
+      createdByUserId: createdByUserId ?? this.createdByUserId,
+      createdAt: createdAt ?? this.createdAt,
+      lastModifiedByUserId: lastModifiedByUserId ?? this.lastModifiedByUserId,
+      lastModifiedAt: lastModifiedAt ?? this.lastModifiedAt,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'createdByUserId': createdByUserId,

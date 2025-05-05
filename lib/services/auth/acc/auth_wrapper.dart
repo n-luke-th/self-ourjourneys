@@ -28,12 +28,14 @@ class AuthWrapper {
   final SharedPreferencesService _sharedPreferencesService =
       getIt<SharedPreferencesService>();
   String _uid = "";
+  String? _idToken;
   String _errorMessage = "";
   String _displayName = "_Unauthenticated user_";
   String _emailAddress = "_Unauthenticated user_";
   String _profilePicURL = "_Unauthenticated user_";
 
   String get uid => _uid;
+  String? get idToken => _idToken;
   String get displayName => _displayName;
   String get emailAddress => _emailAddress;
   String get profilePicURL => _profilePicURL;
@@ -65,6 +67,13 @@ class AuthWrapper {
       _uid = _auth.getCurrentUserAttributes()!['uid'];
     } else {
       _uid = "";
+    }
+  }
+
+  Future<void> refreshIdToken({bool forceNewToken = false}) async {
+    if (_auth.isUserLoggedIn()) {
+      _logger.d("refreshing id token...");
+      _idToken = await _auth.currentUser?.getIdToken(forceNewToken);
     }
   }
 

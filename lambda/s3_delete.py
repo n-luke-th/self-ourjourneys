@@ -2,9 +2,10 @@
 
 from s3configs import S3_BUCKET_NAME, s3
 import json
+import sys
 
 
-def delete_handler(event, context):
+def delete_bynames_handler(event, context):
     try:
         # Extract user context
         request_context = event.get('requestContext', {})
@@ -14,7 +15,7 @@ def delete_handler(event, context):
         # Parse input
         body = json.loads(event["body"])
         filenames = body["fileNames"]  # Expecting a list
-        folder = body.get("folder", "")
+        folder = body['folder']
 
         # Prepare objects to delete
         objects_to_delete = [
@@ -41,8 +42,59 @@ def delete_handler(event, context):
         }
 
     except Exception as e:
+        typee, value, traceback = sys.exc_info()
+        types = {"request_context": type(request_context), "authorizer": type(authorizer), "uid": type(uid), "body": type(body), "filenames": type(filenames), "folder": type(
+            folder), "objects_to_delete": type(objects_to_delete), "response": type(response), "returning_results": type(returning_results)},
         return {
             "statusCode": 500,
             "headers": {"Content-Type": "application/json"},
-            "body": json.dumps({"error": str(e)})
+            "body": json.dumps({"error": str(e), "details": {"type": str(typee), "value": str(value), "traceback": str(traceback)},
+                                "types": {types}, "body": event["body"]})
+        }
+
+
+def delete_bykeys_handler(event, context):
+    try:
+        # Extract user context
+        request_context = event.get('requestContext', {})
+        authorizer = request_context.get('authorizer', {})
+        uid = authorizer.get('uid')
+
+        # Parse input
+        body = json.loads(event["body"])
+        objectKeys = body["objectKeys"]  # Expecting a list
+
+        # Prepare objects to delete
+        objects_to_delete = [
+            {"Key": f"{key}".strip("/")}
+            for key in objectKeys
+        ]
+
+        # Perform batch delete
+        response = s3.delete_objects(
+            Bucket=S3_BUCKET_NAME,
+            Delete={"Objects": objects_to_delete}
+        )
+
+        returning_results = {
+            "deleted": response.get("Deleted", []),
+            "errors": response.get("Errors", []),
+            "requestContext": {"authorizer": authorizer}
+        }
+
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(returning_results, indent=2)
+        }
+
+    except Exception as e:
+        typee, value, traceback = sys.exc_info()
+        types = {"request_context": type(request_context), "authorizer": type(authorizer), "uid": type(uid), "body": type(body), "objectKeys": type(
+            objectKeys), "objects_to_delete": type(objects_to_delete), "response": type(response), "returning_results": type(returning_results)},
+        return {
+            "statusCode": 500,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"error": str(e), "details": {"type": str(typee), "value": str(value), "traceback": str(traceback)},
+                                "types": {types}, "body": event["body"]})
         }

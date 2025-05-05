@@ -101,4 +101,21 @@ class Utils {
       return 'others';
     }
   }
+
+  /// Returns [String] of the folder path from the full valid object key.
+  /// Otherwise returns [Null].
+  ///
+  /// Example: 'uploads/20210507T063025Z-fsjkskjs3/linkedinProfile.png'
+  ///
+  /// Would returns: "uploads/20210507T063025Z-fsjkskjs3"
+  static String? getFolderPathFromObjectKey(String objectKey) {
+    int lastSeparator = objectKey.lastIndexOf('/');
+
+    if (lastSeparator != -1) {
+      String pathWithoutFilename = objectKey.substring(0, lastSeparator);
+      return pathWithoutFilename;
+    } else {
+      return null;
+    }
+  }
 }

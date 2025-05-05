@@ -3,10 +3,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // import 'package:logger/logger.dart';
-import 'package:ourjourneys/components/cloud_image.dart';
+import 'package:ourjourneys/components/media_item_container.dart'
+    show MediaItemContainer;
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/utils.dart' show Utils;
 import 'package:ourjourneys/models/storage/objects_data.dart';
+import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
+import 'package:ourjourneys/services/dialog/dialog_service.dart'
+    show DialogService, DialogType;
+import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 import 'package:ourjourneys/views/albums/full_media_view.dart';
@@ -24,6 +30,7 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
   final List<DocumentSnapshot> _docs = [];
   final ScrollController _scrollController = ScrollController();
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
+  final CloudFileService _cloudFileService = getIt<CloudFileService>();
   // final Logger _logger = getIt<Logger>();
 
   bool _isLoading = false;
@@ -123,15 +130,36 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
         final objectsData =
             ObjectsData.fromMap(_docs[index].data() as Map<String, dynamic>);
         if (objectsData.contentType.startsWith('image/')) {
-          return InkWell(
-            child: CloudImage(objectKey: objectsData.objectKey),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (b) => FullMediaView(
-                          objectKey: objectsData.objectKey,
-                          objectType: "image",
-                        ))),
+          final objectKey = objectsData.objectKey;
+          return SizedBox(
+            width: MediaQuery.of(context).size.width * 0.2,
+            child: MediaItemContainer(
+              mimeType: "image/",
+              fetchSourceMethod: FetchSourceMethod.online,
+              mediaItem: objectKey,
+              mediaAndDescriptionBarFlexValue: (18, 1),
+              descriptionTxtMaxLines: 1,
+              extraMapData: {"description": objectKey.split("/").last},
+              onLongPress: () async {
+                await _handleOnLongPressItem(objectKey);
+              },
+              onDoubleTap: () async {
+                await DialogService.showCustomDialog(
+                  context,
+                  type: DialogType.information,
+                  title: "Information",
+                  message:
+                      "Media type: ${Utils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
+                );
+              },
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (b) => FullMediaView(
+                            objectKey: objectKey,
+                            objectType: "image",
+                          ))),
+            ),
           );
         } else if (objectsData.contentType.startsWith('video/')) {
           return const Icon(Icons.videocam, size: 48);
@@ -144,5 +172,22 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
         }
       },
     );
+  }
+
+  Future<void> _handleOnLongPressItem(String objectKey) async {
+    // TODO: add machanism to: 1. just remove file from albums and memories 2. delete file from server
+    // ! delete from server, files must be in the same folder to delete
+    final bool? confirmation = await DialogService.showConfirmationDialog(
+        context: context,
+        title: "Delete file?",
+        message: "Are you sure to delete '${objectKey.split("/").last}'?",
+        confirmText: "DELETE");
+    if (confirmation == true) {
+      // TODO: also remove the reference from the albums and memories first before deleting the file
+
+      await _cloudFileService
+          // ignore: use_build_context_synchronously
+          .deleteObjectsByKeys(context, objectKeys: [objectKey]);
+    }
   }
 }

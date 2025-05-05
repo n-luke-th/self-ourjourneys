@@ -102,12 +102,20 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
     switch (place) {
       case ActionWidgetPlace.topRight:
         return Alignment.topRight;
+      case ActionWidgetPlace.top:
+        return Alignment.topCenter;
       case ActionWidgetPlace.topLeft:
         return Alignment.topLeft;
       case ActionWidgetPlace.bottomRight:
         return Alignment.bottomRight;
       case ActionWidgetPlace.bottom:
         return Alignment.bottomCenter;
+      case ActionWidgetPlace.bottomLeft:
+        return Alignment.bottomLeft;
+      case ActionWidgetPlace.centerRight:
+        return Alignment.centerRight;
+      case ActionWidgetPlace.centerLeft:
+        return Alignment.centerLeft;
     }
   }
 

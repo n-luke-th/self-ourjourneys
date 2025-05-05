@@ -28,7 +28,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
   final Logger _logger = getIt<Logger>();
-  final List<DocumentSnapshot> _docs = [];
+  final List<Map<String, dynamic>> _docs = [];
   final ScrollController _scrollController = ScrollController();
 
   bool _isLoading = false;
@@ -42,6 +42,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
     super.initState();
     // getIdToken();
     _authWrapper.refreshUid();
+    _authWrapper.refreshIdToken();
     _fetch();
     _scrollController.addListener(_onScroll);
   }
@@ -52,15 +53,14 @@ class _AlbumsPageState extends State<AlbumsPage> {
     super.dispose();
   }
 
-  // void getIdToken() async {
-  //   try {
-  //     final user = _auth.authInstance!.currentUser;
-  //     final idToken = await user!.getIdToken();
-  //     _logger.d("idToken: $idToken");
-  //   } catch (e) {
-  //     _logger.e(e);
-  //   }
-  // }
+  void getIdToken() async {
+    try {
+      final idToken = _authWrapper.idToken;
+      _logger.d("idToken: $idToken");
+    } catch (e) {
+      _logger.e(e);
+    }
+  }
 
   void _onScroll() async {
     if (_scrollController.position.pixels >
@@ -71,10 +71,15 @@ class _AlbumsPageState extends State<AlbumsPage> {
     }
   }
 
-  Future<void> _fetch() async {
+  Future<void> _fetch({bool forceRefresh = false}) async {
     context.loaderOverlay.show();
     _logger.i("fetching albums...");
     setState(() => _isLoading = true);
+    if (forceRefresh) {
+      _docs.clear();
+      _lastDoc = null;
+      _hasMore = true;
+    }
     Query query = _firestoreWrapper.queryCollection(FirestoreCollections.albums,
         orderBy: "albumName", descending: false, limit: _pageSize);
 
@@ -86,7 +91,15 @@ class _AlbumsPageState extends State<AlbumsPage> {
 
     if (snapshot.docs.isNotEmpty) {
       _lastDoc = snapshot.docs.last;
-      _docs.addAll(snapshot.docs);
+      _docs.addAll(
+        snapshot.docs.where((d) => d.id != "_").map((d) {
+          final data = d.data() as Map<String, dynamic>;
+          return {
+            ...data,
+            'id': d.id,
+          };
+        }),
+      );
     }
 
     if (snapshot.docs.length < _pageSize) _hasMore = false;
@@ -99,7 +112,14 @@ class _AlbumsPageState extends State<AlbumsPage> {
   @override
   Widget build(BuildContext context) {
     return mainView(context,
-        appBarTitle: "Albums".toUpperCase(),
+        appBarTitle: "ALBUMS",
+        appBarLeading: IconButton.filled(
+          tooltip: "Refresh data",
+          onPressed: () async => _fetch(forceRefresh: true),
+          icon: const Icon(
+            Icons.sync_outlined,
+          ),
+        ),
         appbarActions: [
           Padding(
             padding: UiConsts.PaddingAll_standard,
@@ -142,7 +162,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                     } else if (_docs.isEmpty) {
                       return const Center(child: Text("No albums yet"));
                     } else {
-                      final data = _docs[index].data() as Map<String, dynamic>;
+                      final data = _docs[index];
                       return _albumTile(data, index);
                     }
                   },
@@ -197,7 +217,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
           name,
           textAlign: TextAlign.justify,
         ),
-        subtitle: Text("$createdString\n$modifiedString"),
+        subtitle: Text("$createdString\n$modifiedString\ndocId: ${data['id']}"),
         style: ListTileStyle.drawer,
         onTap: () => context.goNamed("AlbumDetailsPage", extra: data),
       ),
