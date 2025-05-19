@@ -27,6 +27,7 @@ class AlbumCreationLiveResultPage extends StatefulWidget {
   final List<Uint8List> fileBytesList;
   final List<String> fileNames;
   final List<String> selectedExistingObjectKeys;
+  final bool isEmptyAlbum;
 
   const AlbumCreationLiveResultPage({
     super.key,
@@ -35,6 +36,7 @@ class AlbumCreationLiveResultPage extends StatefulWidget {
     required this.fileNames,
     required this.selectedExistingObjectKeys,
     required this.albumName,
+    required this.isEmptyAlbum,
   });
 
   @override
@@ -60,38 +62,43 @@ class _AlbumCreationLiveResultPageState
   void initState() {
     super.initState();
     _authWrapper.refreshUid();
-    _startUploadAndAlbumCreation();
+    _startUploadAndAlbumCreation(emptyAlbum: widget.isEmptyAlbum);
   }
 
-  Future<void> _startUploadAndAlbumCreation() async {
-    // final total = widget.fileBytes.length;
-    // final uploadedKeys = <String>[];
+  Future<void> _startUploadAndAlbumCreation({bool emptyAlbum = false}) async {
+    if (!emptyAlbum) {
+      final (successful, failedSet) =
+          await _cloudFileService.uploadMultipleFiles(
+        context: context,
+        fileBytesList: widget.fileBytesList,
+        fileNames: widget.fileNames,
+        folderPath: widget.folderPath,
+        onSendProgress: (sent, totalBytes) {
+          setState(() {
+            _currentProgress = (sent / totalBytes);
+          });
+        },
+        onFileIndexChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      );
 
-    final (successful, failedSet) = await _cloudFileService.uploadMultipleFiles(
-      context: context,
-      fileBytesList: widget.fileBytesList,
-      fileNames: widget.fileNames,
-      folderPath: widget.folderPath,
-      onSendProgress: (sent, totalBytes) {
-        setState(() {
-          _currentProgress = (sent / totalBytes);
-        });
-      },
-      onFileIndexChanged: (index) {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
-    );
+      setState(() {
+        _uploadedKeys.addAll(successful);
+        _failedFileNames = failedSet.toList();
+        _isUploading = false;
+      });
 
-    setState(() {
-      _uploadedKeys.addAll(successful);
-      _failedFileNames = failedSet.toList();
-      _isUploading = false;
-    });
-
-    if (_uploadedKeys.isNotEmpty ||
-        widget.selectedExistingObjectKeys.isNotEmpty) {
+      if (_uploadedKeys.isNotEmpty ||
+          widget.selectedExistingObjectKeys.isNotEmpty) {
+        await _createAlbumWithMetadata();
+      }
+    } else {
+      setState(() {
+        _isUploading = false;
+      });
       await _createAlbumWithMetadata();
     }
   }
@@ -141,7 +148,7 @@ class _AlbumCreationLiveResultPageState
       _isAlbumCreated = true;
       _albumDocId = albumRef?.id;
     });
-    if (_albumDocId != null) {
+    if (_albumDocId != null && !widget.isEmptyAlbum) {
       await _updateReferencedObjects(uploadedObjectKeys: [
         ..._uploadedKeys,
         ...widget.selectedExistingObjectKeys

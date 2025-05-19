@@ -173,10 +173,10 @@ packages:
     dependency: "direct main"
     description:
       name: elegant_notification
-      sha256: e3f30aa3e805fc989b0e30819af7e829f85443dab712a2296aefd463b2454e63
+      sha256: "8e20c4f5378a639428cf3703707b67aec796ac009bdf58be559753fe9e852d26"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.0"
+    version: "2.5.1"
   fake_async:
     dependency: transitive
     description:
@@ -205,10 +205,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: "8986dec4581b4bcd4b6df5d75a2ea0bede3db802f500635d05fa8be298f9467f"
+      sha256: "77f8e81d22d2a07d0dee2c62e1dda71dc1da73bf43bb2d45af09727406167964"
       url: "https://pub.dev"
     source: hosted
-    version: "10.1.2"
+    version: "10.1.9"
   file_selector_linux:
     dependency: transitive
     description:
@@ -465,18 +465,18 @@ packages:
     dependency: "direct main"
     description:
       name: get_time_ago
-      sha256: "3bf66b9de4ddf8f9f3621f384ea67fe5c861126e7102df00444e9008b5508287"
+      sha256: "1c6ccc877e480eee559987411ec5242cecc088d45fc821f0d8aec98bbf4f210e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.0"
+    version: "2.3.1"
   go_router:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: "2b9ba6d4c247457c35a6622f1dee6aab6694a4e15237ff7c32320345044112b6"
+      sha256: "0b1e06223bee260dee31a171fb1153e306907563a0b0225e8c1733211911429a"
       url: "https://pub.dev"
     source: hosted
-    version: "15.1.1"
+    version: "15.1.2"
   google_fonts:
     dependency: "direct main"
     description:
@@ -497,10 +497,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: fe7ab022b76f3034adc518fb6ea04a82387620e19977665ea18d30a1cf43442f
+      sha256: "2c11f3f94c687ee9bad77c171151672986360b2b001d109814ee7140b2cf261b"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "1.4.0"
   http_parser:
     dependency: transitive
     description:
@@ -1206,10 +1206,10 @@ packages:
     dependency: transitive
     description:
       name: video_player_android
-      sha256: ae7d4f1b41e3ac6d24dd9b9d5d6831b52d74a61bdd90a7a6262a33d8bb97c29a
+      sha256: "1f4e8e0e02403452d699ef7cf73fe9936fac8f6f0605303d111d71acb375d1bc"
       url: "https://pub.dev"
     source: hosted
-    version: "2.8.2"
+    version: "2.8.3"
   video_player_avfoundation:
     dependency: transitive
     description:
@@ -1254,10 +1254,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: dc6ecaa00a7c708e5b4d10ee7bec8c270e9276dfcab1783f57e9962d7884305f
+      sha256: "329edf97fdd893e0f1e3b9e88d6a0e627128cc17cc316a8d67fda8f1451178ba"
       url: "https://pub.dev"
     source: hosted
-    version: "5.12.0"
+    version: "5.13.0"
   xdg_directories:
     dependency: transitive
     description:

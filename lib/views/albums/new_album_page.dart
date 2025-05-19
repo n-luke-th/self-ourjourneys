@@ -13,6 +13,7 @@ import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/file_picker_preview.dart';
 import 'package:ourjourneys/models/storage/selected_file.dart';
 import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart';
+import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/common/file_picker_enum.dart';
 import 'package:ourjourneys/views/albums/album_creation_live_result_page.dart';
 import 'package:ourjourneys/components/server_file_selector.dart';
@@ -111,25 +112,47 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
 
   Future<void> _createAlbum() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedLocalFiles.isEmpty) {
-      return;
-    }
-    _logger.d(
-        "Creating album: '${_nameController.text}' with files: [${_selectedLocalFiles.map((i) => i.file.name).join(', ')}]");
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AlbumCreationLiveResultPage(
-          albumName: _nameController.text,
-          folderPath:
-              "uploads/${Utils.getUtcTimestampString()}-${_authWrapper.uid}",
-          fileBytesList: _selectedLocalFiles.map((f) => f.bytes).toList(),
-          fileNames: _selectedLocalFiles.map((e) => e.file.name).toList(),
-          selectedExistingObjectKeys:
-              _selectedServerObjects.map((e) => e.objectKey).toList(),
+    if (_selectedLocalFiles.isEmpty && _selectedServerObjects.isEmpty) {
+      final bool? result = await DialogService.showConfirmationDialog(
+          context: context,
+          title: "Create empty album?",
+          message: "Are you sure to create an empty album?",
+          confirmText: "SURE");
+      if (result == true) {
+        _logger.d("Creating empty album: '${_nameController.text}'");
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AlbumCreationLiveResultPage(
+                    isEmptyAlbum: true,
+                    albumName: _nameController.text.trim(),
+                    folderPath: "",
+                    fileBytesList: [],
+                    fileNames: [],
+                    selectedExistingObjectKeys: [])));
+      }
+      // else {
+      //   Navigator.pop(context);
+      // }
+    } else {
+      _logger.d(
+          "Creating album: '${_nameController.text}' with files: [${_selectedLocalFiles.map((i) => i.file.name).join(', ')}]");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AlbumCreationLiveResultPage(
+            isEmptyAlbum: false,
+            albumName: _nameController.text.trim(),
+            folderPath:
+                "uploads/${Utils.getUtcTimestampString()}-${_authWrapper.uid}",
+            fileBytesList: _selectedLocalFiles.map((f) => f.bytes).toList(),
+            fileNames: _selectedLocalFiles.map((e) => e.file.name).toList(),
+            selectedExistingObjectKeys:
+                _selectedServerObjects.map((e) => e.objectKey).toList(),
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
@@ -152,7 +175,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         bottomNavigationBar: Padding(
           padding: UiConsts.PaddingAll_large,
           child: ElevatedButton.icon(
-            icon: Icon(Icons.save_outlined),
+            icon: const Icon(Icons.save_outlined),
             onPressed: () async => _createAlbum(),
             style: ElevatedButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,

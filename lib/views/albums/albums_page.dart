@@ -10,7 +10,10 @@ import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/more_actions_btn.dart'
+    show MoreActionsBtn;
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
@@ -123,15 +126,26 @@ class _AlbumsPageState extends State<AlbumsPage> {
         appbarActions: [
           Padding(
             padding: UiConsts.PaddingAll_standard,
-            child: IconButton.outlined(
-              onPressed: () => context.pushNamed("ViewAllFilesPage"),
-              enableFeedback: true,
-              tooltip: "View all uploaded files",
-              icon: const Icon(
-                Icons.folder_outlined,
-              ),
+            child: MoreActionsBtn(
+              actions: [
+                ActionsBtnModel(
+                    actionName: "View all uploaded files",
+                    icon: const Icon(
+                      Icons.folder_outlined,
+                    ),
+                    onPressed: () => context.pushNamed("ViewAllFilesPage")),
+                if (_docs.isNotEmpty)
+                  ActionsBtnModel(
+                      actionName: "Select Albums",
+                      icon: const Icon(
+                        Icons.check_circle_outline_outlined,
+                      ),
+                      onPressed: () =>
+                          _logger.d("select albums action pressed"))
+              ],
+              displayIcon: const Icon(Icons.menu_outlined),
             ),
-          )
+          ),
         ],
         showFloatingActionButton: true,
         floatingActionButtonTooltip: "Create new album",
@@ -140,33 +154,36 @@ class _AlbumsPageState extends State<AlbumsPage> {
         body: Center(
             child: Padding(
                 padding: UiConsts.PaddingAll_standard,
-                child: GridView.builder(
-                  controller: _scrollController,
-                  padding: UiConsts.PaddingAll_standard,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 2,
-                  ),
-                  itemCount: _docs.length + (_hasMore ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == _docs.length) {
-                      // if (_isLoading) {
-                      //   context.loaderOverlay.show();
-                      // } else if (!_isLoading) {
-                      //   context.loaderOverlay.hide();
-                      // }
+                child: (_docs.isEmpty)
+                    ? const Center(child: Text("No albums yet"))
+                    : GridView.builder(
+                        controller: _scrollController,
+                        padding: UiConsts.PaddingAll_standard,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          childAspectRatio: 2,
+                        ),
+                        itemCount: _docs.length + (_hasMore ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == _docs.length) {
+                            // if (_isLoading) {
+                            //   context.loaderOverlay.show();
+                            // } else if (!_isLoading) {
+                            //   context.loaderOverlay.hide();
+                            // }
 
-                      return const Center(child: SizedBox.shrink());
-                    } else if (_docs.isEmpty) {
-                      return const Center(child: Text("No albums yet"));
-                    } else {
-                      final data = _docs[index];
-                      return _albumTile(data, index);
-                    }
-                  },
-                )
+                            return const Center(child: SizedBox.shrink());
+                          } else if (_docs.isEmpty) {
+                            return const Center(child: Text("No albums yet"));
+                          } else {
+                            final data = _docs[index];
+                            return _albumTile(data, index);
+                          }
+                        },
+                      )
 
                 // Wrap(
                 //   alignment: WrapAlignment.spaceAround,

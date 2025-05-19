@@ -3,15 +3,18 @@
 
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+import 'package:cloud_firestore/cloud_firestore.dart'
+    show FieldValue, Timestamp;
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
+import 'package:ourjourneys/components/more_actions_btn.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/db/albums_model.dart';
+import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
@@ -21,7 +24,6 @@ import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 import 'package:ourjourneys/views/albums/full_media_view.dart';
-import 'package:shimmer/shimmer.dart';
 
 class AlbumDetailsPage extends StatefulWidget {
   final Map<String, dynamic>? album;
@@ -54,7 +56,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
           body: Center(
               child: Padding(
             padding: UiConsts.PaddingAll_large,
-            child: Text('Album not found, please try again'),
+            child: const Text('Album not found, please try again'),
           )));
     } else {
       if (_authWrapper.uid == "") _authWrapper.refreshUid();
@@ -66,27 +68,82 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
       return mainView(context,
           appBarTitle: albumData.albumName,
           appbarActions: [
-            IconButton(
-                onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: const Text('Delete album'),
-                          content: const Text(
-                              'Are you sure you want to delete this album?'),
-                          actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel')),
-                            TextButton(
-                                onPressed: () async {
-                                  // await _firestoreWrapper.deleteAlbum(
-                                  //     albumData.albumId);
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('Delete')),
-                          ],
-                        )),
-                icon: const Icon(Icons.delete)),
+            Padding(
+              padding: UiConsts.PaddingAll_standard,
+              child: MoreActionsBtn(
+                  actions: [
+                    if (albumData.linkedObjects.isNotEmpty)
+                      ActionsBtnModel(
+                          actionName: "Select items",
+                          icon: const Icon(
+                            Icons.check_circle_outline_outlined,
+                          ),
+                          onPressed: () =>
+                              _logger.d("select items action pressed")),
+                    ActionsBtnModel(
+                        actionName: "Delete Album",
+                        actionDes: "Delete this album",
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.redAccent,
+                        ),
+                        onPressed: () async {
+                          final bool? result =
+                              await DialogService.showConfirmationDialog(
+                            context: context,
+                            title: 'Delete album',
+                            message:
+                                'Are you sure you want to delete this album?',
+                          );
+                          if (result == true) {
+                            _logger.i('Deleting album');
+                            final List<String> objectsDataDocIds =
+                                await _firestoreWrapper
+                                    .queryCollection(
+                                        FirestoreCollections.objectsData,
+                                        filters: [
+                                          QueryFilter(
+                                              "linkedAlbums",
+                                              albumData.id,
+                                              QueryCondition.arrayContains)
+                                        ])
+                                    .get()
+                                    .then((result) => result.docs
+                                        .map((doc) => doc.id)
+                                        .toList());
+                            _logger.d(
+                                "objectsDataDocIds to be edited: $objectsDataDocIds");
+
+                            for (String docId in objectsDataDocIds) {
+                              _logger.d("Editing objectData docId: $docId");
+                              await _firestoreWrapper.handleUpdateDocument(
+                                  context,
+                                  collectionName:
+                                      FirestoreCollections.objectsData,
+                                  docId: docId,
+                                  suppressNotification: true,
+                                  data: {
+                                    "linkedAlbums":
+                                        FieldValue.arrayRemove([albumData.id])
+                                  });
+                            }
+
+                            await _firestoreWrapper.handleDeleteDocument(
+                                context,
+                                FirestoreCollections.albums,
+                                albumData.id,
+                                suppressNotification: true);
+                            Navigator.pop(context);
+                          } else {
+                            Navigator.pop(context);
+                            return;
+                          }
+                        })
+                  ],
+                  displayIcon: const Icon(
+                    Icons.menu_outlined,
+                  )),
+            ),
           ],
           body: Center(
               child: Column(
@@ -184,7 +241,6 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
 
   Future<void> _deleteCurrentItem(
       BuildContext context, String objectKey) async {
-    // TODO: add machanism to: 1. just remove file from album 2. delete file from server
     // ! delete from server, files must be in the same folder to delete
     final bool? confirmation = await DialogService.showConfirmationDialog(
         context: context,
@@ -192,7 +248,6 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
         message: "Are you sure to delete '${objectKey.split("/").last}'?",
         confirmText: "DELETE");
     if (confirmation == true) {
-      // TODO: also remove the reference from the album first before deleting the file
       if (_authWrapper.uid == "") _authWrapper.refreshUid();
       if (album is Map<String, dynamic>) {
         final Timestamp now = Timestamp.now();
@@ -225,15 +280,5 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
             objectKeys: [objectKey], folder: folder);
       }
     }
-  }
-
-  Widget _buildShimmer() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.withOpacity(shimmerBaseOpacity),
-      highlightColor: Colors.white.withOpacity(shimmerBaseOpacity),
-      child: Container(
-        color: Colors.grey[300],
-      ),
-    );
   }
 }
