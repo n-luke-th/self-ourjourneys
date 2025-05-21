@@ -30,9 +30,9 @@ class AuthWrapper {
   String _uid = "";
   String? _idToken;
   String _errorMessage = "";
-  String _displayName = "_Unauthenticated user_";
-  String _emailAddress = "_Unauthenticated user_";
-  String _profilePicURL = "_Unauthenticated user_";
+  String _displayName = "_OurJourneys user_";
+  String _emailAddress = "_OurJourneys user_";
+  String _profilePicURL = "_OurJourneys user_";
 
   String get uid => _uid;
   String? get idToken => _idToken;

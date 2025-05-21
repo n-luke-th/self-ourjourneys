@@ -19,7 +19,7 @@ class _AnniversaryPageState extends State<AnniversaryPage> {
     return mainView(
       context,
       appBarTitle: "Anniversaries",
-      body: const Text("Anniversary Page is under construction"),
+      body: const Center(child: Text("Anniversary Page is under construction")),
     );
   }
 }

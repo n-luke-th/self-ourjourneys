@@ -48,8 +48,10 @@ lambda/node_modules
 # service account
 lambda/serviceAccountKey.json
 android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
 
 # models documentation
 OurJourneys_v1.1-models-documentation.pdf
 OurJourneys_v2-models-documentation.pdf
 OurJourneys_v2.1-models-documentation.pdf
+

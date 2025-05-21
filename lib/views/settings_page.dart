@@ -11,7 +11,6 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart';
 import 'package:ourjourneys/services/configs/settings_service.dart';
@@ -41,7 +40,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    // _authWrapper.handleRefreshUser();
+    _authWrapper.refreshAttributes();
     Future.microtask(
         () => context.read<PackageInfoProvider>().loadPackageInfo());
 
@@ -449,40 +448,35 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Container profileSection() {
     return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(
-            bottom: Radius.elliptical(
-                UiConsts.borderRadius_large, UiConsts.borderRadius_large)),
-        gradient: LinearGradient(
-            begin: AlignmentDirectional.topCenter,
-            end: AlignmentDirectional.bottomCenter,
-            colors: [
-              Theme.of(context).colorScheme.errorContainer,
-              Theme.of(context).colorScheme.secondaryContainer,
-            ]),
-      ),
-      child: Consumer<AuthService>(
-        builder: (BuildContext context, AuthService value, Widget? child) {
-          return Padding(
-            padding: UiConsts.PaddingAll_standard,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // UiConsts.SizedBoxGapVertical_small,
-                Text(
-                  value.authInstance!.currentUser?.displayName ??
-                      value.authInstance!.currentUser?.email ??
-                      "OurJourneys user",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.vertical(
+              bottom: Radius.elliptical(
+                  UiConsts.borderRadius_large, UiConsts.borderRadius_large)),
+          gradient: LinearGradient(
+              begin: AlignmentDirectional.topCenter,
+              end: AlignmentDirectional.bottomCenter,
+              colors: [
+                Theme.of(context).colorScheme.errorContainer,
+                Theme.of(context).colorScheme.secondaryContainer,
+              ]),
+        ),
+        child: Padding(
+          padding: UiConsts.PaddingAll_standard,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // UiConsts.SizedBoxGapVertical_small,
+              Text(
+                _authWrapper.displayName == "_OurJourneys user_"
+                    ? _authWrapper.emailAddress
+                    : _authWrapper.displayName,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ],
+          ),
+        ));
   }
 
   Future<void> _showLogoutConfirmation(BuildContext context) async {
