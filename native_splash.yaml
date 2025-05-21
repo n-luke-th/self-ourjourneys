@@ -22,16 +22,16 @@ flutter_native_splash:
 
   # light mode for web+ios+(<=android11)
   color: "#d1ff9d" 
-  image: "assets/logo.png"
+  image: "assets/logo20250504.PNG"
   
   # dark mode for web+ios+(<=android11)
   color_dark: "#8fe8ff"
-  image_dark: "assets/logo.png"
+  image_dark: "assets/logo20250504.PNG"
 
   # light&dark mode for >=android12
   android_12:
     # icon_background_color: "#ffffff"
     color: "#d1ff9d"
     color_dark: "#8fe8ff"
-    image: "assets/logo.png"
-    image_dark: "assets/logo.png"
+    image: "assets/logo20250504.PNG"
+    image_dark: "assets/logo20250504.PNG"

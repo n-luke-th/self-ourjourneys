@@ -104,6 +104,8 @@ class _LoginPage extends State<LoginPage> {
                           // autofocus: false,
                           validator: FormBuilderValidators.email(),
                           autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
                           onChanged: (value) {
                             setState(() {
                               if (_emailKey.currentState?.validate() == true) {
@@ -169,6 +171,9 @@ class _LoginPage extends State<LoginPage> {
                           // autofocus: false,
                           validator: FormBuilderValidators.required(),
                           autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType: TextInputType.visiblePassword,
+                          textInputAction: TextInputAction.go,
+                          onFieldSubmitted: (v) async => _login(),
                           onChanged: (value) {
                             setState(() {
                               if (_passwordKey.currentState?.validate() ==

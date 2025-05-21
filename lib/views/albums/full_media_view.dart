@@ -3,8 +3,10 @@
 /// display a full screen media file (image, video, audio, etc)
 
 import 'package:flutter/material.dart';
-import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/media_item_container.dart'
+    show MediaItemContainer;
+import 'package:ourjourneys/shared/helpers/misc.dart';
 
 class FullMediaView extends StatelessWidget {
   final String objectKey;
@@ -19,7 +21,14 @@ class FullMediaView extends StatelessWidget {
           appBarTitle: objectKey.split('/').last,
           backgroundColor: Colors.transparent,
           body: Center(
-            child: CloudImage(objectKey: objectKey),
+            // child: CloudImage(objectKey: objectKey),
+            child: MediaItemContainer(
+              showDescriptionBar: false,
+              fetchSourceMethod: FetchSourceMethod.online,
+              fitting: BoxFit.contain,
+              mediaItem: objectKey,
+              mimeType: "image/",
+            ),
           ));
     } else if (objectType == "video") {
       return mainView(context,

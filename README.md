@@ -12,7 +12,7 @@
 
 0. make sure you have config the latest changes of the app by run command: `git pull`
 
-1. run `dart pub global activate flutterfire_cli` then `flutterfire configure` to configure the firebase options
+1. run `dart pub global activate flutterfire_cli` then run `flutterfire configure` to configure the firebase options
 
 2. run `flutter clean && flutter pub get` to clean up and get dependencies
 
@@ -29,3 +29,10 @@
 
 - config the [`launcher_icons.yaml`](launcher_icons.yaml) file then
 - (everytime after changes were made) regenerate the launcher icon based on the [`launcher_icons.yaml`](launcher_icons.yaml) file by run command: `dart run icons_launcher:create --path launcher_icons.yaml`
+
+### Change package name
+
+(source: https://pub.dev/packages/change_app_package_name)
+
+- run command `flutter pub add -d change_app_package_name` to add the helper package
+- then run `dart run change_app_package_name:main com.your.package.name` to change the package name

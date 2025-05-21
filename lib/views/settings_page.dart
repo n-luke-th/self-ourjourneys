@@ -99,7 +99,8 @@ class _SettingsPageState extends State<SettingsPage> {
           return Padding(
             padding: UiConsts.PaddingAll_standard,
             child: Center(
-              child: Text('version: ${packageInfo.version}'),
+              child: Text(
+                  'version: ${packageInfo.version}+${packageInfo.buildNumber}'),
             ),
           );
         })

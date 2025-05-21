@@ -47,6 +47,7 @@ lambda/node_modules
 
 # service account
 lambda/serviceAccountKey.json
+android/app/google-services.json
 
 # models documentation
 OurJourneys_v1.1-models-documentation.pdf

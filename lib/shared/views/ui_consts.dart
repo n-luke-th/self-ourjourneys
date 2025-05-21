@@ -10,6 +10,9 @@ import 'package:flutter/widgets.dart';
 class UiConsts {
   UiConsts._();
 
+  /// EdgeInsets.all(4);
+  static const PaddingAll_small = EdgeInsets.all(4);
+
   /// EdgeInsets.all(8);
   static const PaddingAll_standard = EdgeInsets.all(8);
 
