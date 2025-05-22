@@ -302,7 +302,7 @@ class AuthWrapper {
                     message: "Password reset email sent!",
                     type: CustomNotificationType.info));
       }
-      context.pushReplacementNamed("LoginPage");
+      context.goNamed("AuthPage");
     } on FirebaseAuthException catch (e) {
       _auth.mapFirebaseErrorsAndThrowsError(e, "reset password");
       rethrow;

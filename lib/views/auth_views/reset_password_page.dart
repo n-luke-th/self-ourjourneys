@@ -34,7 +34,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget build(BuildContext context) {
     return mainView(
       context,
-      appBarTitle: "reset password".toUpperCase(),
+      appBarTitle: "RESET PASSWORD",
       appBarBackgroundColor: Colors.transparent,
       appbarActions: [QuickSettingsMenu()],
       extendBodyBehindAppBar: true,
@@ -83,6 +83,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           autofocus: false,
                           validator: FormBuilderValidators.email(),
                           autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                               prefixIcon: Icon(Icons.email_rounded),
                               hintText: "email",
@@ -126,7 +128,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               border: InputBorder.none)),
                       UiConsts.SizedBoxGapVertical_large,
                       ElevatedButton(
-                        onPressed: () async => _resetPassword(),
+                        onPressed: () async => await _resetPassword(),
                         style: ElevatedButton.styleFrom(
                           foregroundColor:
                               Theme.of(context).colorScheme.onTertiaryContainer,
@@ -138,7 +140,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 UiConsts.BorderRadiusCircular_standard,
                           ),
                         ),
-                        child: Text("reset password".toUpperCase()),
+                        child: const Text("RESET PASSWORD"),
                       ),
                     ],
                   ),

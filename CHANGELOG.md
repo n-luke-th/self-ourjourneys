@@ -59,3 +59,4 @@
 - Initial Development: Upgraded the dependencies constraints, added support for native Android and iOS, updated the launcher icons and splash screen, and other improvements on May 21, 2025 -> **0.3.4+1** by Luke
 - Initial Development: Upgraded the dependencies constraints, and other improvements on May 21, 2025 -> **0.3.4+2** by Luke
 - Initial Development: Enhanced code reusability and other improvements on May 22, 2025 -> **0.3.4+3** by Luke
+- Initial Development: Fixed unable to go through the reset password flow, and other improvements on May 22, 2025 -> **0.3.5** by Luke

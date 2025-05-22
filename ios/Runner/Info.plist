@@ -2,6 +2,34 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
+		<!-- Permission requires list -->
+		<!-- biometric use -->
+		<key>NSFaceIDUsageDescription</key>
+		<string>Enhance your privacy with the Biometrics guardian</string>
+		<!-- end -->
+		<!-- Permission options for the `photos` group -->
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Requires access to the photo library for features such as Memories and Albums.</string>
+		<!-- Permission options for the `calendar` group -->
+		<key>NSCalendarsUsageDescription</key>
+		<string>Calendars access for feature such as Anniversaries</string>
+		<key>NSCalendarsFullAccessUsageDescription</key>
+		<string>Calendar full access for feature such as Anniversaries.</string>
+		<!-- Permission options for the `location` group -->
+		<!-- <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    	<string>Always and when in use!</string> -->
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Need location when in use</string>
+		<key>NSLocationUsageDescription</key>
+    	<string>Older devices need location.</string>
+		<!-- Permission options for the `mediaLibrary` group -->
+		<key>NSAppleMusicUsageDescription</key>
+		<string>Music!</string>
+		<key>kTCCServiceMediaLibrary</key>
+		<string>media</string>
+		<key>NSUserNotificationsUsageDescription</key>
+		<string>notification</string>
+		<!-- end of the permission list -->
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

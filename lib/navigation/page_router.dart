@@ -30,6 +30,7 @@ final _navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
 
 const String _initialAuthLocation = '/auth';
 const String _landingLocation = '/anniversaries';
+const String _resetPasswordLocation = '/reset-password';
 
 final router = GoRouter(
   initialLocation: _initialAuthLocation,
@@ -39,6 +40,10 @@ final router = GoRouter(
     final user = _auth.currentUser;
     final isAuthRoute = state.matchedLocation == _initialAuthLocation ||
         state.matchedLocation == '/login';
+
+    if (state.matchedLocation == _resetPasswordLocation && user == null) {
+      return _resetPasswordLocation;
+    }
 
     if (state.matchedLocation == '/' && user == null) {
       return _initialAuthLocation;
@@ -64,6 +69,7 @@ final router = GoRouter(
       builder: (context, state, child) {
         if (state.topRoute!.name == "ReauthPage" ||
             state.topRoute!.name == "ChangePasswordPage" ||
+            state.topRoute!.name == "ResetPasswordPage" ||
             state.topRoute!.name == "NewAlbumPage" ||
             state.topRoute!.name == "NewMemoryPage" ||
             state.topRoute!.name == "AlbumDetailsPage") {
@@ -200,7 +206,7 @@ final router = GoRouter(
     ),
     GoRoute(
       /// '/reset-password'
-      path: '/reset-password',
+      path: _resetPasswordLocation,
       name: 'ResetPasswordPage',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const ResetPasswordPage(),

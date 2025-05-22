@@ -173,7 +173,7 @@ class _LoginPage extends State<LoginPage> {
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           keyboardType: TextInputType.visiblePassword,
                           textInputAction: TextInputAction.go,
-                          onFieldSubmitted: (v) async => _login(),
+                          onFieldSubmitted: (v) async => await _login(),
                           onChanged: (value) {
                             setState(() {
                               if (_passwordKey.currentState?.validate() ==
@@ -261,7 +261,7 @@ class _LoginPage extends State<LoginPage> {
                                   .colorScheme
                                   .onSecondaryContainer),
                           child: Text(
-                            "reset password".toUpperCase(),
+                            "RESET PASSWORD",
                             style: TextStyle(
                                 color: Theme.of(context)
                                     .colorScheme
@@ -271,7 +271,7 @@ class _LoginPage extends State<LoginPage> {
                       ),
                       UiConsts.SizedBoxGapVertical_large,
                       ElevatedButton(
-                        onPressed: () async => _login(),
+                        onPressed: () async => await _login(),
                         style: ElevatedButton.styleFrom(
                           foregroundColor:
                               Theme.of(context).colorScheme.onPrimaryContainer,
