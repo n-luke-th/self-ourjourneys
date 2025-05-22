@@ -160,11 +160,11 @@ class AuthWrapper {
             );
       }
       _logger.i("user: '$_displayName' login success!");
-      _logger
-          .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
-    } on FirebaseAuthException catch (e) {
+      _logger.d(
+          "user attributes: ${_auth.getCurrentUserAttributes()!['providerData'].toString()}");
+    } on AuthException catch (e) {
       if (!suppressNotification) {
-        _errorMessage = AuthService.getReadableErrorMessage(e);
+        _errorMessage = e.toString();
         context.read<NotificationManager>().showNotification(
               context,
               overrideErrorNotiData ??

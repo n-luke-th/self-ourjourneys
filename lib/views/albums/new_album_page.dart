@@ -4,7 +4,6 @@
 
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:file_picker/file_picker.dart' show FileType;
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart'
     show FormBuilderValidators;
@@ -12,9 +11,7 @@ import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/file_picker_preview.dart';
 import 'package:ourjourneys/models/storage/selected_file.dart';
-import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
-import 'package:ourjourneys/shared/common/file_picker_enum.dart';
 import 'package:ourjourneys/views/albums/album_creation_live_result_page.dart';
 import 'package:ourjourneys/components/server_file_selector.dart';
 import 'package:ourjourneys/components/main_view.dart';
@@ -43,33 +40,10 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
   Set<SelectedFile> _selectedLocalFiles = {};
   List<ObjectsData> _selectedServerObjects = [];
 
-  Future<void> _pickLocalFiles() async {
-    final result = await FilesPickerUtils.pickFiles(
-      allowMultiple: true,
-      fileType: FileType.custom,
-      allowedExtensions: [
-        ...AllowedExtensions.imageCompactExtensions,
-        ...AllowedExtensions.videoExtensions,
-      ],
-      withData: true,
-    );
-    if (result == null || result.files.isEmpty) return;
-
-    final picked = result.files
-        .where((f) => f.bytes != null)
-        .map((f) => SelectedFile(file: f, bytes: f.bytes!))
-        .toList();
-
-    _onLocalFilesSelected(picked);
-    _logger.d(
-        "Picked local files: [${picked.map((i) => i.file.name).join(', ')}]");
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
-  }
-
   void _onLocalFilesSelected(List<SelectedFile> files,
       {bool isReplacing = false}) {
+    _logger
+        .d("Picked local files: [${files.map((i) => i.file.name).join(', ')}]");
     setState(() {
       if (!isReplacing) {
         if (_selectedLocalFiles.isNotEmpty) {
@@ -83,7 +57,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         _selectedLocalFiles = files.toSet();
       }
     });
-    _logger.d(
+    _logger.i(
         "Selected files: [${_selectedLocalFiles.map((i) => i.file.name).join(', ')}]");
   }
 
@@ -211,7 +185,15 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                     "Local Files",
                     textAlign: TextAlign.center,
                   ),
-                  onTap: () => _pickLocalFiles(),
+                  onTap: () async => await Utils.pickLocalFiles(
+                    onFilesSelected: (List<SelectedFile> pickedFiles) =>
+                        _onLocalFilesSelected(pickedFiles),
+                    onCompleted: () {
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
                 ),
                 ListTile(
                   shape: RoundedRectangleBorder(
@@ -281,7 +263,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
       Chip(
           backgroundColor: Theme.of(context).colorScheme.secondaryFixed,
           deleteButtonTooltipMessage: "Clear selected server files",
-          deleteIcon: Icon(
+          deleteIcon: const Icon(
             Icons.delete_outline_outlined,
             size: UiConsts.standardIconSize,
           ),
@@ -291,7 +273,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
           labelStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onSecondaryFixed,
               ),
-          label: Text(
+          label: const Text(
             "Server files selected:",
           ),
           shape: RoundedRectangleBorder(
@@ -322,7 +304,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
       Chip(
           backgroundColor: Theme.of(context).colorScheme.secondaryFixed,
           deleteButtonTooltipMessage: "Clear selected local files",
-          deleteIcon: Icon(
+          deleteIcon: const Icon(
             Icons.delete_outline_outlined,
             size: UiConsts.standardIconSize,
           ),
@@ -332,7 +314,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
           labelStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onSecondaryFixed,
               ),
-          label: Text(
+          label: const Text(
             "Local files selected:",
           ),
           shape: RoundedRectangleBorder(

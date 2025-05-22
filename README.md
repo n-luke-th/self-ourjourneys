@@ -22,6 +22,8 @@
 
 ### Splash screen
 
+(source: https://pub.dev/packages/flutter_native_splash)
+
 - config the [`native_splash.yaml`](native_splash.yaml) file then
 - (everytime after changes were made) regenerate the splash screen based on the [`native_splash.yaml`](native_splash.yaml) file by run command: `dart run flutter_native_splash:create --path=native_splash.yaml`
 

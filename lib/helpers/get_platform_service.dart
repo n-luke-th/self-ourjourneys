@@ -13,6 +13,8 @@ class PlatformDetectionService {
 
   PlatformDetectionService._internal();
 
+  static bool get isWeb => kIsWeb;
+
   PlatformEnum get currentPlatform {
     if (kIsWeb) {
       return PlatformEnum.web;

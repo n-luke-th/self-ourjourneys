@@ -2,10 +2,19 @@
 /// Utils class
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+import 'package:file_picker/file_picker.dart' show FileType, FilePickerResult;
 import 'package:get_time_ago/get_time_ago.dart' show GetTimeAgo;
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:mime/mime.dart' show lookupMimeType;
+import 'package:ourjourneys/helpers/get_platform_service.dart';
+import 'package:ourjourneys/models/storage/selected_file.dart'
+    show SelectedFile;
 import 'package:path/path.dart' as path show extension;
+
+import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart'
+    show FilesPickerUtils;
+import 'package:ourjourneys/shared/common/file_picker_enum.dart'
+    show AllowedExtensions;
 
 class Utils {
   /// Returns a human readable date string from a DateTime object with a given pattern.
@@ -83,15 +92,14 @@ class Utils {
         mimeType.startsWith('text/')) {
       final extension = path.extension(filename).toLowerCase();
       if ([
-        '.pdf',
         '.doc',
         '.docx',
         '.xls',
         '.xlsx',
         '.ppt',
         '.pptx',
-        '.txt',
-        '.csv'
+        '.csv',
+        ...AllowedExtensions.documentExtensions
       ].contains(extension)) {
         return 'document';
       } else {
@@ -117,5 +125,38 @@ class Utils {
     } else {
       return null;
     }
+  }
+
+  static Future<void> pickLocalFiles(
+      {void Function()? onCompleted,
+      required void Function(List<SelectedFile>) onFilesSelected}) async {
+    FilePickerResult? result;
+    if (PlatformDetectionService.isWeb) {
+      result = await FilesPickerUtils.pickFiles(
+        allowMultiple: true,
+        fileType: FileType.custom,
+        allowedExtensions: [
+          ...AllowedExtensions.imageCompactExtensions,
+          ...AllowedExtensions.videoExtensions,
+        ],
+        withData: true,
+      );
+    } else {
+      result = await FilesPickerUtils.pickFiles(
+        allowMultiple: true,
+        fileType: FileType.media,
+        withData: true,
+      );
+    }
+    if (result == null || result.files.isEmpty) return;
+
+    final picked = result.files
+        .where((f) => f.bytes != null)
+        .map((f) => SelectedFile(file: f, bytes: f.bytes!))
+        .toList();
+
+    onFilesSelected(picked);
+
+    onCompleted?.call();
   }
 }

@@ -55,8 +55,6 @@ void _main() async {
           ),
           // setting page service
           ChangeNotifierProvider.value(value: settingsService),
-          // auth notifier helper
-          // ChangeNotifierProvider(create: (_) => getIt<AuthWrapper>()),
           // notification service
           ProxyProvider<SettingsService, NotificationManager>(
             update: (_, settings, __) => NotificationManager(settings),
@@ -111,7 +109,8 @@ class OurJourneys extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingsService>(builder: (context, settings, child) {
       return GlobalLoaderOverlay(
-        overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        overlayColor:
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
         overlayWidgetBuilder: (progress) => Center(
           child: LoadingAnimationWidget.beat(
             // color: Color(0xFF8FE8FF),

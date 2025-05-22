@@ -183,24 +183,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                             return _albumTile(data, index);
                           }
                         },
-                      )
-
-                // Wrap(
-                //   alignment: WrapAlignment.spaceAround,
-                //   runAlignment: WrapAlignment.center,
-                //   children: [
-                //     CloudImage(
-                //       objectKey: objectKey,
-                //       width: 200,
-                //       height: 200,
-                //       fit: BoxFit.cover,
-                //       shimmerBaseOpacity: 0.3,
-                //       errorWidget: const Icon(Icons.error_outline),
-                //     ),
-                //   ],
-                // ),
-
-                )));
+                      ))));
   }
 
   Widget _albumTile(Map<String, dynamic> data, int index) {

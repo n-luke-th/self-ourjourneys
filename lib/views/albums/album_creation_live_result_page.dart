@@ -208,7 +208,7 @@ class _AlbumCreationLiveResultPageState
     return mainView(
       context,
       appBarTitle: "Album Creation Progress",
-      appBarLeading: isDone
+      appBarLeading: (isDone || _isUploading)
           ? null
           : BackButton(
               onPressed: () {
@@ -218,45 +218,47 @@ class _AlbumCreationLiveResultPageState
       automaticallyImplyLeading: false,
       body: Padding(
         padding: UiConsts.PaddingAll_large,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (_isUploading)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                      "Uploading file ${_currentIndex + 1}/${widget.fileNames.length}"),
-                  LinearProgressIndicator(value: _currentProgress),
-                  UiConsts.SizedBoxGapVertical_standard,
-                ],
-              ),
-            if (isDone) ...[
-              const Text("✅ Album created successfully!",
-                  style: TextStyle(fontSize: 18)),
-              if (_albumDocId != null)
-                Text("Album ID: $_albumDocId",
-                    style: const TextStyle(color: Colors.grey)),
-              UiConsts.SizedBoxGapVertical_standard,
-              ElevatedButton.icon(
-                  onPressed: () => context.goNamed("AlbumsPage"),
-                  label: const Text("Go to Albums Page"),
-                  icon: const Icon(Icons.auto_awesome_mosaic_outlined))
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (_isUploading)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        "Processing/Uploading file: ${_currentIndex + 1}${widget.fileNames.isEmpty ? "" : "/${widget.fileNames.length}"}"),
+                    LinearProgressIndicator(value: _currentProgress),
+                    UiConsts.SizedBoxGapVertical_standard,
+                  ],
+                ),
+              if (isDone) ...[
+                Text("✅ Album '${widget.albumName}' created successfully!",
+                    style: TextStyle(fontSize: 18)),
+                if (_albumDocId != null)
+                  Text("Album ID: $_albumDocId",
+                      style: const TextStyle(color: Colors.grey)),
+                UiConsts.SizedBoxGapVertical_standard,
+                ElevatedButton.icon(
+                    onPressed: () => context.goNamed("AlbumsPage"),
+                    label: const Text("Go to Albums Page"),
+                    icon: const Icon(Icons.auto_awesome_mosaic_outlined))
+              ],
+              if (_failedFileNames.isNotEmpty) ...[
+                UiConsts.SizedBoxGapVertical_standard,
+                const Text("❌ Failed Files:",
+                    style: TextStyle(color: Colors.red)),
+                ..._failedFileNames.map((f) =>
+                    Text("- $f", style: const TextStyle(color: Colors.red))),
+                UiConsts.SizedBoxGapVertical_standard,
+                ElevatedButton.icon(
+                  onPressed: _retryFailedUploads,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text("Retry Failed Uploads"),
+                ),
+              ],
             ],
-            if (_failedFileNames.isNotEmpty) ...[
-              UiConsts.SizedBoxGapVertical_standard,
-              const Text("❌ Failed Files:",
-                  style: TextStyle(color: Colors.red)),
-              ..._failedFileNames.map((f) =>
-                  Text("- $f", style: const TextStyle(color: Colors.red))),
-              UiConsts.SizedBoxGapVertical_standard,
-              ElevatedButton.icon(
-                onPressed: _retryFailedUploads,
-                icon: const Icon(Icons.refresh),
-                label: const Text("Retry Failed Uploads"),
-              ),
-            ],
-          ],
+          ),
         ),
       ),
     );

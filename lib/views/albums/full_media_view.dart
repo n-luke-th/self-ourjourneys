@@ -33,7 +33,7 @@ class FullMediaView extends StatelessWidget {
     } else if (objectType == "video") {
       return mainView(context,
           appBarTitle: objectKey.split('/').last,
-          body: Center(
+          body: const Center(
             child: Text('Video not supported yet'),
           ));
     } else {
