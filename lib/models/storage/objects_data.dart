@@ -61,3 +61,17 @@ class ObjectsData {
   factory ObjectsData.fromJson(String source) =>
       ObjectsData.fromMap(json.decode(source));
 }
+
+/// The type of the object.
+enum MediaObjectType {
+  image("image"),
+  video("video"),
+  audio("audio"),
+  document("document"),
+  // nullObject("nullObject"),
+  unknown("unknown");
+
+  final String stringValue;
+
+  const MediaObjectType(this.stringValue);
+}

@@ -125,8 +125,6 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        // _logger.d(_docs[index].data());
-
         final objectsData =
             ObjectsData.fromMap(_docs[index].data() as Map<String, dynamic>);
         if (objectsData.contentType.startsWith('image/')) {
@@ -135,7 +133,7 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
             width: MediaQuery.of(context).size.width * 0.2,
             child: MediaItemContainer(
               mimeType: "image/",
-              fetchSourceMethod: FetchSourceMethod.online,
+              fetchSourceMethod: FetchSourceMethod.server,
               mediaItem: objectKey,
               mediaAndDescriptionBarFlexValue: (18, 1),
               descriptionTxtMaxLines: 1,
@@ -144,21 +142,9 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
                 await _handleOnLongPressItem(objectKey);
               },
               onDoubleTap: () async {
-                await DialogService.showCustomDialog(
-                  context,
-                  type: DialogType.information,
-                  title: "Information",
-                  message:
-                      "Media type: ${Utils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
-                );
+                await _onDoubleTapItem(objectKey);
               },
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (b) => FullMediaView(
-                            objectKey: objectKey,
-                            objectType: "image",
-                          ))),
+              onTap: () => _onTapItem(objectKey),
             ),
           );
         } else if (objectsData.contentType.startsWith('video/')) {
@@ -171,6 +157,27 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
           );
         }
       },
+    );
+  }
+
+  Future<dynamic> _onTapItem(String objectKey) {
+    return Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (b) => FullMediaView(
+                  fetchSourceMethod: FetchSourceMethod.server,
+                  onlineObjectKey: objectKey,
+                  objectType: MediaObjectType.image,
+                )));
+  }
+
+  Future<void> _onDoubleTapItem(String objectKey) async {
+    await DialogService.showCustomDialog(
+      context,
+      type: DialogType.information,
+      title: "Information",
+      message:
+          "Media type: ${Utils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
     );
   }
 

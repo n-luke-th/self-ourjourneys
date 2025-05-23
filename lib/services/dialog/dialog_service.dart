@@ -141,4 +141,25 @@ class DialogService {
       ],
     );
   }
+
+  static Future<bool?> showInfoDialog({
+    required BuildContext context,
+    required String title,
+    required String message,
+    String? acknowledgeText = 'ACKNOWLEDGE',
+  }) {
+    return showCustomDialog<bool>(
+      context,
+      type: DialogType.information,
+      title: title,
+      message: message,
+      buttons: [
+        DialogButton(
+          text: acknowledgeText!,
+          onPressed: () => context.pop(true),
+          isDestructive: true,
+        ),
+      ],
+    );
+  }
 }

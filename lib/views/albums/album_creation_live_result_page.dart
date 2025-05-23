@@ -27,7 +27,7 @@ class AlbumCreationLiveResultPage extends StatefulWidget {
   final List<Uint8List> fileBytesList;
   final List<String> fileNames;
   final List<String> selectedExistingObjectKeys;
-  final bool isEmptyAlbum;
+  final bool isNoNeedNewUpload;
 
   const AlbumCreationLiveResultPage({
     super.key,
@@ -36,7 +36,7 @@ class AlbumCreationLiveResultPage extends StatefulWidget {
     required this.fileNames,
     required this.selectedExistingObjectKeys,
     required this.albumName,
-    required this.isEmptyAlbum,
+    required this.isNoNeedNewUpload,
   });
 
   @override
@@ -62,11 +62,11 @@ class _AlbumCreationLiveResultPageState
   void initState() {
     super.initState();
     _authWrapper.refreshUid();
-    _startUploadAndAlbumCreation(emptyAlbum: widget.isEmptyAlbum);
+    _startUploadAndAlbumCreation(noNeedUpload: widget.isNoNeedNewUpload);
   }
 
-  Future<void> _startUploadAndAlbumCreation({bool emptyAlbum = false}) async {
-    if (!emptyAlbum) {
+  Future<void> _startUploadAndAlbumCreation({bool noNeedUpload = false}) async {
+    if (!noNeedUpload) {
       final (successful, failedSet) =
           await _cloudFileService.uploadMultipleFiles(
         context: context,
@@ -148,7 +148,7 @@ class _AlbumCreationLiveResultPageState
       _isAlbumCreated = true;
       _albumDocId = albumRef?.id;
     });
-    if (_albumDocId != null && !widget.isEmptyAlbum) {
+    if (_albumDocId != null && !widget.isNoNeedNewUpload) {
       await _updateReferencedObjects(uploadedObjectKeys: [
         ..._uploadedKeys,
         ...widget.selectedExistingObjectKeys
@@ -205,59 +205,79 @@ class _AlbumCreationLiveResultPageState
   Widget build(BuildContext context) {
     final isDone = !_isUploading && _isAlbumCreated;
 
-    return mainView(
-      context,
-      appBarTitle: "Album Creation Progress",
-      appBarLeading: (isDone || _isUploading)
-          ? null
-          : BackButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+    return PopScope(
+      canPop: false,
+      child: mainView(
+        context,
+        appBarTitle: "Album Creation Progress",
+        appBarLeading: (isDone || _isUploading)
+            ? null
+            : BackButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+        automaticallyImplyLeading: false,
+        body: Padding(
+          padding: UiConsts.PaddingAll_large,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (_isUploading)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          "Processing/Uploading file: ${_currentIndex + 1}${widget.fileNames.isEmpty ? "" : "of ${widget.fileNames.length}"}"),
+                      LinearProgressIndicator(
+                        value: _currentProgress,
+                        stopIndicatorColor:
+                            Theme.of(context).colorScheme.errorContainer,
+                        semanticsLabel: "Current progress",
+                        semanticsValue:
+                            "${(_currentProgress * 100).toStringAsFixed(0)}%",
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                      UiConsts.SizedBoxGapVertical_standard,
+                    ],
+                  ),
+                if (isDone) ...[
+                  Text("✅ Album '${widget.albumName}' created successfully!",
+                      style: TextStyle(fontSize: 18)),
+                  if (_albumDocId != null)
+                    Text("Album ID: $_albumDocId",
+                        style: const TextStyle(color: Colors.grey)),
+                  UiConsts.SizedBoxGapVertical_standard,
+                  ElevatedButton.icon(
+                      onPressed: () => context.goNamed("AlbumsPage"),
+                      label: const Text(
+                        "Go to Albums Page",
+                        style: TextStyle(color: Colors.deepPurpleAccent),
+                      ),
+                      icon: const Icon(Icons.auto_awesome_mosaic_outlined,
+                          color: Colors.deepPurpleAccent))
+                ],
+                if (_failedFileNames.isNotEmpty) ...[
+                  UiConsts.SizedBoxGapVertical_standard,
+                  const Text("❌ Failed Files:",
+                      style: TextStyle(color: Colors.red)),
+                  ..._failedFileNames.map((f) =>
+                      Text("- $f", style: const TextStyle(color: Colors.red))),
+                  UiConsts.SizedBoxGapVertical_standard,
+                  ElevatedButton.icon(
+                    onPressed: _retryFailedUploads,
+                    icon: const Icon(
+                      Icons.refresh,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    label: const Text("Retry Failed Uploads",
+                        style: TextStyle(color: Colors.deepPurpleAccent)),
+                  ),
+                ],
+              ],
             ),
-      automaticallyImplyLeading: false,
-      body: Padding(
-        padding: UiConsts.PaddingAll_large,
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (_isUploading)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        "Processing/Uploading file: ${_currentIndex + 1}${widget.fileNames.isEmpty ? "" : "/${widget.fileNames.length}"}"),
-                    LinearProgressIndicator(value: _currentProgress),
-                    UiConsts.SizedBoxGapVertical_standard,
-                  ],
-                ),
-              if (isDone) ...[
-                Text("✅ Album '${widget.albumName}' created successfully!",
-                    style: TextStyle(fontSize: 18)),
-                if (_albumDocId != null)
-                  Text("Album ID: $_albumDocId",
-                      style: const TextStyle(color: Colors.grey)),
-                UiConsts.SizedBoxGapVertical_standard,
-                ElevatedButton.icon(
-                    onPressed: () => context.goNamed("AlbumsPage"),
-                    label: const Text("Go to Albums Page"),
-                    icon: const Icon(Icons.auto_awesome_mosaic_outlined))
-              ],
-              if (_failedFileNames.isNotEmpty) ...[
-                UiConsts.SizedBoxGapVertical_standard,
-                const Text("❌ Failed Files:",
-                    style: TextStyle(color: Colors.red)),
-                ..._failedFileNames.map((f) =>
-                    Text("- $f", style: const TextStyle(color: Colors.red))),
-                UiConsts.SizedBoxGapVertical_standard,
-                ElevatedButton.icon(
-                  onPressed: _retryFailedUploads,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Retry Failed Uploads"),
-                ),
-              ],
-            ],
           ),
         ),
       ),

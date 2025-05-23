@@ -2,35 +2,33 @@
 ///
 ///
 
-enum FilePickerMode {
-  /// meant to support only image file type
-  ///
-  /// opens the platform photo library
-  photoPicker,
+// enum FilePickerMode {
+//   /// meant to support only image file type
+//   ///
+//   /// opens the platform photo library
+//   photoPicker,
 
-  /// meant to support any file type
-  ///
-  /// opens the platform file picker
-  filePicker,
-}
+//   /// meant to support any file type
+//   ///
+//   /// opens the platform file picker
+//   filePicker,
+// }
 
 class AllowedExtensions {
-  /// List of allowed image extensions: jpg, jpeg, png, gif, webp, svg
-  static const List<String> imagePlusExtensions = [
-    'jpg',
-    'jpeg',
-    'png',
-    'gif',
-    'webp',
-    'svg'
-  ];
-
   /// List of allowed image extensions: jpg, jpeg, png, gif
   static const List<String> imageCompactExtensions = [
     'jpg',
     'jpeg',
     'png',
+    'heic',
     'gif',
+  ];
+
+  /// List of allowed image extensions: jpg, jpeg, png, gif, webp, svg
+  static const List<String> imagePlusExtensions = [
+    ...imageCompactExtensions,
+    'webp',
+    'svg'
   ];
 
   /// List of allowed video extensions: mp4, mov, avi, mpeg

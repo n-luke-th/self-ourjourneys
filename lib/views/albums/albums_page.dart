@@ -13,11 +13,13 @@ import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/more_actions_btn.dart'
     show MoreActionsBtn;
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
+import 'package:ourjourneys/shared/views/screen_sizes.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class AlbumsPage extends StatefulWidget {
@@ -140,8 +142,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                       icon: const Icon(
                         Icons.check_circle_outline_outlined,
                       ),
-                      onPressed: () =>
-                          _logger.d("select albums action pressed"))
+                      onPressed: () => _onPressedSelectAlbumsActionBtn())
               ],
               displayIcon: const Icon(Icons.menu_outlined),
             ),
@@ -153,18 +154,21 @@ class _AlbumsPageState extends State<AlbumsPage> {
         onFloatingActionButtonPressed: () => context.pushNamed("NewAlbumPage"),
         body: Center(
             child: Padding(
-                padding: UiConsts.PaddingAll_standard,
+                padding: UiConsts.PaddingAll_small,
                 child: (_docs.isEmpty)
                     ? const Center(child: Text("No albums yet"))
                     : GridView.builder(
                         controller: _scrollController,
                         padding: UiConsts.PaddingAll_standard,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           mainAxisSpacing: 8,
                           crossAxisSpacing: 8,
-                          childAspectRatio: 2,
+                          childAspectRatio: Utils.getScreenSize(
+                                      MediaQuery.sizeOf(context).width) ==
+                                  ScreenSize.large
+                              ? 2
+                              : 0.9,
                         ),
                         itemCount: _docs.length + (_hasMore ? 1 : 0),
                         itemBuilder: (context, index) {
@@ -186,6 +190,9 @@ class _AlbumsPageState extends State<AlbumsPage> {
                       ))));
   }
 
+  void _onPressedSelectAlbumsActionBtn() =>
+      _logger.d("select albums action pressed");
+
   Widget _albumTile(Map<String, dynamic> data, int index) {
     final name = data['albumName'] as String;
     final modData = ModificationData.fromMap(
@@ -197,30 +204,48 @@ class _AlbumsPageState extends State<AlbumsPage> {
       _authWrapper.refreshUid();
     }
     return Container(
+      margin: UiConsts.PaddingAll_small,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: UiConsts.BorderRadiusCircular_standard,
       ),
       child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: UiConsts.BorderRadiusCircular_standard,
+        ),
+        visualDensity: VisualDensity.comfortable,
         enableFeedback: true,
         contentPadding: UiConsts.PaddingHorizontal_small,
         titleAlignment: ListTileTitleAlignment.center,
         isThreeLine: true,
-        leading: Text((index + 1).toString()),
+        // leading: Text((index + 1).toString()),
         trailing: Text(
-          "${data["linkedObjects"].length.toString()}\n${index == 0 ? 'item' : 'items'}",
+          "${data["linkedObjects"].length.toString()}\n${data["linkedObjects"].length <= 1 ? 'item' : 'items'}",
           maxLines: 2,
           softWrap: true,
           textAlign: TextAlign.center,
         ),
         title: Text(
           name,
-          textAlign: TextAlign.justify,
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge!
+              .copyWith(decoration: TextDecoration.underline),
         ),
-        subtitle: Text("$createdString\n$modifiedString\ndocId: ${data['id']}"),
+        subtitle: Text(
+          modifiedString,
+          softWrap: true,
+          maxLines: 5,
+          overflow: TextOverflow.clip,
+        ),
         style: ListTileStyle.drawer,
         onTap: () => context.goNamed("AlbumDetailsPage", extra: data),
+        onLongPress: () => _onLongPressAlbumTile(data),
       ),
     );
   }
+
+  void _onLongPressAlbumTile(Map<String, dynamic> data) {}
 }

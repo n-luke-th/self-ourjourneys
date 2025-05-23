@@ -78,7 +78,7 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
             fit: widget.fitting,
             width: double.infinity,
             height: double.infinity);
-      } else if (widget.fetchSourceMethod == FetchSourceMethod.online &&
+      } else if (widget.fetchSourceMethod == FetchSourceMethod.server &&
           widget.mediaItem is String) {
         return CloudImage(
             objectKey: widget.mediaItem,
@@ -90,7 +90,7 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
 
     if (isVideo &&
         widget.mediaItem is String &&
-        widget.fetchSourceMethod == FetchSourceMethod.online) {
+        widget.fetchSourceMethod == FetchSourceMethod.server) {
       return _VideoPlayerWidget(videoUrl: widget.mediaItem);
     }
 
@@ -147,7 +147,7 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
     );
 
     final descriptionContent = Container(
-      padding: UiConsts.PaddingAll_standard,
+      padding: UiConsts.PaddingAll_small,
       width: double.infinity,
       color: Theme.of(context).colorScheme.primaryContainer,
       child: (!widget.showDescriptionBar)
@@ -156,6 +156,8 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
               widget.extraMapData?['description'] ?? 'No description',
               maxLines: widget.descriptionTxtMaxLines,
               overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              textAlign: TextAlign.center,
               // style: const TextStyle(fontSize: 14),
             ),
     );

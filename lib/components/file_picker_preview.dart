@@ -3,45 +3,120 @@
 // lib/components/previews/file_picker_preview.dart
 
 import 'package:flutter/material.dart';
+import 'package:mime/mime.dart';
+import 'package:ourjourneys/components/media_item_container.dart';
+import 'package:ourjourneys/helpers/utils.dart' show Utils;
+import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/models/storage/selected_file.dart';
+import 'package:ourjourneys/services/dialog/dialog_service.dart';
+import 'package:ourjourneys/shared/helpers/misc.dart';
+import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
+import 'package:ourjourneys/views/albums/full_media_view.dart';
 
 class FilePickerPreview extends StatelessWidget {
   final List<SelectedFile> files;
-  final void Function(List<SelectedFile>, {bool isReplacing})
-      onSelectedFilesChanged;
+  final void Function(List<SelectedFile>, {bool isReplacing})?
+      onLocalSelectedFilesChanged;
+  final void Function(ObjectsData)? onServerObjectDeleted;
 
   const FilePickerPreview({
     super.key,
-    required this.onSelectedFilesChanged,
+    this.onLocalSelectedFilesChanged,
+    this.onServerObjectDeleted,
     required this.files,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: files.map((file) {
-        final isImage =
-            file.file.extension?.toLowerCase().contains("jpg") == true ||
-                file.file.extension?.toLowerCase().contains("png") == true ||
-                file.file.extension?.toLowerCase().contains("jpeg") == true;
-
-        return Chip(
-          label: Text(file.file.name),
-          avatar: isImage
-              ? CircleAvatar(
-                  backgroundImage: MemoryImage(file.bytes),
-                )
-              : const CircleAvatar(
-                  child: Icon(Icons.insert_drive_file),
+    return Container(
+      constraints: BoxConstraints.tightFor(
+        width: MediaQuery.sizeOf(context).width * 0.9,
+        height: files.isEmpty
+            ? MediaQuery.sizeOf(context).height * 0.1
+            : MediaQuery.sizeOf(context).height * 0.35,
+      ),
+      child: GridView.builder(
+          itemCount: files.length,
+          padding: UiConsts.PaddingAll_standard,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio:
+                Utils.getScreenSize(MediaQuery.sizeOf(context).width) ==
+                        ScreenSize.large
+                    ? 2
+                    : 1,
+          ),
+          itemBuilder: (context, index) {
+            final file = files[index];
+            final String mimeType =
+                file.fetchSourceMethod == FetchSourceMethod.local
+                    ? lookupMimeType(file.localFile!.name) ?? "text/*"
+                    : file.cloudObjectData!.contentType;
+            return GestureDetector(
+              onTap: () =>
+                  _onTabTrackedItem(context, file: file, mimeType: mimeType),
+              onLongPress: () async => await _onLongPressTrackedItem(context,
+                  file: file, mimeType: mimeType),
+              child: MediaItemContainer(
+                mimeType: mimeType,
+                fetchSourceMethod: file.fetchSourceMethod,
+                mediaItem: file.fetchSourceMethod == FetchSourceMethod.local
+                    ? file.localFile!.bytes
+                    : file.cloudObjectData!.objectKey,
+                extraMapData: {
+                  "description":
+                      file.fetchSourceMethod == FetchSourceMethod.local
+                          ? file.localFile!.name
+                          : file.cloudObjectData!.fileName
+                },
+                showActionWidget: true,
+                showDescriptionBar: false,
+                actionWidget: IconButton(
+                  color: Colors.red,
+                  onPressed: () {
+                    if (onLocalSelectedFilesChanged != null &&
+                        file.fetchSourceMethod == FetchSourceMethod.local) {
+                      onLocalSelectedFilesChanged!([...files]..remove(file),
+                          isReplacing: true);
+                    } else if (onServerObjectDeleted != null &&
+                        file.cloudObjectData != null) {
+                      onServerObjectDeleted!(file.cloudObjectData!);
+                    }
+                  },
+                  icon: const Icon(Icons.delete),
                 ),
-          onDeleted: () {
-            final updatedFiles = [...files]..remove(file);
-            onSelectedFilesChanged(updatedFiles, isReplacing: true);
-          },
-        );
-      }).toList(),
+                widgetRatio: 1,
+                mediaAndDescriptionBarFlexValue: (18, 2),
+                mediaRatio: 1,
+                fitting: BoxFit.cover,
+                shape: BoxShape.rectangle,
+              ),
+            );
+          }),
     );
+  }
+
+  Future<dynamic> _onTabTrackedItem(BuildContext context,
+      {required SelectedFile file, required String mimeType}) {
+    return Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => FullMediaView(
+                fetchSourceMethod: file.fetchSourceMethod,
+                onlineObjectKey: file.cloudObjectData?.objectKey,
+                localFile: file.localFile,
+                objectType: Utils.detectFileTypeFromMimeType(mimeType))));
+  }
+
+  Future<void> _onLongPressTrackedItem(BuildContext context,
+      {required SelectedFile file, required String mimeType}) async {
+    await DialogService.showInfoDialog(
+        context: context,
+        title: "Media information",
+        message:
+            "Media type: ${Utils.detectFileTypeFromMimeType(mimeType).stringValue}\nName: ${file.localFile?.name ?? file.cloudObjectData?.fileName}");
   }
 }

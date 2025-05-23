@@ -7,8 +7,12 @@ import 'package:get_time_ago/get_time_ago.dart' show GetTimeAgo;
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:mime/mime.dart' show lookupMimeType;
 import 'package:ourjourneys/helpers/get_platform_service.dart';
+import 'package:ourjourneys/models/storage/objects_data.dart'
+    show MediaObjectType;
 import 'package:ourjourneys/models/storage/selected_file.dart'
     show SelectedFile;
+import 'package:ourjourneys/shared/helpers/misc.dart';
+import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
 import 'package:path/path.dart' as path show extension;
 
 import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart'
@@ -70,24 +74,45 @@ class Utils {
     }
   }
 
+  /// Returns a detected file type from a mime type.
+  /// Returns [MediaObjectType.unknown] if the mime type is not recognized.
+  /// Returns [MediaObjectType.image] if the mime type is an image.
+  /// Returns [MediaObjectType.video] if the mime type is a video.
+  /// Returns [MediaObjectType.document] if the mime type starts with 'application/' or 'text/'.
+  /// Returns [MediaObjectType.audio] if the mime type is an audio.
+  static MediaObjectType detectFileTypeFromMimeType(String mimeType) {
+    if (mimeType.startsWith('image/')) {
+      return MediaObjectType.image;
+    } else if (mimeType.startsWith('video/')) {
+      return MediaObjectType.video;
+    } else if (mimeType.startsWith('audio/')) {
+      return MediaObjectType.audio;
+    } else if (mimeType.startsWith('application/') ||
+        mimeType.startsWith('text/')) {
+      return MediaObjectType.document;
+    } else {
+      return MediaObjectType.unknown;
+    }
+  }
+
   /// Returns a detected file type from a file path.
   ///
-  /// Returns `others` if the file type is not recognized.
-  /// Returns `image` if the file type is an image.
-  /// Returns `video` if the file type is a video.
-  /// Returns `document` if the file type is a document.
-  static String detectFileTypeFromFilepath(String filePath) {
+  /// Returns [MediaObjectType.unknown] if the file type is not recognized.
+  /// Returns [MediaObjectType.image] if the file type is an image.
+  /// Returns [MediaObjectType.video] if the file type is a video.
+  /// Returns [MediaObjectType.document] if the file type is a document.
+  static MediaObjectType detectFileTypeFromFilepath(String filePath) {
     final filename = filePath.split('/').last;
     final mimeType = lookupMimeType(filename);
 
     if (mimeType == null) {
-      return 'others';
+      return MediaObjectType.unknown;
     }
 
     if (mimeType.startsWith('image/')) {
-      return 'image';
+      return MediaObjectType.image;
     } else if (mimeType.startsWith('video/')) {
-      return 'video';
+      return MediaObjectType.video;
     } else if (mimeType.startsWith('application/') ||
         mimeType.startsWith('text/')) {
       final extension = path.extension(filename).toLowerCase();
@@ -101,12 +126,12 @@ class Utils {
         '.csv',
         ...AllowedExtensions.documentExtensions
       ].contains(extension)) {
-        return 'document';
+        return MediaObjectType.document;
       } else {
-        return 'others';
+        return MediaObjectType.unknown;
       }
     } else {
-      return 'others';
+      return MediaObjectType.unknown;
     }
   }
 
@@ -127,6 +152,7 @@ class Utils {
     }
   }
 
+  /// Utility function to pick local files from the device.
   static Future<void> pickLocalFiles(
       {void Function()? onCompleted,
       required void Function(List<SelectedFile>) onFilesSelected}) async {
@@ -152,11 +178,24 @@ class Utils {
 
     final picked = result.files
         .where((f) => f.bytes != null)
-        .map((f) => SelectedFile(file: f, bytes: f.bytes!))
+        .map((f) => SelectedFile(
+            fetchSourceMethod: FetchSourceMethod.local, localFile: f))
         .toList();
 
     onFilesSelected(picked);
 
     onCompleted?.call();
+  }
+
+  /// Utility function to determine the screen size of the device.
+  /// Returns a [ScreenSize] enum value.
+  static ScreenSize getScreenSize(double screenWidth) {
+    if (screenWidth < 600) {
+      return ScreenSize.small;
+    } else if (screenWidth < 900) {
+      return ScreenSize.medium;
+    } else {
+      return ScreenSize.large;
+    }
   }
 }

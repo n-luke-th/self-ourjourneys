@@ -16,6 +16,8 @@ import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
+import 'package:ourjourneys/models/storage/objects_data.dart'
+    show MediaObjectType;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
@@ -53,6 +55,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
   Widget build(BuildContext context) {
     if (album == null) {
       return mainView(context,
+          appBarTitle: 'Album not found',
           body: Center(
               child: Padding(
             padding: UiConsts.PaddingAll_large,
@@ -78,8 +81,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                           icon: const Icon(
                             Icons.check_circle_outline_outlined,
                           ),
-                          onPressed: () =>
-                              _logger.d("select items action pressed")),
+                          onPressed: () => _onTouchedSelectItemsActionBtn()),
                     ActionsBtnModel(
                         actionName: "Delete Album",
                         actionDes: "Delete this album",
@@ -87,58 +89,9 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                           Icons.delete,
                           color: Colors.redAccent,
                         ),
-                        onPressed: () async {
-                          final bool? result =
-                              await DialogService.showConfirmationDialog(
-                            context: context,
-                            title: 'Delete album',
-                            message:
-                                'Are you sure you want to delete this album?',
-                          );
-                          if (result == true) {
-                            _logger.i('Deleting album');
-                            final List<String> objectsDataDocIds =
-                                await _firestoreWrapper
-                                    .queryCollection(
-                                        FirestoreCollections.objectsData,
-                                        filters: [
-                                          QueryFilter(
-                                              "linkedAlbums",
-                                              albumData.id,
-                                              QueryCondition.arrayContains)
-                                        ])
-                                    .get()
-                                    .then((result) => result.docs
-                                        .map((doc) => doc.id)
-                                        .toList());
-                            _logger.d(
-                                "objectsDataDocIds to be edited: $objectsDataDocIds");
-
-                            for (String docId in objectsDataDocIds) {
-                              _logger.d("Editing objectData docId: $docId");
-                              await _firestoreWrapper.handleUpdateDocument(
-                                  context,
-                                  collectionName:
-                                      FirestoreCollections.objectsData,
-                                  docId: docId,
-                                  suppressNotification: true,
-                                  data: {
-                                    "linkedAlbums":
-                                        FieldValue.arrayRemove([albumData.id])
-                                  });
-                            }
-
-                            await _firestoreWrapper.handleDeleteDocument(
-                                context,
-                                FirestoreCollections.albums,
-                                albumData.id,
-                                suppressNotification: true);
-                            Navigator.pop(context);
-                          } else {
-                            Navigator.pop(context);
-                            return;
-                          }
-                        })
+                        onPressed: () async =>
+                            await _onTouchedDeleteSingleAlbumActionBtn(
+                                albumData))
                   ],
                   displayIcon: const Icon(
                     Icons.menu_outlined,
@@ -164,17 +117,19 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
               ],
               Expanded(
                 child: SingleChildScrollView(
+                  padding: UiConsts.PaddingVertical_large,
                   child: Wrap(
-                    spacing: 8,
+                    clipBehavior: Clip.antiAlias,
+                    spacing: 16,
                     runSpacing: 8.0,
                     children: albumData.linkedObjects.map((objectKey) {
                       if (Utils.detectFileTypeFromFilepath(objectKey) ==
-                          "image") {
+                          MediaObjectType.image) {
                         return SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.2,
+                          width: MediaQuery.sizeOf(context).width * 0.4,
                           child: MediaItemContainer(
                             mimeType: "image/",
-                            fetchSourceMethod: FetchSourceMethod.online,
+                            fetchSourceMethod: FetchSourceMethod.server,
                             mediaItem: objectKey,
                             mediaAndDescriptionBarFlexValue: (8, 1),
                             descriptionTxtMaxLines: 1,
@@ -185,7 +140,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                             actionWidget: IconButton(
                               color: Colors.redAccent,
                               onPressed: () async {
-                                await _deleteCurrentItem(context, objectKey);
+                                await _deleteCurrentItem(objectKey);
                               },
                               icon: const Icon(
                                 Icons.delete_forever_outlined,
@@ -194,37 +149,19 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                               //   Icons.more_vert_outlined,
                               // ),
                             ),
-                            onLongPress: () async {
-                              // await _deleteCurrentItem(context, objectKey);
-                              await DialogService.showCustomDialog(context,
-                                  type: DialogType.information,
-                                  title: "Alert",
-                                  message: "You have long pressed the item.");
-                            },
-                            onDoubleTap: () async {
-                              await DialogService.showCustomDialog(
-                                context,
-                                type: DialogType.information,
-                                title: "Information",
-                                message:
-                                    "Media type: ${Utils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
-                              );
-                            },
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (b) => FullMediaView(
-                                          objectKey: objectKey,
-                                          objectType: "image",
-                                        ))),
+                            onLongPress: () async =>
+                                await _onLongPressMediaItem(),
+                            onDoubleTap: () async =>
+                                await _onDoubleTapMediaItem(objectKey),
+                            onTap: () => _onTapMediaItem(objectKey),
                           ),
                         );
                       } else {
                         return SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.2,
+                          width: MediaQuery.sizeOf(context).width * 0.2,
                           child: MediaItemContainer(
                             mimeType: "text/",
-                            fetchSourceMethod: FetchSourceMethod.online,
+                            fetchSourceMethod: FetchSourceMethod.server,
                             mediaItem: null,
                             extraMapData: {"description": objectKey},
                           ),
@@ -233,14 +170,45 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                     }).toList(),
                   ),
                 ),
-              )
+              ),
             ],
           )));
     }
   }
 
-  Future<void> _deleteCurrentItem(
-      BuildContext context, String objectKey) async {
+  Future<dynamic> _onTapMediaItem(String objectKey) {
+    return Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (b) => FullMediaView(
+                  fetchSourceMethod: FetchSourceMethod.server,
+                  onlineObjectKey: objectKey,
+                  objectType: MediaObjectType.image,
+                )));
+  }
+
+  Future<void> _onDoubleTapMediaItem(String objectKey) async {
+    await DialogService.showCustomDialog(
+      context,
+      type: DialogType.information,
+      title: "Information",
+      message:
+          "Media type: ${Utils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
+    );
+  }
+
+  void _onTouchedSelectItemsActionBtn() =>
+      _logger.d("select items action pressed");
+
+  Future<void> _onLongPressMediaItem() async {
+    // await _deleteCurrentItem(context, objectKey);
+    await DialogService.showCustomDialog(context,
+        type: DialogType.information,
+        title: "Alert",
+        message: "You have long pressed the item.");
+  }
+
+  Future<void> _deleteCurrentItem(String objectKey) async {
     // ! delete from server, files must be in the same folder to delete
     final bool? confirmation = await DialogService.showConfirmationDialog(
         context: context,
@@ -279,6 +247,45 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
         await _cloudFileService.deleteObjectsSameFolder(context,
             objectKeys: [objectKey], folder: folder);
       }
+    }
+  }
+
+  Future<void> _onTouchedDeleteSingleAlbumActionBtn(
+      AlbumsModel albumData) async {
+    final bool? result = await DialogService.showConfirmationDialog(
+      context: context,
+      title: 'Delete album',
+      message: 'Are you sure you want to delete this album?',
+    );
+    if (result == true) {
+      _logger.i('Deleting album');
+      final List<String> objectsDataDocIds = await _firestoreWrapper
+          .queryCollection(FirestoreCollections.objectsData, filters: [
+            QueryFilter(
+                "linkedAlbums", albumData.id, QueryCondition.arrayContains)
+          ])
+          .get()
+          .then((result) => result.docs.map((doc) => doc.id).toList());
+      _logger.d("objectsDataDocIds to be edited: $objectsDataDocIds");
+
+      for (String docId in objectsDataDocIds) {
+        _logger.d("Editing objectData docId: $docId");
+        await _firestoreWrapper.handleUpdateDocument(context,
+            collectionName: FirestoreCollections.objectsData,
+            docId: docId,
+            suppressNotification: true,
+            data: {
+              "linkedAlbums": FieldValue.arrayRemove([albumData.id])
+            });
+      }
+
+      await _firestoreWrapper.handleDeleteDocument(
+          context, FirestoreCollections.albums, albumData.id,
+          suppressNotification: true);
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+      return;
     }
   }
 }

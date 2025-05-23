@@ -60,3 +60,4 @@
 - Initial Development: Upgraded the dependencies constraints, and other improvements on May 21, 2025 -> **0.3.4+2** by Luke
 - Initial Development: Enhanced code reusability and other improvements on May 22, 2025 -> **0.3.4+3** by Luke
 - Initial Development: Fixed unable to go through the reset password flow, and other improvements on May 22, 2025 -> **0.3.5** by Luke
+- Initial Development: Improved the UI/UX of the album tile + items in album details page + add new album page as well as full media view page, enhanced internal Widget classes/app functions, and other improvements on May 24, 2025 -> **0.3.6** by Luke
