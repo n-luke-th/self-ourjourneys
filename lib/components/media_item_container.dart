@@ -29,6 +29,8 @@ class MediaItemContainer extends StatefulWidget {
   final int descriptionTxtMaxLines;
   final (int, int) mediaAndDescriptionBarFlexValue;
   final Map<String, dynamic>? extraMapData;
+  final bool showWidgetBorder;
+  final BoxBorder? widgetBorder;
 
   // gesture callbacks
   final VoidCallback? onTap;
@@ -55,6 +57,8 @@ class MediaItemContainer extends StatefulWidget {
     this.descriptionTxtMaxLines = 3,
     this.mediaAndDescriptionBarFlexValue = (3, 1),
     this.extraMapData,
+    this.showWidgetBorder = true,
+    this.widgetBorder,
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
@@ -186,7 +190,11 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
           borderRadius: widget.shape == BoxShape.rectangle
               ? UiConsts.BorderRadiusCircular_standard
               : null,
-          border: Border.all(color: Colors.grey.shade300),
+          border: !widget.showWidgetBorder
+              ? null
+              : (widget.widgetBorder == null)
+                  ? Border.all(color: Colors.grey.shade300)
+                  : widget.widgetBorder,
           boxShadow: _hovering
               ? [
                   BoxShadow(

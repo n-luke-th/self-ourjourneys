@@ -18,7 +18,7 @@ class _AnniversaryPageState extends State<AnniversaryPage> {
   Widget build(BuildContext context) {
     return mainView(
       context,
-      appBarTitle: "Anniversaries",
+      appBarTitle: "ANNIVERSARIES",
       body: const Center(child: Text("Anniversary Page is under construction")),
     );
   }

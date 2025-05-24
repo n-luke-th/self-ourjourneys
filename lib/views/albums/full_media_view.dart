@@ -55,7 +55,7 @@ class FullMediaView extends StatelessWidget {
                   Padding(
                     padding: UiConsts.PaddingAll_small,
                     child: Text(
-                      "Media type:\t\t${objectType.stringValue}\nName:\t\t$fileName\nSize:\t\t${localFile?.size ?? extraMapData?['fileSize'] ?? "-"} bytes\nInitial Origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['description'] ?? ""}",
+                      "Media type:\t\t${objectType.stringValue}\nName:\t\t$fileName\nSize:\t\t${localFile?.size ?? extraMapData?['fileSize'] ?? "-"} bytes\nInitial origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['description'] ?? ""}",
                       maxLines: 8,
                       softWrap: true,
                       textAlign: TextAlign.start,

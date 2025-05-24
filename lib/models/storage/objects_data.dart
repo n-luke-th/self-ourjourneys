@@ -10,6 +10,7 @@ class ObjectsData {
   final String contentType;
   final String objectUrl;
   final String userId;
+  final int objectSizeInBytes;
   final Timestamp objectUploadRequestedAt;
   final List<String> tags;
   final List<String> linkedAlbums;
@@ -21,6 +22,7 @@ class ObjectsData {
       required this.contentType,
       required this.objectUrl,
       required this.userId,
+      required this.objectSizeInBytes,
       required this.objectUploadRequestedAt,
       required this.linkedAlbums,
       required this.linkedMemories,
@@ -33,6 +35,7 @@ class ObjectsData {
       'contentType': contentType,
       'objectUrl': objectUrl,
       'userId': userId,
+      'objectSizeInBytes': objectSizeInBytes,
       'objectUploadRequestedAt': objectUploadRequestedAt,
       'linkedAlbums': linkedAlbums,
       'linkedMemories': linkedMemories,
@@ -49,6 +52,7 @@ class ObjectsData {
       contentType: map['contentType'] ?? '',
       objectUrl: map['objectUrl'] ?? '',
       userId: authWrapper.uid,
+      objectSizeInBytes: map['objectSizeInBytes'] ?? 0,
       objectUploadRequestedAt: map['objectUploadRequestedAt'] as Timestamp,
       linkedAlbums: List<String>.from(map['linkedAlbums'] ?? []),
       linkedMemories: List<String>.from(map['linkedMemories'] ?? []),

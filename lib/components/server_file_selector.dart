@@ -1,11 +1,12 @@
 /// lib/components/server_file_selector.dart
 
 import 'package:flutter/material.dart';
-import 'package:ourjourneys/components/cloud_image.dart';
 import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/media_item_container.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
+import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
@@ -79,7 +80,7 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
 
     return mainView(
       context,
-      appBarTitle: "Edit Selected Existing files",
+      appBarTitle: "Edit Selected Server files",
       body: Padding(
         padding: UiConsts.PaddingAll_large,
         child: Column(
@@ -99,21 +100,58 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
             UiConsts.SizedBoxGapVertical_large,
             _allFiles.isEmpty
                 ? const Text("No files found.")
-                : Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: filtered.map((obj) {
-                      final isSelected =
-                          _selected.any((o) => o.objectKey == obj.objectKey);
-                      return ChoiceChip(
-                        avatar: CircleAvatar(
-                          child: CloudImage(objectKey: obj.objectKey),
+                : Expanded(
+                    child: SingleChildScrollView(
+                      child: Center(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          alignment: WrapAlignment.center,
+                          runAlignment: WrapAlignment.spaceAround,
+                          spacing: 16,
+                          runSpacing: 8,
+                          children: filtered.map((obj) {
+                            final isSelected = _selected
+                                .any((o) => o.objectKey == obj.objectKey);
+                            return SizedBox(
+                              width: MediaQuery.sizeOf(context).width * 0.4,
+                              child: ChoiceChip.elevated(
+                                selectedColor: Theme.of(context)
+                                    .colorScheme
+                                    .tertiaryContainer,
+                                showCheckmark: false,
+                                selected: isSelected,
+                                onSelected: (_) => _toggleSelection(obj),
+                                tooltip: obj.fileName,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        UiConsts.BorderRadiusCircular_standard),
+                                // avatar: const Icon(Icons.open_in_full_rounded),
+                                // avatarBoxConstraints:
+                                //     BoxConstraints.tightFor(width: 20),
+                                labelPadding: UiConsts.PaddingVertical_small,
+                                label: MediaItemContainer(
+                                    showDescriptionBar: false,
+                                    showWidgetBorder: false,
+                                    showActionWidget: true,
+                                    actionWidget: Icon(
+                                      isSelected
+                                          ? Icons.check_box
+                                          : Icons.check_box_outline_blank,
+                                      color: isSelected
+                                          ? Colors.green
+                                          : Colors.grey,
+                                    ),
+                                    fitting: BoxFit.contain,
+                                    mimeType: obj.contentType,
+                                    widgetRatio: 1,
+                                    fetchSourceMethod: FetchSourceMethod.server,
+                                    mediaItem: obj.objectKey),
+                              ),
+                            );
+                          }).toList(),
                         ),
-                        label: Text(obj.fileName),
-                        selected: isSelected,
-                        onSelected: (_) => _toggleSelection(obj),
-                      );
-                    }).toList(),
+                      ),
+                    ),
                   ),
           ],
         ),
