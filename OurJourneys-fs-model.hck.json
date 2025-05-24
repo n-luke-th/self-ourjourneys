@@ -243,14 +243,13 @@
           "error": {}
         },
         {
-          "name": "objectUrl",
+          "name": "objectThumbnailKey",
           "hackoladeMeta": {},
           "isActivated": true,
           "primaryKey": false,
           "type": "string",
           "GUID": "d823a3ac-634e-44b1-86c6-3aac5f5e5bab",
-          "format": "uri",
-          "required": true,
+          "required": false,
           "error": {}
         },
         {
@@ -629,7 +628,6 @@
     "0c309552-b0af-414c-8d5c-4ccaff59858c": "anniversaryDate",
     "b30e5dbf-7dd8-4a42-b0b5-6cb984797608": "userId",
     "cfaefe62-7379-44d5-ae92-36b08920ae44": "contentType",
-    "d823a3ac-634e-44b1-86c6-3aac5f5e5bab": "objectUrl",
     "17e7908a-d32c-4d67-a660-22fd91de7878": "tags",
     "76dd2582-3e94-4226-acb7-e5191a8ebb40": "",
     "f9865b9c-babe-461a-9f8f-023a7bd3d61a": "linkedObjects",
@@ -650,7 +648,8 @@
     "f6a7ae57-1413-4dd2-86a5-bb3248cbbf56": "modificationData",
     "875ca962-de3e-44af-b9f3-510db2934920": "externalLinks",
     "3cd3d478-1fa7-4d0f-9898-e787e83a0624": "collectionBody",
-    "c621aa29-4ea8-49a8-a951-991db81a4c9c": "lastUpdatedAt"
+    "c621aa29-4ea8-49a8-a951-991db81a4c9c": "lastUpdatedAt",
+    "d823a3ac-634e-44b1-86c6-3aac5f5e5bab": "objectThumbnailKey"
   },
   "definitions": {
     "type": "definitions",
@@ -682,7 +681,7 @@
   "author": "Kittipich Aiumbhornsin",
   "projectName": "OurJourneys",
   "publicFacingName": "OurJourneys",
-  "lastModifTS": "2025-05-24T07:12:15.059Z",
+  "lastModifTS": "2025-05-24T17:15:54.257Z",
   "persistenceSchemaVersion": "8",
   "isCreatedByPlugin": true,
   "pluginInformation": {
@@ -693,7 +692,7 @@
   "applicationInformation": {
     "version": "8.1.2"
   },
-  "version": "3",
+  "version": "3.1",
   "settings": {
     "centralPane": {
       "dbLevel": {

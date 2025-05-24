@@ -8,7 +8,7 @@ class ObjectsData {
   final String objectKey;
   final String fileName;
   final String contentType;
-  final String objectUrl;
+  final String objectThumbnailKey;
   final String userId;
   final int objectSizeInBytes;
   final Timestamp objectUploadRequestedAt;
@@ -20,7 +20,7 @@ class ObjectsData {
       {required this.objectKey,
       required this.fileName,
       required this.contentType,
-      required this.objectUrl,
+      required this.objectThumbnailKey,
       required this.userId,
       required this.objectSizeInBytes,
       required this.objectUploadRequestedAt,
@@ -33,7 +33,7 @@ class ObjectsData {
       'objectKey': objectKey,
       'fileName': fileName,
       'contentType': contentType,
-      'objectUrl': objectUrl,
+      'objectThumbnailKey': objectThumbnailKey,
       'userId': userId,
       'objectSizeInBytes': objectSizeInBytes,
       'objectUploadRequestedAt': objectUploadRequestedAt,
@@ -50,7 +50,7 @@ class ObjectsData {
       objectKey: map['objectKey'] ?? '',
       fileName: map['fileName'] ?? '',
       contentType: map['contentType'] ?? '',
-      objectUrl: map['objectUrl'] ?? '',
+      objectThumbnailKey: map['objectThumbnailKey'] ?? '',
       userId: authWrapper.uid,
       objectSizeInBytes: map['objectSizeInBytes'] ?? 0,
       objectUploadRequestedAt: map['objectUploadRequestedAt'] as Timestamp,
@@ -73,7 +73,8 @@ enum MediaObjectType {
   audio("audio"),
   document("document"),
   // nullObject("nullObject"),
-  unknown("unknown");
+  unknown("unknown"),
+  imageOrVideo("imageOrVideo");
 
   final String stringValue;
 

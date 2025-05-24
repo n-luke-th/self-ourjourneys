@@ -1,24 +1,28 @@
 /// lib/helpers/utils.dart
 /// Utils class
 
+import 'dart:typed_data' show Uint8List;
+
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:file_picker/file_picker.dart' show FileType, FilePickerResult;
 import 'package:get_time_ago/get_time_ago.dart' show GetTimeAgo;
+import 'package:image_picker/image_picker.dart'
+    show XFile, ImageSource, CameraDevice;
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:mime/mime.dart' show lookupMimeType;
-import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
 import 'package:ourjourneys/models/storage/selected_file.dart'
     show SelectedFile;
-import 'package:ourjourneys/shared/helpers/misc.dart';
+import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
 import 'package:path/path.dart' as path show extension;
-
 import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart'
     show FilesPickerUtils;
 import 'package:ourjourneys/shared/common/file_picker_enum.dart'
     show AllowedExtensions;
+import 'package:image/image.dart' as img
+    show copyResize, decodeImage, encodeJpg;
 
 class Utils {
   /// Returns a human readable date string from a DateTime object with a given pattern.
@@ -153,27 +157,23 @@ class Utils {
   }
 
   /// Utility function to pick local files from the device.
+  ///
+  /// consult [FilesPickerUtils.pickFiles] for more information.
   static Future<void> pickLocalFiles(
       {void Function()? onCompleted,
-      required void Function(List<SelectedFile>) onFilesSelected}) async {
+      required void Function(List<SelectedFile>) onFilesSelected,
+      List<String> allowedExtensions = const [
+        ...AllowedExtensions.imageCompactExtensions,
+        ...AllowedExtensions.videoExtensions
+      ]}) async {
     FilePickerResult? result;
-    if (PlatformDetectionService.isWeb) {
-      result = await FilesPickerUtils.pickFiles(
-        allowMultiple: true,
-        fileType: FileType.custom,
-        allowedExtensions: [
-          ...AllowedExtensions.imageCompactExtensions,
-          ...AllowedExtensions.videoExtensions,
-        ],
-        withData: true,
-      );
-    } else {
-      result = await FilesPickerUtils.pickFiles(
-        allowMultiple: true,
-        fileType: FileType.media,
-        withData: true,
-      );
-    }
+    result = await FilesPickerUtils.pickFiles(
+      allowMultiple: true,
+      fileType: FileType.custom,
+      allowedExtensions: allowedExtensions,
+      withData: true,
+    );
+
     if (result == null || result.files.isEmpty) return;
 
     final picked = result.files
@@ -183,6 +183,32 @@ class Utils {
         .toList();
 
     onFilesSelected(picked);
+
+    onCompleted?.call();
+  }
+
+  /// Utility function to pick local photos or video from the device.
+  ///
+  /// consult [FilesPickerUtils.pickPhotosOrVideos] for more information.
+  static Future<void> pickLocalPhotosOrVideos({
+    void Function()? onCompleted,
+    required void Function(List<XFile>) onMediaSelected,
+    bool allowMultiple = true,
+    ImageSource mediaSource = ImageSource.gallery,
+    bool fullMetaData = true,
+    int? photoQuality,
+    double? photoMaxWidth,
+    double? photoMaxHeight,
+    int? limit,
+    MediaObjectType mediaType = MediaObjectType.imageOrVideo,
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+    Duration? videoMaxDuration,
+  }) async {
+    List<XFile> result = await FilesPickerUtils.pickPhotosOrVideos();
+
+    if (result.isEmpty) return;
+
+    onMediaSelected(result);
 
     onCompleted?.call();
   }
@@ -197,5 +223,39 @@ class Utils {
     } else {
       return ScreenSize.large;
     }
+  }
+
+  // TODO: complete following functions
+
+  /// Utility function to retrieve [ObjectsData.objectThumbnailKey] from a given [objectKey].
+  ///
+  /// Returns a [String] of the thumbnail key.
+  /// Otherwise returns an empty [String].
+  static String getThumbnailKeyFromObjectKey(String objectKey) {
+    if (objectKey.contains('thumbnails/')) {
+      return objectKey;
+    } else {
+      return '';
+    }
+  }
+
+  static Uint8List compressImage(
+    Uint8List originalBytes, {
+    int maxDimension = 1080,
+    int quality = 70,
+  }) {
+    final image = img.decodeImage(originalBytes);
+    if (image == null) throw Exception("Invalid image");
+
+    final resized = img.copyResize(image,
+        width: maxDimension, maintainAspect: true); // maintains aspect ratio
+    final compressed =
+        img.encodeJpg(resized, quality: quality); // compress image
+
+    return Uint8List.fromList(compressed);
+  }
+
+  static Uint8List generateThumbnail(Uint8List originalBytes) {
+    return compressImage(originalBytes, maxDimension: 300, quality: 60);
   }
 }

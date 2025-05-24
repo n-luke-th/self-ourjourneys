@@ -2,17 +2,17 @@
 ///
 ///
 
-// enum FilePickerMode {
-//   /// meant to support only image file type
-//   ///
-//   /// opens the platform photo library
-//   photoPicker,
+enum FilePickerMode {
+  /// meant to support image or video file type
+  ///
+  /// opens the platform photo/video library
+  libraryPicker,
 
-//   /// meant to support any file type
-//   ///
-//   /// opens the platform file picker
-//   filePicker,
-// }
+  /// meant to support any file type
+  ///
+  /// opens the platform file picker
+  filePicker,
+}
 
 class AllowedExtensions {
   /// List of allowed image extensions: jpg, jpeg, png, gif

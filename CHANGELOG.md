@@ -57,8 +57,9 @@
 - Initial Development: Enhanced the Albums feature (able to delete album's item, added the refresh albums button), able to delete image file from all files page, added support for both deleting files by keys and names, and other improvements on May 5, 2025 -> **0.3.3** by Luke
 - Initial Development: Enhanced the Albums feature (able to delete entire album with its items and draft the delete multiple albums at once ability, able to create an empty album), upgraded the dependencies constraints, and other improvements on May 19, 2025 -> **0.3.4** by Luke
 - Initial Development: Upgraded the dependencies constraints, added support for native Android and iOS, updated the launcher icons and splash screen, and other improvements on May 21, 2025 -> **0.3.4+1** by Luke
-- Initial Development: Upgraded the dependencies constraints, and other improvements on May 21, 2025 -> **0.3.4+2** by Luke
+- Initial Development: , and other improvements on May 21, 2025 -> **0.3.4+2** by Luke
 - Initial Development: Enhanced code reusability and other improvements on May 22, 2025 -> **0.3.4+3** by Luke
 - Initial Development: Fixed unable to go through the reset password flow, and other improvements on May 22, 2025 -> **0.3.5** by Luke
 - Initial Development: Improved the UI/UX of the album tile + items in album details page + add new album page as well as full media view page, enhanced internal Widget classes/app functions, and other improvements on May 24, 2025 -> **0.3.6** by Luke
 - Initial Development: Enhanced the UI/UX of the server file selection, updated the data models for the database to v3, and other improvements on May 24, 2025 -> **0.3.7** by Luke
+- Initial Development: Upgraded the dependencies constraints, updated the data models for the database to v3.1, and other improvements on May 25, 2025 -> **0.3.8** by Luke

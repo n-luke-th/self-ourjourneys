@@ -34,7 +34,7 @@ class DioHandler {
     _baseDio.options.receiveTimeout = const Duration(seconds: 10);
   }
 
-  /// Get a fresh Dio client with optional auth and contentType
+  /// Get a fresh Dio client with optional auth and auth contentType
   Future<Dio> getClient({
     bool withAuth = true,
     required String baseUrl,

@@ -83,7 +83,8 @@ class CloudFileService {
           objectSizeInBytes: fileBytes.length,
           contentType: lookupMimeType(uploadTarget.fileName) ??
               'application/octet-stream',
-          objectUrl: "${NetworkConsts.cdnUrl}/${uploadTarget.key}",
+          objectThumbnailKey:
+              Utils.getThumbnailKeyFromObjectKey(uploadTarget.key),
           objectUploadRequestedAt: requestedTime,
           tags: tags,
           linkedAlbums: linkedAlbums,
@@ -182,7 +183,8 @@ class CloudFileService {
               objectSizeInBytes: fileBytesList[i].length,
               contentType:
                   lookupMimeType(result.fileName) ?? 'application/octet-stream',
-              objectUrl: "${NetworkConsts.cdnUrl}/${result.key}",
+              objectThumbnailKey:
+                  Utils.getThumbnailKeyFromObjectKey(result.key),
               objectUploadRequestedAt: requestedTime,
               tags: tags,
               linkedAlbums: linkedAlbums,
@@ -282,7 +284,7 @@ class CloudFileService {
     required String objectKey,
     required String fileName,
     required String contentType,
-    required String objectUrl,
+    required String objectThumbnailKey,
     required int objectSizeInBytes,
     required Timestamp objectUploadRequestedAt,
     List<String> tags = const [],
@@ -294,7 +296,7 @@ class CloudFileService {
       objectKey: objectKey,
       fileName: fileName,
       contentType: contentType,
-      objectUrl: objectUrl,
+      objectThumbnailKey: objectThumbnailKey,
       userId: _authWrapper.uid,
       objectSizeInBytes: objectSizeInBytes,
       objectUploadRequestedAt: objectUploadRequestedAt,
