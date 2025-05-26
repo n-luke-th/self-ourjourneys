@@ -29,8 +29,10 @@ import 'package:ourjourneys/views/albums/full_media_view.dart';
 
 class AlbumDetailsPage extends StatefulWidget {
   final Map<String, dynamic>? album;
+  final bool cloudImageAllowCache;
 
-  const AlbumDetailsPage({super.key, required this.album});
+  const AlbumDetailsPage(
+      {super.key, required this.album, this.cloudImageAllowCache = true});
 
   @override
   State<AlbumDetailsPage> createState() => _AlbumDetailsPageState();
@@ -130,7 +132,9 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                           child: MediaItemContainer(
                             mimeType: "image/",
                             fetchSourceMethod: FetchSourceMethod.server,
-                            mediaItem: objectKey,
+                            cloudImageAllowCache: widget.cloudImageAllowCache,
+                            mediaItem:
+                                Utils.getThumbnailKeyFromObjectKey(objectKey),
                             mediaAndDescriptionBarFlexValue: (8, 1),
                             descriptionTxtMaxLines: 1,
                             extraMapData: {

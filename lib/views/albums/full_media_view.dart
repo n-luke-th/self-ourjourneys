@@ -10,8 +10,8 @@ import 'package:ourjourneys/components/media_item_container.dart'
 import 'package:ourjourneys/helpers/utils.dart' show Utils;
 import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
-import 'package:ourjourneys/shared/helpers/misc.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 class FullMediaView extends StatelessWidget {
   final String? onlineObjectKey;
@@ -19,12 +19,14 @@ class FullMediaView extends StatelessWidget {
   final MediaObjectType objectType;
   final Map<String, dynamic>? extraMapData;
   final FetchSourceMethod fetchSourceMethod;
+  final bool cloudImageAllowCache;
   FullMediaView(
       {super.key,
       this.onlineObjectKey,
       this.localFile,
       required this.objectType,
       this.extraMapData,
+      this.cloudImageAllowCache = false,
       required this.fetchSourceMethod}) {
     if (onlineObjectKey == null &&
         fetchSourceMethod == FetchSourceMethod.server) {
@@ -34,53 +36,71 @@ class FullMediaView extends StatelessWidget {
       throw Exception('FullMediaView: localFile is null');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final String? fileName =
         onlineObjectKey?.split("/").last ?? localFile?.name;
     final String appBarTitle =
-        "FULL ${Utils.detectFileTypeFromFilepath(fileName ?? "OurJourneys.jpg").stringValue.toUpperCase()} VIEW";
-    if (objectType == MediaObjectType.image) {
-      return mainView(context,
-          appBarTitle: appBarTitle,
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: SingleChildScrollView(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                runAlignment: WrapAlignment.spaceBetween,
-                runSpacing: 10,
-                children: [
-                  _buildImageView(),
-                  Padding(
-                    padding: UiConsts.PaddingAll_small,
-                    child: Text(
-                      "Media type:\t\t${objectType.stringValue}\nName:\t\t$fileName\nSize:\t\t${localFile?.size ?? extraMapData?['fileSize'] ?? "-"} bytes\nInitial origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['description'] ?? ""}",
-                      maxLines: 8,
-                      softWrap: true,
-                      textAlign: TextAlign.start,
-                    ),
-                  )
-                ],
-              ),
+        "FULL ${Utils.detectFileTypeFromFilepath(fileName ?? "OurJourneys File").stringValue.toUpperCase()} VIEW";
+
+    return mainView(context,
+        appBarTitle: appBarTitle,
+        backgroundColor: Colors.transparent,
+        appbarActions: [
+          IconButton(
+            icon: const Icon(Icons.edit_document),
+            onPressed: () => _onPressedEditMediaFile(),
+          ),
+          Padding(
+            padding: UiConsts.PaddingAll_small,
+            child: IconButton.filled(
+                onPressed: () => _onPressDownloadMediaFile(),
+                icon: const Icon(Icons.download_rounded)),
+          ),
+        ],
+        body: Center(
+          child: SingleChildScrollView(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.spaceBetween,
+              runSpacing: 10,
+              children: [
+                _mediaView(),
+                Padding(
+                  padding: UiConsts.PaddingAll_small,
+                  child: Text(
+                    "Media type:\t\t${objectType.stringValue}\nName:\t\t$fileName\nSize:\t\t${localFile?.size ?? extraMapData?['fileSizeInBytes'] ?? "-"} bytes\nInitial origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['description'] ?? ""}",
+                    maxLines: 8,
+                    softWrap: true,
+                    textAlign: TextAlign.start,
+                  ),
+                )
+              ],
             ),
-          ));
-    } else if (objectType == MediaObjectType.video) {
-      return mainView(context,
-          appBarTitle: appBarTitle,
-          backgroundColor: Colors.transparent,
-          body: const Center(
-            child: Text('Video not supported yet'),
-          ));
-    } else {
-      return mainView(context,
-          appBarTitle: appBarTitle,
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: Text("File type '$objectType' not supported yet"),
-          ));
+          ),
+        ));
+  }
+
+  Widget _mediaView() {
+    switch (objectType) {
+      case MediaObjectType.image:
+        return _buildImageView();
+      case MediaObjectType.video:
+        return const Center(child: Text("Video not supported yet"));
+      case MediaObjectType.audio:
+        return const Center(child: Text("Audio not supported yet"));
+      case MediaObjectType.document:
+        return const Center(child: Text("Document not supported yet"));
+      case MediaObjectType.unknown:
+        return const Center(child: Text("Unknown file type"));
+      default:
+        return const Center(child: Text("File type not supported yet"));
     }
   }
+
+  void _onPressedEditMediaFile() {}
+  void _onPressDownloadMediaFile() {}
 
   MediaItemContainer _buildImageView() {
     return fetchSourceMethod == FetchSourceMethod.server
@@ -88,6 +108,7 @@ class FullMediaView extends StatelessWidget {
             widgetRatio: 1,
             showDescriptionBar: false,
             fetchSourceMethod: FetchSourceMethod.server,
+            cloudImageAllowCache: cloudImageAllowCache,
             fitting: BoxFit.contain,
             mediaItem: onlineObjectKey,
             mimeType: "image/*",
@@ -95,6 +116,7 @@ class FullMediaView extends StatelessWidget {
         : MediaItemContainer(
             widgetRatio: 1,
             showDescriptionBar: false,
+            cloudImageAllowCache: cloudImageAllowCache,
             fetchSourceMethod: FetchSourceMethod.local,
             fitting: BoxFit.contain,
             mediaItem: localFile?.bytes,

@@ -19,8 +19,12 @@ import 'package:ourjourneys/views/albums/full_media_view.dart';
 
 class PaginatedFilesGrid extends StatefulWidget {
   final String? filterContentTypePrefix;
+  final bool cloudImageAllowCache;
 
-  const PaginatedFilesGrid({super.key, this.filterContentTypePrefix});
+  const PaginatedFilesGrid(
+      {super.key,
+      this.filterContentTypePrefix,
+      this.cloudImageAllowCache = true});
 
   @override
   State<PaginatedFilesGrid> createState() => _PaginatedFilesGridState();
@@ -127,14 +131,16 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
 
         final objectsData =
             ObjectsData.fromMap(_docs[index].data() as Map<String, dynamic>);
-        if (objectsData.contentType.startsWith('image/')) {
+        if (Utils.detectFileTypeFromMimeType(objectsData.contentType) ==
+            MediaObjectType.image) {
           final objectKey = objectsData.objectKey;
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.2,
             child: MediaItemContainer(
+              cloudImageAllowCache: widget.cloudImageAllowCache,
               mimeType: "image/",
               fetchSourceMethod: FetchSourceMethod.server,
-              mediaItem: objectKey,
+              mediaItem: objectsData.objectThumbnailKey,
               mediaAndDescriptionBarFlexValue: (18, 1),
               descriptionTxtMaxLines: 1,
               extraMapData: {"description": objectKey.split("/").last},
@@ -147,7 +153,8 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
               onTap: () => _onTapItem(objectKey),
             ),
           );
-        } else if (objectsData.contentType.startsWith('video/')) {
+        } else if (Utils.detectFileTypeFromMimeType(objectsData.contentType) ==
+            MediaObjectType.video) {
           return const Icon(Icons.videocam, size: 48);
         } else {
           // return const Icon(Icons.insert_drive_file, size: 48);

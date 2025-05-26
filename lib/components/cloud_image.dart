@@ -22,6 +22,9 @@ class CloudImage extends StatefulWidget {
   final Widget? errorWidget;
   final double shimmerBaseOpacity;
 
+  /// Allow caching of the image, also attempts to load from cache first
+  final bool allowCache;
+
   const CloudImage({
     super.key,
     required this.objectKey,
@@ -31,6 +34,7 @@ class CloudImage extends StatefulWidget {
     this.fadeDuration = const Duration(milliseconds: 500),
     this.errorWidget = const Icon(Icons.error_outline),
     this.shimmerBaseOpacity = 0.5,
+    this.allowCache = true,
   });
 
   @override
@@ -52,12 +56,13 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
 
   Future<Uint8List> _loadImageSecurely() async {
     final cacheKey = widget.objectKey.hashCode.toString();
-
-    // Check local cache first
-    final cachedFile = await cache.getFileFromCache(cacheKey);
-    if (cachedFile != null) {
-      _logger.i("Loaded image from cache: ${widget.objectKey}");
-      return cachedFile.file.readAsBytes();
+    if (widget.allowCache) {
+      // Check local cache first
+      final cachedFile = await cache.getFileFromCache(cacheKey);
+      if (cachedFile != null) {
+        _logger.i("Loaded image from cache: ${widget.objectKey}");
+        return cachedFile.file.readAsBytes();
+      }
     }
 
     if (!_auth.isUserLoggedIn()) {
@@ -82,7 +87,9 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
       );
 
       final bytes = Uint8List.fromList(response.data!);
-      await cache.putFile(cacheKey, bytes);
+      if (widget.allowCache) {
+        await cache.putFile(cacheKey, bytes);
+      }
       return bytes;
     } catch (e, stack) {
       _logger.e("Failed to load image from server",

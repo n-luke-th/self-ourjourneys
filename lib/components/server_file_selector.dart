@@ -13,9 +13,11 @@ import 'package:ourjourneys/shared/views/ui_consts.dart';
 class ServerFileSelector extends StatefulWidget {
   final void Function(List<ObjectsData>) onSelectionChanged;
   final List<ObjectsData> selectedFiles;
+  final bool cloudImageAllowCache;
 
   const ServerFileSelector(
       {super.key,
+      this.cloudImageAllowCache = true,
       required this.onSelectionChanged,
       required this.selectedFiles});
 
@@ -145,7 +147,9 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
                                     mimeType: obj.contentType,
                                     widgetRatio: 1,
                                     fetchSourceMethod: FetchSourceMethod.server,
-                                    mediaItem: obj.objectKey),
+                                    cloudImageAllowCache:
+                                        widget.cloudImageAllowCache,
+                                    mediaItem: obj.objectThumbnailKey),
                               ),
                             );
                           }).toList(),

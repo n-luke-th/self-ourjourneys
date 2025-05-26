@@ -32,6 +32,9 @@ class MediaItemContainer extends StatefulWidget {
   final bool showWidgetBorder;
   final BoxBorder? widgetBorder;
 
+  /// if true and mediaItem is a String, CloudImage will be used to fetch the image with caching allowed
+  final bool cloudImageAllowCache;
+
   // gesture callbacks
   final VoidCallback? onTap;
   final VoidCallback? onDoubleTap;
@@ -59,6 +62,7 @@ class MediaItemContainer extends StatefulWidget {
     this.extraMapData,
     this.showWidgetBorder = true,
     this.widgetBorder,
+    this.cloudImageAllowCache = true,
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
@@ -85,10 +89,12 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
       } else if (widget.fetchSourceMethod == FetchSourceMethod.server &&
           widget.mediaItem is String) {
         return CloudImage(
-            objectKey: widget.mediaItem,
-            fit: widget.fitting,
-            width: double.infinity,
-            height: double.infinity);
+          objectKey: widget.mediaItem,
+          fit: widget.fitting,
+          width: double.infinity,
+          height: double.infinity,
+          allowCache: widget.cloudImageAllowCache,
+        );
       }
     }
 
@@ -200,7 +206,7 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
                   BoxShadow(
                       color: Colors.black54,
                       blurRadius: 8,
-                      offset: Offset(0, 4))
+                      offset: const Offset(0, 4))
                 ]
               : [],
         ),
