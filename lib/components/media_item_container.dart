@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/get_platform_service.dart';
-import 'package:ourjourneys/helpers/utils.dart';
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
 import 'package:universal_io/io.dart' show File;
@@ -93,13 +93,11 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
   final Logger _logger = getIt<Logger>();
   bool _hovering = false;
   bool get isImage =>
-      Utils.detectFileTypeFromMimeType(widget.mimeType) ==
+      FileUtils.detectFileTypeFromMimeType(widget.mimeType) ==
       MediaObjectType.image;
   bool get isVideo =>
-      Utils.detectFileTypeFromMimeType(widget.mimeType) ==
+      FileUtils.detectFileTypeFromMimeType(widget.mimeType) ==
       MediaObjectType.video;
-  // bool get isImage => widget.mimeType.startsWith('image/');
-  // bool get isVideo => widget.mimeType.startsWith('video/');
 
   Widget _handleBuildMediaError(BuildContext context, Object error,
       StackTrace? stackTrace, MediaObjectType mediaType) {

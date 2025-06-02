@@ -1,10 +1,9 @@
 /// lib/services/cloud/cloud_file_service.dart
 ///
-/// cloud file service for uploading files to cloud storage
 
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:typed_data';
+import 'dart:typed_data' show Uint8List;
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:dio/dio.dart';
@@ -13,17 +12,19 @@ import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart';
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
 import 'package:ourjourneys/models/storage/file_model.dart' show DeleteResult;
-import 'package:ourjourneys/models/storage/objects_data.dart';
+import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/services/api/api_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/services/network/dio_handler.dart';
-import 'package:ourjourneys/shared/services/firestore_commons.dart';
+import 'package:ourjourneys/shared/services/firestore_commons.dart'
+    show FirestoreCollections;
 import 'package:ourjourneys/shared/services/network_const.dart'
     show NetworkConsts;
 
+/// cloud file service for uploading files to cloud storage
 class CloudFileService {
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
@@ -84,7 +85,7 @@ class CloudFileService {
           contentType: lookupMimeType(uploadTarget.fileName) ??
               'application/octet-stream',
           objectThumbnailKey:
-              Utils.getThumbnailKeyFromObjectKey(uploadTarget.key),
+              FileUtils.getThumbnailKeyFromObjectKey(uploadTarget.key),
           objectUploadRequestedAt: requestedTime,
           tags: tags,
           linkedAlbums: linkedAlbums,
@@ -184,7 +185,7 @@ class CloudFileService {
               contentType:
                   lookupMimeType(result.fileName) ?? 'application/octet-stream',
               objectThumbnailKey:
-                  Utils.getThumbnailKeyFromObjectKey(result.key),
+                  FileUtils.getThumbnailKeyFromObjectKey(result.key),
               objectUploadRequestedAt: requestedTime,
               tags: tags,
               linkedAlbums: linkedAlbums,

@@ -1,5 +1,5 @@
 /// lib/helpers/utils.dart
-/// Utils class
+/// utility classes and functions
 
 import 'dart:typed_data' show Uint8List;
 
@@ -19,12 +19,74 @@ import 'package:ourjourneys/shared/common/allowed_extensions.dart'
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
 import 'package:path/path.dart' as path show extension;
-import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart'
-    show FilesPickerUtils;
+import 'package:ourjourneys/services/configs/utils/files_picker_service.dart'
+    show FilesPickerService;
 import 'package:image/image.dart' as img
     show copyResize, decodeImage, encodeJpg;
 
+extension on String {
+  bool isNullOrEmpty(String? text) {
+    return text == null || text.isEmpty;
+  }
+
+  // ignore: unused_element
+  bool isNotNullOrEmpty(String? text) {
+    return text != null && text.isNotEmpty;
+  }
+}
+
+/// A utility class for various utility functions.
 class Utils {
+  Utils._(); // Private constructor to prevent instantiation
+
+  /// capitalize the first letter of a given [text]
+  static String capitalizeFirstLetter(String text) {
+    if (text.isNullOrEmpty(text)) return '';
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
+  /// Returns a custom document ID with a given type, user ID, and UTC timestamp.
+  ///
+  /// Example: "type-userId-timestamp"
+  static String genCustomDocId({required String type, required String userId}) {
+    return '$type-$userId-${DateTimeUtils.getUtcTimestampString()}';
+  }
+
+  /// Returns a reformatted object key
+  /// replaces either a backslash or a forward slash with the other
+  static String reformatObjectKey(String objectKey,
+      {bool forFirestore = true}) {
+    // final regex = r'\\|/'; // Matches either a backslash or a forward slash
+    if (forFirestore) {
+      return objectKey.replaceAll(RegExp(r'/'), r'\'); // Replace '/' with '\'
+    } else {
+      return objectKey.replaceAll(RegExp(r'\\'), r'/'); // Replace '\' with '/'
+    }
+  }
+
+  /// Utility function to determine the screen size of the device.
+  /// Returns a [ScreenSize] enum value.
+  static ScreenSize getScreenSize(double screenWidth) {
+    if (screenWidth < 600) {
+      return ScreenSize.small;
+    } else if (screenWidth < 900) {
+      return ScreenSize.medium;
+    } else {
+      return ScreenSize.large;
+    }
+  }
+}
+
+/// Utility class for date and time related operations.
+class DateTimeUtils {
+  DateTimeUtils._(); // private constructor to prevent instantiation
+
+  /// Returns nullable [DateTime] from the given [dateTimeString].
+  static DateTime? parseDateTime(String? dateTimeString) {
+    if (dateTimeString == null) return null;
+    return DateTime.tryParse(dateTimeString);
+  }
+
   /// Returns a human readable date string from a DateTime object with a given pattern.
   static String getReadableDate(
       {required DateTime dateTime, required String pattern}) {
@@ -58,25 +120,11 @@ class Utils {
         DateFormat("yyyyMMdd'T'HHmmss'Z'").format(DateTime.now().toUtc());
     return timestamp;
   }
+}
 
-  /// Returns a custom document ID with a given type, user ID, and UTC timestamp.
-  ///
-  /// Example: "type-userId-timestamp"
-  static String genCustomDocId({required String type, required String userId}) {
-    return '$type-$userId-${getUtcTimestampString()}';
-  }
-
-  /// Returns a reformatted object key
-  /// replaces either a backslash or a forward slash with the other
-  static String reformatObjectKey(String objectKey,
-      {bool forFirestore = true}) {
-    // final regex = r'\\|/'; // Matches either a backslash or a forward slash
-    if (forFirestore) {
-      return objectKey.replaceAll(RegExp(r'/'), r'\'); // Replace '/' with '\'
-    } else {
-      return objectKey.replaceAll(RegExp(r'\\'), r'/'); // Replace '\' with '/'
-    }
-  }
+/// Utility class for file related operations.
+class FileUtils {
+  FileUtils._(); // Private constructor to prevent instantiation
 
   /// Returns a detected file type from a mime type.
   /// Returns [MediaObjectType.unknown] if the mime type is not recognized.
@@ -164,7 +212,7 @@ class Utils {
 
   /// Utility function to pick local files from the device.
   ///
-  /// consult [FilesPickerUtils.pickFiles] for more information.
+  /// consult [FilesPickerService.pickFiles] for more information.
   static Future<void> pickLocalFiles(
       {void Function()? onCompleted,
       required void Function(List<SelectedFile>) onFilesSelected,
@@ -173,7 +221,7 @@ class Utils {
         ...AllowedExtensions.videoExtensions
       ]}) async {
     FilePickerResult? result;
-    result = await FilesPickerUtils.pickFiles(
+    result = await FilesPickerService.pickFiles(
       allowMultiple: true,
       fileType: FileType.custom,
       allowedExtensions: allowedExtensions,
@@ -195,7 +243,7 @@ class Utils {
 
   /// Utility function to pick local photos or video from the device.
   ///
-  /// consult [FilesPickerUtils.pickPhotosOrVideos] for more information.
+  /// consult [FilesPickerService.pickPhotosOrVideos] for more information.
   static Future<void> pickLocalPhotosOrVideos({
     void Function()? onCompleted,
     required void Function(List<SelectedFile>) onMediaSelected,
@@ -210,7 +258,7 @@ class Utils {
     CameraDevice preferredCameraDevice = CameraDevice.rear,
     Duration? videoMaxDuration,
   }) async {
-    List<XFile> result = await FilesPickerUtils.pickPhotosOrVideos();
+    List<XFile> result = await FilesPickerService.pickPhotosOrVideos();
 
     if (result.isEmpty) return;
 
@@ -224,18 +272,6 @@ class Utils {
     onCompleted?.call();
   }
 
-  /// Utility function to determine the screen size of the device.
-  /// Returns a [ScreenSize] enum value.
-  static ScreenSize getScreenSize(double screenWidth) {
-    if (screenWidth < 600) {
-      return ScreenSize.small;
-    } else if (screenWidth < 900) {
-      return ScreenSize.medium;
-    } else {
-      return ScreenSize.large;
-    }
-  }
-
   /// Utility function to retrieve [ObjectsData.objectThumbnailKey] from a given [objectKey].
   ///
   /// Returns a [String] of the thumbnail key.
@@ -244,6 +280,7 @@ class Utils {
     return "gen/thumbs/$objectKey";
   }
 
+  /// Utility function to compress an image.
   static Uint8List compressImage(
     Uint8List originalBytes, {
     int maxDimension = 1080,
@@ -260,6 +297,7 @@ class Utils {
     return Uint8List.fromList(compressed);
   }
 
+  /// Utility function to generate a thumbnail from a given [Uint8List].
   static Uint8List generateThumbnail(Uint8List originalBytes) {
     return compressImage(originalBytes, maxDimension: 300, quality: 60);
   }

@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart';
+import 'package:ourjourneys/helpers/utils.dart' show Utils;
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;

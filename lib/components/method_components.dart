@@ -1,7 +1,7 @@
 /// lib/components/method_components.dart
 /// A class of methods components
 
-import 'dart:async';
+import 'dart:async' show Future, FutureOr;
 
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart'

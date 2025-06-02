@@ -12,7 +12,7 @@ import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
 import 'package:ourjourneys/components/more_actions_btn.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart';
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
@@ -27,6 +27,7 @@ import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 import 'package:ourjourneys/views/albums/full_media_view.dart';
 
+/// a page to display the details of an album and a list of items associate with it
 class AlbumDetailsPage extends StatefulWidget {
   final Map<String, dynamic>? album;
   final bool cloudImageAllowCache;
@@ -125,7 +126,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                     spacing: 16,
                     runSpacing: 8.0,
                     children: albumData.linkedObjects.map((objectKey) {
-                      if (Utils.detectFileTypeFromFilepath(objectKey) ==
+                      if (FileUtils.detectFileTypeFromFilepath(objectKey) ==
                           MediaObjectType.image) {
                         return SizedBox(
                           width: MediaQuery.sizeOf(context).width * 0.4,
@@ -134,8 +135,8 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                             fetchSourceMethod: FetchSourceMethod.server,
                             cloudImageAllowCache: widget.cloudImageAllowCache,
                             imageFilterQuality: FilterQuality.low,
-                            mediaItem:
-                                Utils.getThumbnailKeyFromObjectKey(objectKey),
+                            mediaItem: FileUtils.getThumbnailKeyFromObjectKey(
+                                objectKey),
                             mediaAndDescriptionBarFlexValue: (8, 1),
                             descriptionTxtMaxLines: 1,
                             extraMapData: {
@@ -199,7 +200,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
       type: DialogType.information,
       title: "Information",
       message:
-          "Media type: ${Utils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
+          "Media type: ${FileUtils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
     );
   }
 
@@ -249,7 +250,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
             suppressNotification: true);
       }
 
-      final String? folder = Utils.getFolderPathFromObjectKey(objectKey);
+      final String? folder = FileUtils.getFolderPathFromObjectKey(objectKey);
       if (folder != null) {
         await _cloudFileService.deleteObjectsSameFolder(context,
             objectKeys: [objectKey], folder: folder);

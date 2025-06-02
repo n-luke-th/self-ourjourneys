@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
-import 'package:ourjourneys/helpers/utils.dart' show Utils;
+import 'package:ourjourneys/helpers/utils.dart' show DateTimeUtils;
 
 class ModificationData {
   final String createdByUserId;
@@ -64,8 +64,8 @@ class ModificationData {
       getModificationDataString(
           {required ModificationData modData, required String uid}) {
     return (
-      "Created by ${modData.createdByUserId == uid ? "You" : "Your lover"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.createdAt, pattern: "y.MM.d @H:mm")}",
-      "Last modified by ${modData.lastModifiedByUserId == uid ? "You" : "Your lover"} on ${Utils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @H:mm")}"
+      "Created by ${modData.createdByUserId == uid ? "You" : "Your lover"} on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.createdAt, pattern: "y.MM.d @H:mm")}",
+      "Last modified by ${modData.lastModifiedByUserId == uid ? "You" : "Your lover"} on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @H:mm")}"
     );
   }
 }

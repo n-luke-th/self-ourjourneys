@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
-import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart';
+import 'package:ourjourneys/services/configs/utils/files_picker_service.dart';
 import 'package:ourjourneys/shared/common/allowed_extensions.dart'
     show AllowedExtensions;
 import 'package:ourjourneys/shared/views/ui_consts.dart';
@@ -45,7 +45,7 @@ class _CloudFileUploaderState extends State<CloudFileUploader> {
       ...AllowedExtensions.videoExtensions,
       ...AllowedExtensions.documentExtensions,
     ];
-    FilePickerResult? result = await FilesPickerUtils.pickFiles(
+    FilePickerResult? result = await FilesPickerService.pickFiles(
       allowMultiple: true,
       fileType: FileType.custom,
       allowedExtensions: allowedExtensions,

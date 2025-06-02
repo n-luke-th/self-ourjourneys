@@ -18,8 +18,8 @@ import 'package:ourjourneys/views/albums/album_creation_live_result_page.dart';
 import 'package:ourjourneys/components/server_file_selector.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart';
-import 'package:ourjourneys/models/storage/objects_data.dart';
+import 'package:ourjourneys/helpers/utils.dart' show DateTimeUtils, FileUtils;
+import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
@@ -118,7 +118,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             isNoNeedNewUpload: fileNames.isEmpty ? true : false,
             albumName: _nameController.text.trim(),
             folderPath:
-                "uploads/${Utils.getUtcTimestampString()}-${_authWrapper.uid}",
+                "uploads/${DateTimeUtils.getUtcTimestampString()}-${_authWrapper.uid}",
             listOfXFiles: _selectedLocalFiles.map((f) => f.localFile!).toList(),
             selectedExistingObjectKeys:
                 _selectedServerObjects.map((e) => e.objectKey).toList(),
@@ -232,7 +232,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
 
   Future<void> _onLocalSourceSelected() async {
     if (PlatformDetectionService.isWeb) {
-      await Utils.pickLocalFiles(
+      await FileUtils.pickLocalFiles(
         onFilesSelected: (List<SelectedFile> pickedFiles) =>
             _onLocalFilesSelected(pickedFiles),
         onCompleted: () {
@@ -242,7 +242,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         },
       );
     } else if (PlatformDetectionService.isMobile) {
-      await Utils.pickLocalPhotosOrVideos(
+      await FileUtils.pickLocalPhotosOrVideos(
           onMediaSelected: (List<SelectedFile> pickedFiles) {
         _onLocalFilesSelected(pickedFiles);
       }, onCompleted: () {

@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/media_item_container.dart';
-import 'package:ourjourneys/helpers/utils.dart' show Utils;
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
 import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/models/storage/selected_file.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
@@ -52,11 +52,11 @@ class FilePickerPreview extends StatelessWidget {
           ),
           itemBuilder: (context, index) {
             final file = files[index];
-            final String mimeType =
-                file.fetchSourceMethod == FetchSourceMethod.local
-                    ? Utils.detectMimeTypeFromFilepath(file.localFile!.name) ??
-                        "text/*"
-                    : file.cloudObjectData!.contentType;
+            final String mimeType = file.fetchSourceMethod ==
+                    FetchSourceMethod.local
+                ? FileUtils.detectMimeTypeFromFilepath(file.localFile!.name) ??
+                    "text/*"
+                : file.cloudObjectData!.contentType;
             return GestureDetector(
               onTap: () async => await _onTabTrackedItem(context,
                   file: file, mimeType: mimeType),
@@ -117,7 +117,7 @@ class FilePickerPreview extends StatelessWidget {
                 localFile: file.localFile,
                 allowDownload: false,
                 extraMapData: {"fileSizeInBytes": fileSize},
-                objectType: Utils.detectFileTypeFromMimeType(mimeType))));
+                objectType: FileUtils.detectFileTypeFromMimeType(mimeType))));
   }
 
   Future<void> _onLongPressTrackedItem(BuildContext context,
@@ -126,6 +126,6 @@ class FilePickerPreview extends StatelessWidget {
         context: context,
         title: "Media information",
         message:
-            "Media type: ${Utils.detectFileTypeFromMimeType(mimeType).stringValue}\nName: ${file.localFile?.name ?? file.cloudObjectData?.fileName}");
+            "Media type: ${FileUtils.detectFileTypeFromMimeType(mimeType).stringValue}\nName: ${file.localFile?.name ?? file.cloudObjectData?.fileName}");
   }
 }

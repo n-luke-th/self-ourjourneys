@@ -1,5 +1,5 @@
-/// lib/services/configs/utils/files_picker_utils.dart
-/// Utility class for files picker operations
+/// lib/services/configs/utils/files_picker_service.dart
+/// service class for files picker operations
 
 import 'package:file_picker/file_picker.dart'
     show FilePicker, FilePickerResult, FileType;
@@ -7,8 +7,11 @@ import 'package:image_picker/image_picker.dart'
     show ImagePicker, ImageSource, XFile, CameraDevice;
 import 'package:ourjourneys/models/storage/objects_data.dart';
 
-class FilesPickerUtils {
+/// A service class for files picker operations.
+class FilesPickerService {
   /// Pick any files from device
+  ///
+  /// consult [FilePicker.platform.pickFiles] for more details
   static Future<FilePickerResult?> pickFiles(
       {FileType fileType = FileType.any,
       List<String>? allowedExtensions,

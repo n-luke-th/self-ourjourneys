@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart' show Utils;
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
@@ -131,7 +131,7 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
 
         final objectsData =
             ObjectsData.fromMap(_docs[index].data() as Map<String, dynamic>);
-        if (Utils.detectFileTypeFromMimeType(objectsData.contentType) ==
+        if (FileUtils.detectFileTypeFromMimeType(objectsData.contentType) ==
             MediaObjectType.image) {
           final objectKey = objectsData.objectKey;
           return SizedBox(
@@ -153,7 +153,8 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
               onTap: () => _onTapItem(objectKey),
             ),
           );
-        } else if (Utils.detectFileTypeFromMimeType(objectsData.contentType) ==
+        } else if (FileUtils.detectFileTypeFromMimeType(
+                objectsData.contentType) ==
             MediaObjectType.video) {
           return const Icon(Icons.videocam, size: 48);
         } else {
@@ -184,7 +185,7 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
       type: DialogType.information,
       title: "Information",
       message:
-          "Media type: ${Utils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
+          "Media type: ${FileUtils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
     );
   }
 

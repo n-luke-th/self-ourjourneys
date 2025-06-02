@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
-import 'package:ourjourneys/helpers/utils.dart' show Utils;
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
@@ -47,7 +47,7 @@ class FullMediaView extends StatelessWidget {
     final String? fileName =
         onlineObjectKey?.split("/").last ?? localFile?.name;
     final String appBarTitle =
-        "FULL ${Utils.detectFileTypeFromFilepath(fileName ?? "OurJourneys File").stringValue.toUpperCase()} VIEW";
+        "FULL ${FileUtils.detectFileTypeFromFilepath(fileName ?? "OurJourneys File").stringValue.toUpperCase()} VIEW";
 
     return mainView(context,
         appBarTitle: appBarTitle,
@@ -122,8 +122,9 @@ class FullMediaView extends StatelessWidget {
             imageFilterQuality: FilterQuality.high,
             fitting: BoxFit.contain,
             mediaItem: onlineObjectKey,
-            mimeType: Utils.detectMimeTypeFromFilepath(onlineObjectKey ?? "") ??
-                "image/*",
+            mimeType:
+                FileUtils.detectMimeTypeFromFilepath(onlineObjectKey ?? "") ??
+                    "image/*",
           )
         : MediaItemContainer(
             widgetRatio: 1,
@@ -134,7 +135,7 @@ class FullMediaView extends StatelessWidget {
             fitting: BoxFit.contain,
             mediaItem: localFile,
             mimeType: localFile?.mimeType ??
-                Utils.detectMimeTypeFromFilepath(localFile?.path ?? "") ??
+                FileUtils.detectMimeTypeFromFilepath(localFile?.path ?? "") ??
                 "image/*",
           );
   }
