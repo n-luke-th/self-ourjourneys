@@ -1,6 +1,6 @@
 /// lib/helpers/get_platform_service.dart
 ///
-///
+/// a helper service to detect the platform and related info
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:universal_io/io.dart';
@@ -15,7 +15,10 @@ class PlatformDetectionService {
 
   static bool get isWeb => kIsWeb;
 
-  PlatformEnum get currentPlatform {
+  static bool get isMobile =>
+      !kIsWeb && currentPlatform != PlatformEnum.unsupportedError;
+
+  static PlatformEnum get currentPlatform {
     if (kIsWeb) {
       return PlatformEnum.web;
     } else if (Platform.isIOS) {
@@ -27,7 +30,7 @@ class PlatformDetectionService {
     }
   }
 
-  String get readableCurrentPlatform {
+  static String get readableCurrentPlatform {
     switch (currentPlatform) {
       case PlatformEnum.web:
         return 'Web';

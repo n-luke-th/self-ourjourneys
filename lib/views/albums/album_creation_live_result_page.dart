@@ -4,36 +4,33 @@
 /// including uploading files
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:typed_data' show Uint8List;
-
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
-import 'package:ourjourneys/models/storage/objects_data.dart';
+import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 class AlbumCreationLiveResultPage extends StatefulWidget {
   final String albumName;
   final String folderPath;
-  final List<Uint8List> fileBytesList;
-  final List<String> fileNames;
+  final List<XFile> listOfXFiles;
   final List<String> selectedExistingObjectKeys;
   final bool isNoNeedNewUpload;
 
   const AlbumCreationLiveResultPage({
     super.key,
     required this.folderPath,
-    required this.fileBytesList,
-    required this.fileNames,
+    required this.listOfXFiles,
     required this.selectedExistingObjectKeys,
     required this.albumName,
     required this.isNoNeedNewUpload,
@@ -70,8 +67,10 @@ class _AlbumCreationLiveResultPageState
       final (successful, failedSet) =
           await _cloudFileService.uploadMultipleFiles(
         context: context,
-        fileBytesList: widget.fileBytesList,
-        fileNames: widget.fileNames,
+        fileBytesList: await Future.wait(
+          widget.listOfXFiles.map((file) => file.readAsBytes()),
+        ),
+        fileNames: widget.listOfXFiles.map((file) => file.name).toList(),
         folderPath: widget.folderPath,
         onSendProgress: (sent, totalBytes) {
           setState(() {
@@ -157,16 +156,16 @@ class _AlbumCreationLiveResultPageState
   }
 
   Future<void> _retryFailedUploads() async {
-    final retryIndices = widget.fileNames
+    final retryIndices = widget.listOfXFiles
         .asMap()
         .entries
-        .where((entry) => _failedFileNames.contains(entry.value))
+        .where((entry) => _failedFileNames.contains(entry.value.name))
         .map((e) => e.key)
         .toList();
 
-    final retryBytes =
-        retryIndices.map((i) => widget.fileBytesList[i]).toList();
-    final retryNames = retryIndices.map((i) => widget.fileNames[i]).toList();
+    final retryBytes = retryIndices.map((i) => widget.listOfXFiles[i]).toList();
+    final retryNames =
+        retryIndices.map((i) => widget.listOfXFiles[i].name).toList();
 
     setState(() {
       _isUploading = true;
@@ -175,7 +174,9 @@ class _AlbumCreationLiveResultPageState
 
     final (successful, failedSet) = await _cloudFileService.uploadMultipleFiles(
       context: context,
-      fileBytesList: retryBytes,
+      fileBytesList: await Future.wait(
+        retryBytes.map((file) => file.readAsBytes()),
+      ),
       fileNames: retryNames,
       folderPath: widget.folderPath,
       onSendProgress: (sent, totalBytes) {
@@ -229,7 +230,7 @@ class _AlbumCreationLiveResultPageState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                          "Processing/Uploading file: ${_currentIndex + 1}${widget.fileNames.isEmpty ? "" : "of ${widget.fileNames.length}"}"),
+                          "Processing/Uploading file: ${_currentIndex + 1}${widget.listOfXFiles.isEmpty ? "" : " of ${widget.listOfXFiles.length}"}"),
                       LinearProgressIndicator(
                         value: _currentProgress,
                         stopIndicatorColor:

@@ -14,13 +14,13 @@ import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
 import 'package:ourjourneys/models/storage/selected_file.dart'
     show SelectedFile;
+import 'package:ourjourneys/shared/common/allowed_extensions.dart'
+    show AllowedExtensions;
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
 import 'package:path/path.dart' as path show extension;
 import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart'
     show FilesPickerUtils;
-import 'package:ourjourneys/shared/common/file_picker_enum.dart'
-    show AllowedExtensions;
 import 'package:image/image.dart' as img
     show copyResize, decodeImage, encodeJpg;
 
@@ -139,6 +139,12 @@ class Utils {
     }
   }
 
+  /// Returns a mimetype from a file path.
+  static String? detectMimeTypeFromFilepath(String filePath) {
+    final filename = filePath.split('/').last;
+    return lookupMimeType(filename);
+  }
+
   /// Returns [String] of the folder path from the full valid object key.
   /// Otherwise returns [Null].
   ///
@@ -179,7 +185,7 @@ class Utils {
     final picked = result.files
         .where((f) => f.bytes != null)
         .map((f) => SelectedFile(
-            fetchSourceMethod: FetchSourceMethod.local, localFile: f))
+            fetchSourceMethod: FetchSourceMethod.local, localFile: f.xFile))
         .toList();
 
     onFilesSelected(picked);
@@ -192,7 +198,7 @@ class Utils {
   /// consult [FilesPickerUtils.pickPhotosOrVideos] for more information.
   static Future<void> pickLocalPhotosOrVideos({
     void Function()? onCompleted,
-    required void Function(List<XFile>) onMediaSelected,
+    required void Function(List<SelectedFile>) onMediaSelected,
     bool allowMultiple = true,
     ImageSource mediaSource = ImageSource.gallery,
     bool fullMetaData = true,
@@ -208,7 +214,12 @@ class Utils {
 
     if (result.isEmpty) return;
 
-    onMediaSelected(result);
+    final picked = result
+        .map((f) => SelectedFile(
+            fetchSourceMethod: FetchSourceMethod.local, localFile: f))
+        .toList();
+
+    onMediaSelected(picked);
 
     onCompleted?.call();
   }
@@ -225,18 +236,12 @@ class Utils {
     }
   }
 
-  // TODO: complete following functions
-
   /// Utility function to retrieve [ObjectsData.objectThumbnailKey] from a given [objectKey].
   ///
   /// Returns a [String] of the thumbnail key.
   /// Otherwise returns an empty [String].
   static String getThumbnailKeyFromObjectKey(String objectKey) {
-    if (objectKey.contains('thumbnails/')) {
-      return objectKey;
-    } else {
-      return '';
-    }
+    return "gen/thumbs/$objectKey";
   }
 
   static Uint8List compressImage(

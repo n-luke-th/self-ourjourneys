@@ -61,7 +61,7 @@ void _main() async {
             dispose: (_, manager) => manager.dispose(),
           ),
         ],
-        child: OurJourneys(),
+        child: const OurJourneys(),
       ),
     );
   } on Exception catch (e) {
@@ -82,14 +82,13 @@ void main() {
 
 Future<void> logSettingsConfig({required ThemeProvider themeProvider}) async {
   final Logger logger = getIt<Logger>();
-  SharedPreferencesService prefs = getIt<SharedPreferencesService>();
-  final platformService = getIt<PlatformDetectionService>();
+  final SharedPreferencesService prefs = getIt<SharedPreferencesService>();
   final packageInfoService = getIt<PackageInfoService>();
   final packageInfo = await packageInfoService.getPackageInfo();
   logger
       .d("${DateTime.now().toLocal()}: Application is starting/restarting...");
   logger.d("\tOurJourneys:\n"
-      ">>> Platform: '${platformService.readableCurrentPlatform}'\n"
+      ">>> Platform: '${PlatformDetectionService.readableCurrentPlatform}'\n"
       ">>> Version '${packageInfo.version}'\n"
       ">>> Package Name: '${packageInfo.packageName}'\n"
       //

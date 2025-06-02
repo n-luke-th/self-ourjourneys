@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/helpers/rate_limiter.dart';
 import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
@@ -27,6 +28,10 @@ class AuthService with ChangeNotifier {
   late final StreamSubscription<User?> _authSub;
 
   AuthService() {
+    if (PlatformDetectionService.isWeb) {
+      _auth.setPersistence(Persistence.NONE);
+      _logger.d("Firebase Auth persistence set to NONE");
+    }
     _currentUser = _auth.currentUser;
     _authSub = _auth.authStateChanges().listen((user) {
       _currentUser = user;

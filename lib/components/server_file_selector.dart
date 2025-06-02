@@ -147,6 +147,7 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
                                     mimeType: obj.contentType,
                                     widgetRatio: 1,
                                     fetchSourceMethod: FetchSourceMethod.server,
+                                    imageFilterQuality: FilterQuality.low,
                                     cloudImageAllowCache:
                                         widget.cloudImageAllowCache,
                                     mediaItem: obj.objectThumbnailKey),

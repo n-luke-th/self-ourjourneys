@@ -4,7 +4,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
-import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/services/api/api_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
@@ -30,7 +29,6 @@ Future<void> setupDependencies() async {
   setupPackageInfoServices();
   await setupSharedPref();
   getIt.registerSingleton<PermissionsService>(PermissionsService());
-  getIt.registerSingleton<PlatformDetectionService>(PlatformDetectionService());
   getIt.registerLazySingleton<LocalAuthService>(() => LocalAuthService());
 }
 
@@ -68,7 +66,7 @@ void setupCloudFileServices() {
   getIt.registerLazySingleton(() => CloudFileService());
 }
 
-setupFirestoreServices() {
+void setupFirestoreServices() {
   getIt.registerLazySingleton(() => FirestoreService());
   getIt.registerLazySingleton(() => FirestoreWrapper());
 }

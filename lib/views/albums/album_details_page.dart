@@ -133,6 +133,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                             mimeType: "image/",
                             fetchSourceMethod: FetchSourceMethod.server,
                             cloudImageAllowCache: widget.cloudImageAllowCache,
+                            imageFilterQuality: FilterQuality.low,
                             mediaItem:
                                 Utils.getThumbnailKeyFromObjectKey(objectKey),
                             mediaAndDescriptionBarFlexValue: (8, 1),
@@ -188,6 +189,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                   fetchSourceMethod: FetchSourceMethod.server,
                   onlineObjectKey: objectKey,
                   objectType: MediaObjectType.image,
+                  cloudImageAllowCache: true,
                 )));
   }
 
@@ -213,6 +215,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
   }
 
   Future<void> _deleteCurrentItem(String objectKey) async {
+    // TODO: convert to unlink from album action and add dedicated delete file action in the future
     // ! delete from server, files must be in the same folder to delete
     final bool? confirmation = await DialogService.showConfirmationDialog(
         context: context,

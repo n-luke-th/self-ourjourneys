@@ -4,18 +4,18 @@
 // TODO: edit this page
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:logger/logger.dart';
+import 'package:universal_io/io.dart' show File;
+
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/quick_settings_menu.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
-import 'package:universal_io/io.dart';
 
 class UpdateProfilePage extends StatefulWidget {
   const UpdateProfilePage({super.key});
@@ -28,10 +28,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
-  final _platformDetectionService = PlatformDetectionService();
   final Logger _logger = getIt<Logger>();
   File? _image;
-  PlatformFile? _picToBeUploaded;
+  XFile? _picToBeUploaded;
 
   @override
   void initState() {
@@ -44,7 +43,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   Widget build(BuildContext context) {
     return mainView(
       context,
-      appBarTitle: "Update profile".toUpperCase(),
+      appBarTitle: "UPDATE PROFILE",
       appBarBackgroundColor: Colors.transparent,
       appbarActions: [QuickSettingsMenu()],
       extendBodyBehindAppBar: true,
@@ -129,7 +128,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                         borderRadius: UiConsts.BorderRadiusCircular_standard,
                       ),
                     ),
-                    child: const Text("Update Profile"),
+                    child: const Text("UPDATE PROFILE"),
                   ),
                 ],
               ),

@@ -8,7 +8,8 @@ import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
 import 'package:ourjourneys/services/configs/utils/files_picker_utils.dart';
-import 'package:ourjourneys/shared/common/file_picker_enum.dart';
+import 'package:ourjourneys/shared/common/allowed_extensions.dart'
+    show AllowedExtensions;
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class CloudFileUploader extends StatefulWidget {

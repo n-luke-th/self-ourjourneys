@@ -1,9 +1,8 @@
 /// lib/components/file_picker_preview.dart
 ///
-// lib/components/previews/file_picker_preview.dart
+/// a widget that shows a preview of selected local files
 
 import 'package:flutter/material.dart';
-import 'package:mime/mime.dart';
 import 'package:ourjourneys/components/media_item_container.dart';
 import 'package:ourjourneys/helpers/utils.dart' show Utils;
 import 'package:ourjourneys/models/storage/objects_data.dart';
@@ -55,19 +54,21 @@ class FilePickerPreview extends StatelessWidget {
             final file = files[index];
             final String mimeType =
                 file.fetchSourceMethod == FetchSourceMethod.local
-                    ? lookupMimeType(file.localFile!.name) ?? "text/*"
+                    ? Utils.detectMimeTypeFromFilepath(file.localFile!.name) ??
+                        "text/*"
                     : file.cloudObjectData!.contentType;
             return GestureDetector(
-              onTap: () =>
-                  _onTabTrackedItem(context, file: file, mimeType: mimeType),
+              onTap: () async => await _onTabTrackedItem(context,
+                  file: file, mimeType: mimeType),
               onLongPress: () async => await _onLongPressTrackedItem(context,
                   file: file, mimeType: mimeType),
               child: MediaItemContainer(
                 mimeType: mimeType,
                 fetchSourceMethod: file.fetchSourceMethod,
                 cloudImageAllowCache: cloudImageAllowCache,
+                imageFilterQuality: FilterQuality.low,
                 mediaItem: file.fetchSourceMethod == FetchSourceMethod.local
-                    ? file.localFile!.bytes
+                    ? file.localFile
                     : file.cloudObjectData!.objectThumbnailKey,
                 extraMapData: {
                   "description":
@@ -103,14 +104,19 @@ class FilePickerPreview extends StatelessWidget {
   }
 
   Future<dynamic> _onTabTrackedItem(BuildContext context,
-      {required SelectedFile file, required String mimeType}) {
+      {required SelectedFile file, required String mimeType}) async {
+    final int? fileSize = await file.localFile?.length() ??
+        file.cloudObjectData?.objectSizeInBytes;
     return Navigator.push(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
             builder: (context) => FullMediaView(
                 fetchSourceMethod: file.fetchSourceMethod,
                 onlineObjectKey: file.cloudObjectData?.objectKey,
                 localFile: file.localFile,
+                allowDownload: false,
+                extraMapData: {"fileSizeInBytes": fileSize},
                 objectType: Utils.detectFileTypeFromMimeType(mimeType))));
   }
 

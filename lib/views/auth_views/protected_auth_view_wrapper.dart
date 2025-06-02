@@ -6,20 +6,19 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/services/auth/acc/auth_service.dart';
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/views/auth_views/full_screen_auth_redirection_page.dart';
 
 class ProtectedAuthViewWrapper extends StatelessWidget {
   final Widget child;
-  final _auth = getIt<AuthService>();
-  final Logger _logger = Logger();
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
+  final Logger _logger = getIt<Logger>();
 
   ProtectedAuthViewWrapper({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    if (_auth.isUserLoggedIn()) {
-      _logger.d("current user is authenticated!");
+    if (_authWrapper.isUserLoggedIn()) {
       return child;
     } else {
       _logger.d(

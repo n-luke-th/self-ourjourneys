@@ -9,6 +9,8 @@ import 'package:form_builder_validators/form_builder_validators.dart'
     show FormBuilderValidators;
 import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/file_picker_preview.dart';
+import 'package:ourjourneys/components/method_components.dart';
+import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/models/storage/selected_file.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
@@ -19,7 +21,6 @@ import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
-import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 class NewAlbumPage extends StatefulWidget {
@@ -39,7 +40,6 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
 
   Set<SelectedFile> _selectedLocalFiles = {};
   List<ObjectsData> _selectedServerObjects = [];
-  bool _canPop = false;
 
   void _onLocalFilesSelected(List<SelectedFile> files,
       {bool isReplacing = false}) {
@@ -59,7 +59,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
       }
     });
     _logger.i(
-        "Tracked files: [${_selectedLocalFiles.map((i) => i.localFile?.name).join(', ')}]");
+        "Tracked files (${_selectedLocalFiles.length}): [${_selectedLocalFiles.map((i) => i.localFile?.name).join(', ')}]");
   }
 
   void _onServerObjectDeleted(ObjectsData object) {
@@ -102,8 +102,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                   isNoNeedNewUpload: true,
                   albumName: _nameController.text.trim(),
                   folderPath: "",
-                  fileBytesList: [],
-                  fileNames: [],
+                  listOfXFiles: [],
                   selectedExistingObjectKeys: [])),
         );
       }
@@ -120,9 +119,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             albumName: _nameController.text.trim(),
             folderPath:
                 "uploads/${Utils.getUtcTimestampString()}-${_authWrapper.uid}",
-            fileBytesList:
-                _selectedLocalFiles.map((f) => f.localFile!.bytes!).toList(),
-            fileNames: fileNames,
+            listOfXFiles: _selectedLocalFiles.map((f) => f.localFile!).toList(),
             selectedExistingObjectKeys:
                 _selectedServerObjects.map((e) => e.objectKey).toList(),
           ),
@@ -146,7 +143,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: _canPop,
+      canPop: false,
       child: mainView(context,
           appBarTitle: "Create New Album",
           persistentFooterAlignment: AlignmentDirectional.center,
@@ -193,64 +190,11 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             onPressed: () {},
             backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
           ),
-          onFloatingActionButtonPressed: () {
-            BottomSheetService.showCustomBottomSheet(
-                context: context,
-                initialChildSize: 0.3,
-                builder: (context, scrollController) {
-                  return Column(
-                    children: [
-                      const Text("Select File Source"),
-                      const Divider(),
-                      ListTile(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                UiConsts.BorderRadiusCircular_standard),
-                        title: const Text(
-                          "Local Files",
-                          textAlign: TextAlign.center,
-                        ),
-                        onTap: () async => await Utils.pickLocalFiles(
-                          onFilesSelected: (List<SelectedFile> pickedFiles) =>
-                              _onLocalFilesSelected(pickedFiles),
-                          onCompleted: () {
-                            if (Navigator.canPop(context)) {
-                              Navigator.pop(context);
-                            }
-                          },
-                        ),
-                      ),
-                      ListTile(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                UiConsts.BorderRadiusCircular_standard),
-                        title: const Text(
-                          "Server Files",
-                          textAlign: TextAlign.center,
-                        ),
-                        onTap: () {
-                          if (Navigator.canPop(context)) {
-                            Navigator.pop(context);
-                          }
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ServerFileSelector(
-                                    selectedFiles: [..._selectedServerObjects],
-                                    onSelectionChanged:
-                                        (List<ObjectsData> selectedObjects) {
-                                      setState(() {
-                                        _selectedServerObjects =
-                                            selectedObjects;
-                                      });
-                                    }),
-                              ));
-                        },
-                      ),
-                    ],
-                  );
-                });
-          },
+          onFloatingActionButtonPressed: () async =>
+              await MethodsComponents.showUploadSourceSelector(context,
+                  onServerSourceSelected: () => _onServerSourceSelected(),
+                  onLocalSourceSelected: () async =>
+                      await _onLocalSourceSelected()),
           body: Center(
             child: SingleChildScrollView(
               child: Container(
@@ -284,6 +228,46 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             ),
           )),
     );
+  }
+
+  Future<void> _onLocalSourceSelected() async {
+    if (PlatformDetectionService.isWeb) {
+      await Utils.pickLocalFiles(
+        onFilesSelected: (List<SelectedFile> pickedFiles) =>
+            _onLocalFilesSelected(pickedFiles),
+        onCompleted: () {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
+        },
+      );
+    } else if (PlatformDetectionService.isMobile) {
+      await Utils.pickLocalPhotosOrVideos(
+          onMediaSelected: (List<SelectedFile> pickedFiles) {
+        _onLocalFilesSelected(pickedFiles);
+      }, onCompleted: () {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+      });
+    }
+  }
+
+  void _onServerSourceSelected() {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ServerFileSelector(
+              selectedFiles: [..._selectedServerObjects],
+              onSelectionChanged: (List<ObjectsData> selectedObjects) {
+                setState(() {
+                  _selectedServerObjects = selectedObjects;
+                });
+              }),
+        ));
   }
 
   Widget _buildSelectedServerFiles() {

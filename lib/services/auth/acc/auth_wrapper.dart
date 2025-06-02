@@ -72,7 +72,7 @@ class AuthWrapper {
 
   Future<void> refreshIdToken({bool forceNewToken = false}) async {
     if (_auth.isUserLoggedIn()) {
-      _logger.d("refreshing id token...");
+      // _logger.d("refreshing id token...");
       _idToken = await _auth.currentUser?.getIdToken(forceNewToken);
     }
   }

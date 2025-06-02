@@ -1,3 +1,5 @@
+/// lib/components/cloud_image.dart
+// TODO: enhance performance for image widget
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -13,6 +15,8 @@ import 'package:ourjourneys/shared/errors_code_and_msg/cloud_object_storage_erro
 import 'package:ourjourneys/shared/services/network_const.dart';
 import 'package:shimmer/shimmer.dart';
 
+/// The [CloudImage] widget is a wrapper around the Image widget that allows for caching of images fetched from a server.
+/// used to handle display the images from the cloud storage
 class CloudImage extends StatefulWidget {
   final String objectKey;
   final BoxFit fit;
@@ -21,6 +25,9 @@ class CloudImage extends StatefulWidget {
   final Duration fadeDuration;
   final Widget? errorWidget;
   final double shimmerBaseOpacity;
+  final FilterQuality filterQuality;
+  final Widget Function(
+      BuildContext context, Object error, StackTrace? stackTrace)? errorBuilder;
 
   /// Allow caching of the image, also attempts to load from cache first
   final bool allowCache;
@@ -34,7 +41,9 @@ class CloudImage extends StatefulWidget {
     this.fadeDuration = const Duration(milliseconds: 500),
     this.errorWidget = const Icon(Icons.error_outline),
     this.shimmerBaseOpacity = 0.5,
+    this.filterQuality = FilterQuality.medium,
     this.allowCache = true,
+    this.errorBuilder,
   });
 
   @override
@@ -122,6 +131,8 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
               width: widget.width,
               height: widget.height,
               fit: widget.fit,
+              filterQuality: widget.filterQuality,
+              errorBuilder: widget.errorBuilder,
             ),
           );
         }
@@ -131,8 +142,8 @@ class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
 
   Widget _buildShimmer() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.withOpacity(widget.shimmerBaseOpacity),
-      highlightColor: Colors.white.withOpacity(widget.shimmerBaseOpacity),
+      baseColor: Colors.grey.withValues(alpha: widget.shimmerBaseOpacity),
+      highlightColor: Colors.white.withValues(alpha: widget.shimmerBaseOpacity),
       child: Container(
         width: widget.width,
         height: widget.height,

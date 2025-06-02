@@ -1,9 +1,9 @@
 /// lib/views/albums/full_media_view.dart
 ///
-/// display a full screen media file (image, video, audio, etc)
+// TODO: add ability to fetch the object data from server and display
 
-import 'package:file_picker/file_picker.dart' show PlatformFile;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
@@ -13,21 +13,26 @@ import 'package:ourjourneys/models/storage/objects_data.dart'
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
+/// display a full screen media file (image, video, audio, etc)
+///
+/// which behind the scenes, using the [MediaItemContainer] component
 class FullMediaView extends StatelessWidget {
   final String? onlineObjectKey;
-  final PlatformFile? localFile;
+  final XFile? localFile;
   final MediaObjectType objectType;
   final Map<String, dynamic>? extraMapData;
   final FetchSourceMethod fetchSourceMethod;
   final bool cloudImageAllowCache;
+  final bool allowDownload;
   FullMediaView(
       {super.key,
       this.onlineObjectKey,
       this.localFile,
       required this.objectType,
       this.extraMapData,
+      required this.fetchSourceMethod,
       this.cloudImageAllowCache = false,
-      required this.fetchSourceMethod}) {
+      this.allowDownload = true}) {
     if (onlineObjectKey == null &&
         fetchSourceMethod == FetchSourceMethod.server) {
       throw Exception('FullMediaView: onlineObjectKey is null');
@@ -52,12 +57,13 @@ class FullMediaView extends StatelessWidget {
             icon: const Icon(Icons.edit_document),
             onPressed: () => _onPressedEditMediaFile(),
           ),
-          Padding(
-            padding: UiConsts.PaddingAll_small,
-            child: IconButton.filled(
-                onPressed: () => _onPressDownloadMediaFile(),
-                icon: const Icon(Icons.download_rounded)),
-          ),
+          if (allowDownload)
+            Padding(
+              padding: UiConsts.PaddingAll_small,
+              child: IconButton.filled(
+                  onPressed: () => _onPressDownloadMediaFile(),
+                  icon: const Icon(Icons.download_rounded)),
+            ),
         ],
         body: Center(
           child: SingleChildScrollView(
@@ -70,7 +76,7 @@ class FullMediaView extends StatelessWidget {
                 Padding(
                   padding: UiConsts.PaddingAll_small,
                   child: Text(
-                    "Media type:\t\t${objectType.stringValue}\nName:\t\t$fileName\nSize:\t\t${localFile?.size ?? extraMapData?['fileSizeInBytes'] ?? "-"} bytes\nInitial origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['description'] ?? ""}",
+                    "Media type:\t\t${objectType.stringValue}\nName:\t\t$fileName\nSize:\t\t${_getFileSizeInBytes()} bytes\nInitial origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['description'] ?? ""}",
                     maxLines: 8,
                     softWrap: true,
                     textAlign: TextAlign.start,
@@ -99,6 +105,10 @@ class FullMediaView extends StatelessWidget {
     }
   }
 
+  String _getFileSizeInBytes() {
+    return extraMapData?['fileSizeInBytes'].toString() ?? "Unknown";
+  }
+
   void _onPressedEditMediaFile() {}
   void _onPressDownloadMediaFile() {}
 
@@ -109,18 +119,23 @@ class FullMediaView extends StatelessWidget {
             showDescriptionBar: false,
             fetchSourceMethod: FetchSourceMethod.server,
             cloudImageAllowCache: cloudImageAllowCache,
+            imageFilterQuality: FilterQuality.high,
             fitting: BoxFit.contain,
             mediaItem: onlineObjectKey,
-            mimeType: "image/*",
+            mimeType: Utils.detectMimeTypeFromFilepath(onlineObjectKey ?? "") ??
+                "image/*",
           )
         : MediaItemContainer(
             widgetRatio: 1,
             showDescriptionBar: false,
             cloudImageAllowCache: cloudImageAllowCache,
             fetchSourceMethod: FetchSourceMethod.local,
+            imageFilterQuality: FilterQuality.high,
             fitting: BoxFit.contain,
-            mediaItem: localFile?.bytes,
-            mimeType: "image/*",
+            mediaItem: localFile,
+            mimeType: localFile?.mimeType ??
+                Utils.detectMimeTypeFromFilepath(localFile?.path ?? "") ??
+                "image/*",
           );
   }
 }

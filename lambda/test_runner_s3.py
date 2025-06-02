@@ -1,4 +1,4 @@
-""" test runner for lambda functions """
+""" test runner for s3 lambda functions """
 
 from verify_mock import verify_handler
 import json
