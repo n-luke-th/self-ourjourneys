@@ -318,7 +318,7 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
         decoration: BoxDecoration(
           shape: widget.shape,
           borderRadius: widget.shape == BoxShape.rectangle
-              ? UiConsts.BorderRadiusCircular_standard
+              ? UiConsts.BorderRadiusCircular_mediumLarge
               : null,
           border: !widget.showWidgetBorder
               ? null

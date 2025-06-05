@@ -1,16 +1,17 @@
 /// lib/views/auth_views/change_password_page.dart
 ///
-/// change password page
 import 'package:flutter/material.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:form_builder_validators/form_builder_validators.dart'
+    show FormBuilderValidators;
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/quick_settings_menu.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/pref/shared_pref_service.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
+/// a page for changing password
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
 
@@ -151,25 +152,25 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                                       .inverseSurface),
                               errorBorder: UnderlineInputBorder(
                                   borderRadius:
-                                      UiConsts.BorderRadiusCircular_standard,
+                                      UiConsts.BorderRadiusCircular_mediumLarge,
                                   borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error,
                                   )),
                               focusedErrorBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).focusColor),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -239,25 +240,25 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                                       .inverseSurface),
                               errorBorder: UnderlineInputBorder(
                                   borderRadius:
-                                      UiConsts.BorderRadiusCircular_standard,
+                                      UiConsts.BorderRadiusCircular_mediumLarge,
                                   borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error,
                                   )),
                               focusedErrorBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).focusColor),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -276,10 +277,10 @@ class _ChangePasswordPage extends State<ChangePasswordPage> {
                           padding: UiConsts.PaddingElevBtn,
                           shape: RoundedRectangleBorder(
                             borderRadius:
-                                UiConsts.BorderRadiusCircular_standard,
+                                UiConsts.BorderRadiusCircular_mediumLarge,
                           ),
                         ),
-                        child: Text("change password".toUpperCase()),
+                        child: const Text("CHANGE PASSWORD"),
                       ),
                     ],
                   ),

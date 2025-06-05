@@ -1,6 +1,7 @@
 /// lib/helpers/utils.dart
 /// utility classes and functions
 
+import 'dart:math' show log, pow;
 import 'dart:typed_data' show Uint8List;
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
@@ -16,6 +17,7 @@ import 'package:ourjourneys/models/storage/selected_file.dart'
     show SelectedFile;
 import 'package:ourjourneys/shared/common/allowed_extensions.dart'
     show AllowedExtensions;
+import 'package:ourjourneys/shared/common/file_enum.dart' show FileSizeUnit;
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
 import 'package:path/path.dart' as path show extension;
@@ -62,6 +64,19 @@ class Utils {
     } else {
       return objectKey.replaceAll(RegExp(r'\\'), r'/'); // Replace '\' with '/'
     }
+  }
+
+  /// Utility function to retrieve a [String] of [ObjectsData.objectThumbnailKey] from a given [objectKey].
+  ///
+  /// Returns a [String] of the thumbnail key.
+  /// Otherwise returns an empty [String].
+  static String getThumbnailKeyFromObjectKey(String objectKey) {
+    return "gen/thumbs/$objectKey";
+  }
+
+  /// Returns a folder path used to create an object key
+  static String getFolderPath(String userId) {
+    return "uploads/${DateTimeUtils.getUtcTimestampString()}-$userId";
   }
 
   /// Utility function to determine the screen size of the device.
@@ -125,6 +140,62 @@ class DateTimeUtils {
 /// Utility class for file related operations.
 class FileUtils {
   FileUtils._(); // Private constructor to prevent instantiation
+
+  /// Converts a given byte value to a human-readable file size string.
+  ///
+  /// - [bytes]: The size of the file in bytes.
+  ///
+  /// - [desiredUnit]: Optional. The desired unit for the output (e.g., 'B', 'KB', 'MB', 'GB', 'TB').
+  ///         If not provided, the method will automatically determine the best unit.
+  ///
+  /// - [decimalPlaces]: Optional. The number of decimal places to include in the result. Defaults to 2.
+  ///
+  /// - [throwErrorIfInvalid]: Optional. If true, throws an [ArgumentError] if the input size is less than 0. Defaults to false.
+  ///
+  /// Returns a formatted [String] representing the file size (e.g., "1.23 MB", "500 B"). if [throwErrorIfInvalid] is true, throws an [ArgumentError] if the input size is less than 0, otherwise returns an empty [String].
+  static String formatBytes(int? bytes,
+      {FileSizeUnit? desiredUnit,
+      int decimalPlaces = 2,
+      bool throwErrorIfInvalid = false}) {
+    if (bytes == null || bytes < 0) {
+      if (throwErrorIfInvalid) {
+        throw ArgumentError.value(
+            bytes, "bytes", "Invalid size [must be >= 0]");
+      } else {
+        return "";
+      }
+    }
+
+    if (bytes == 0) {
+      return "0 B";
+    }
+
+    const int k = 1024;
+    final List<String> units = [
+      FileSizeUnit.bytes.abbreviation,
+      FileSizeUnit.kilobytes.abbreviation,
+      FileSizeUnit.megabytes.abbreviation,
+      FileSizeUnit.gigabytes.abbreviation,
+      FileSizeUnit.terabytes.abbreviation,
+      FileSizeUnit.petabytes.abbreviation
+    ];
+
+    if (desiredUnit != null) {
+      final int unitIndex = units.indexOf(desiredUnit.abbreviation);
+      if (unitIndex != -1) {
+        double convertedValue = bytes / pow(k, unitIndex);
+        return '${convertedValue.toStringAsFixed(decimalPlaces)} ${desiredUnit.abbreviation}';
+      } else {
+        // If the provided unit is invalid, default to automatic detection.
+        // ignore: avoid_print
+        print(
+            "Warning: Invalid unit provided. Falling back to automatic unit detection.");
+      }
+    }
+
+    int i = (log(bytes) / log(k)).floor();
+    return '${(bytes / pow(k, i)).toStringAsFixed(decimalPlaces)} ${units[i]}';
+  }
 
   /// Returns a detected file type from a mime type.
   /// Returns [MediaObjectType.unknown] if the mime type is not recognized.
@@ -270,14 +341,6 @@ class FileUtils {
     onMediaSelected(picked);
 
     onCompleted?.call();
-  }
-
-  /// Utility function to retrieve [ObjectsData.objectThumbnailKey] from a given [objectKey].
-  ///
-  /// Returns a [String] of the thumbnail key.
-  /// Otherwise returns an empty [String].
-  static String getThumbnailKeyFromObjectKey(String objectKey) {
-    return "gen/thumbs/$objectKey";
   }
 
   /// Utility function to compress an image.

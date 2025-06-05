@@ -76,7 +76,7 @@ class FullMediaView extends StatelessWidget {
                 Padding(
                   padding: UiConsts.PaddingAll_small,
                   child: Text(
-                    "Media type:\t\t${objectType.stringValue}\nName:\t\t$fileName\nSize:\t\t${_getFileSizeInBytes()} bytes\nInitial origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['description'] ?? ""}",
+                    "Media type:\t\t${objectType.stringValue}\nFile extension:\t\t${fileName!.split(".").last}\nName:\t\t$fileName\nSize:\t\t${_getFileSizeInBytes()} bytes ${_getFileSizeInUnit()}\nInitial origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['objectTags'] ?? ""}",
                     maxLines: 8,
                     softWrap: true,
                     textAlign: TextAlign.start,
@@ -107,6 +107,16 @@ class FullMediaView extends StatelessWidget {
 
   String _getFileSizeInBytes() {
     return extraMapData?['fileSizeInBytes'].toString() ?? "Unknown";
+  }
+
+  String _getFileSizeInUnit() {
+    final String fileSizeUnit =
+        FileUtils.formatBytes(extraMapData?['fileSizeInBytes']);
+    if (fileSizeUnit != "") {
+      return "(~ $fileSizeUnit)";
+    } else {
+      return "";
+    }
   }
 
   void _onPressedEditMediaFile() {}

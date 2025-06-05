@@ -116,6 +116,7 @@ class FilePickerPreview extends StatelessWidget {
                 onlineObjectKey: file.cloudObjectData?.objectKey,
                 localFile: file.localFile,
                 allowDownload: false,
+                cloudImageAllowCache: true,
                 extraMapData: {"fileSizeInBytes": fileSize},
                 objectType: FileUtils.detectFileTypeFromMimeType(mimeType))));
   }

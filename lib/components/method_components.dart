@@ -1,11 +1,15 @@
 /// lib/components/method_components.dart
 /// A class of methods components
 
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async' show Future, FutureOr;
 
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart'
     show BottomSheetService;
+import 'package:ourjourneys/services/dialog/dialog_service.dart'
+    show DialogService;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 /// A class of methods components
@@ -26,7 +30,7 @@ class MethodsComponents {
               const Divider(),
               ListTile(
                 shape: RoundedRectangleBorder(
-                    borderRadius: UiConsts.BorderRadiusCircular_standard),
+                    borderRadius: UiConsts.BorderRadiusCircular_mediumLarge),
                 title: const Text(
                   "Local Files",
                   textAlign: TextAlign.center,
@@ -35,7 +39,7 @@ class MethodsComponents {
               ),
               ListTile(
                 shape: RoundedRectangleBorder(
-                    borderRadius: UiConsts.BorderRadiusCircular_standard),
+                    borderRadius: UiConsts.BorderRadiusCircular_mediumLarge),
                 title: const Text(
                   "Server Files",
                   textAlign: TextAlign.center,
@@ -45,5 +49,22 @@ class MethodsComponents {
             ],
           );
         });
+  }
+
+  static Future<void> showPopPageConfirmationDialog(
+      BuildContext context) async {
+    await DialogService.showConfirmationDialog(
+            context: context,
+            title: "Leave the page?",
+            message: "Are you sure to discard the progress and leave the page?",
+            confirmText: "DISCARD & LEAVE",
+            cancelText: "CANCEL")
+        .then((value) async {
+      if (value == true) {
+        if (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+      }
+    });
   }
 }

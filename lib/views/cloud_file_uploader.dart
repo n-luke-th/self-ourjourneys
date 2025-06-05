@@ -1,17 +1,22 @@
 /// lib/views/cloud_file_uploader.dart
 ///
-/// a dedicated general purpose file picker and uploader page
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart' show XFile;
+import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/main_view.dart';
+import 'package:ourjourneys/components/media_item_container.dart';
+import 'package:ourjourneys/components/method_components.dart'
+    show MethodsComponents;
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
-import 'package:ourjourneys/services/configs/utils/files_picker_service.dart';
 import 'package:ourjourneys/shared/common/allowed_extensions.dart'
     show AllowedExtensions;
+import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
+/// a dedicated general purpose file picker and uploader page
 class CloudFileUploader extends StatefulWidget {
   final String folderPath;
   final void Function(List<String> uploadedUrls)? onUploaded;
@@ -28,10 +33,11 @@ class CloudFileUploader extends StatefulWidget {
 
 class _CloudFileUploaderState extends State<CloudFileUploader> {
   final CloudFileService _cloudFileService = getIt<CloudFileService>();
+  final Logger _logger = getIt<Logger>();
 
-  List<PlatformFile> _selectedFiles = [];
+  List<XFile> _selectedFiles = [];
   List<String> _uploadedKeys = [];
-  List<PlatformFile> _failedFiles = [];
+  List<XFile> _failedFiles = [];
 
   double _currentFileProgress = 0.0;
   double _overallProgress = 0.0;
@@ -39,29 +45,45 @@ class _CloudFileUploaderState extends State<CloudFileUploader> {
   bool _isDone = false;
   String? _statusMessage;
 
+  void _onLocalFilesSelected(List<XFile> files, {bool isReplacing = false}) {
+    _logger.d("Picked local files: [${files.map((i) => i.name).join(', ')}]");
+    setState(() {
+      if (!isReplacing) {
+        if (_selectedFiles.isNotEmpty) {
+          _selectedFiles.addAll(files.where(
+              (f) => _selectedFiles.where((i) => i.name == f.name).isEmpty));
+        } else {
+          _selectedFiles.addAll(files);
+        }
+      } else {
+        _selectedFiles = files.toList();
+      }
+      _uploadedKeys = [];
+      _failedFiles = [];
+      _isUploading = false;
+      _isDone = false;
+      _statusMessage = null;
+    });
+    _logger.i(
+        "Tracked files (${_selectedFiles.length}): [${_selectedFiles.map((i) => i.name).join(', ')}]");
+  }
+
   Future<void> _pickFiles() async {
     final allowedExtensions = [
       ...AllowedExtensions.imageCompactExtensions,
       ...AllowedExtensions.videoExtensions,
       ...AllowedExtensions.documentExtensions,
     ];
-    FilePickerResult? result = await FilesPickerService.pickFiles(
-      allowMultiple: true,
-      fileType: FileType.custom,
-      allowedExtensions: allowedExtensions,
-      withData: true,
-    );
-
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        _selectedFiles = result.files.where((f) => f.bytes != null).toList();
-        _uploadedKeys = [];
-        _failedFiles = [];
-        _isUploading = false;
-        _isDone = false;
-        _statusMessage = null;
-      });
-    }
+    await FileUtils.pickLocalFiles(
+        onFilesSelected: (selectedFiles) {
+          if (selectedFiles.isNotEmpty) {
+            _onLocalFilesSelected(selectedFiles
+                .map((f) => f.localFile)
+                .whereType<XFile>()
+                .toList());
+          }
+        },
+        allowedExtensions: allowedExtensions);
   }
 
   Future<void> _uploadFiles() async {
@@ -77,10 +99,12 @@ class _CloudFileUploaderState extends State<CloudFileUploader> {
     final totalFiles = _selectedFiles.length;
     int currentUploadFileIndex = 0;
 
-    final fileBytesList = _selectedFiles.map((f) => f.bytes!).toList();
+    final fileBytesList =
+        await Future.wait(_selectedFiles.map((f) => f.readAsBytes()).toList());
     final fileNames = _selectedFiles.map((f) => f.name).toList();
 
     final result = await _cloudFileService.uploadMultipleFiles(
+      // ignore: use_build_context_synchronously
       context: context,
       fileBytesList: fileBytesList,
       fileNames: fileNames,
@@ -141,6 +165,7 @@ ${_uploadedKeys.map((k) => '- $k').join('\n')}
   }
 
   Future<void> _retryFailedUploads() async {
+    _logger.d("Retrying failed uploads");
     if (_failedFiles.isNotEmpty) {
       setState(() {
         _isUploading = true;
@@ -151,111 +176,165 @@ ${_uploadedKeys.map((k) => '- $k').join('\n')}
     }
   }
 
-  Widget _buildFilePreview(PlatformFile file) {
-    if (file.bytes == null) return const SizedBox();
+  Widget _buildFilePreview(XFile file) {
+    return SizedBox(
+      width: MediaQuery.sizeOf(context).width * 0.4,
+      child: MediaItemContainer(
+          mimeType: file.mimeType ??
+              FileUtils.detectMimeTypeFromFilepath(file.path) ??
+              "",
+          fetchSourceMethod: FetchSourceMethod.local,
+          showActionWidget: true,
+          actionWidget: IconButton.outlined(
+            icon: const Icon(Icons.close, size: 18, color: Colors.red),
+            onPressed: () {
+              setState(() {
+                _selectedFiles.remove(file);
+              });
+            },
+          ),
+          showDescriptionBar: true,
+          descriptionTxtMaxLines: 1,
+          mediaAndDescriptionBarFlexValue: (8, 2),
+          imageFilterQuality: FilterQuality.low,
+          extraMapData: {"description": file.name},
+          mediaItem: file),
+    );
+  }
 
-    final isImage = file.extension != null &&
-        [...AllowedExtensions.imageCompactExtensions]
-            .contains(file.extension!.toLowerCase());
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: mainView(
+        context,
+        appBarTitle: 'Cloud Files Uploader',
+        appBarLeading: BackButton(
+          onPressed: () async {
+            if (!_isDone) {
+              await MethodsComponents.showPopPageConfirmationDialog(context);
+            } else {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            }
+          },
+        ),
+        bottomSheet: (_selectedFiles.isNotEmpty && !_isUploading && !_isDone)
+            ? ElevatedButton.icon(
+                onPressed: _uploadFiles,
+                icon: const Icon(Icons.cloud_upload),
+                label: const Text('Start Upload Files'),
+              )
+            : null,
+        body: SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: Stack(
+            children: [
+              _buildSelectFilesMedium(),
+              _buildPreviewsOrProgressReport(),
+              if (_statusMessage != null) ...[
+                Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: UiConsts.PaddingAll_standard,
+                    child: Text(
+                      _statusMessage!,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ),
+                if (_failedFiles.isNotEmpty) _buildRetryBtn(),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-    if (isImage) {
-      return Image.memory(
-        file.bytes!,
-        width: 100,
-        height: 100,
-        fit: BoxFit.cover,
-      );
-    } else {
-      return Container(
-        width: 100,
-        height: 100,
-        color: Colors.grey.shade200,
-        child: Center(
-          child: Text(
-            file.extension ?? 'file',
-            textAlign: TextAlign.center,
+  Align _buildPreviewsOrProgressReport() {
+    return Align(
+      alignment: Alignment.center,
+      child: (!_isUploading && !_isDone && _selectedFiles.isNotEmpty)
+          ? Container(
+              height: MediaQuery.sizeOf(context).height * 0.5,
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .surface
+                    .withValues(alpha: 0.5),
+                borderRadius: UiConsts.BorderRadiusCircular_standard,
+              ),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
+                itemCount: _selectedFiles.length,
+                shrinkWrap: true,
+                padding: UiConsts.PaddingAll_small,
+                itemBuilder: (_, int index) {
+                  return _buildFilePreview(_selectedFiles[index]);
+                },
+              ),
+            )
+          : (_isUploading)
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text("Uploading current file..."),
+                    LinearProgressIndicator(
+                      value: _currentFileProgress,
+                      minHeight: 6,
+                      color: Colors.blue,
+                    ),
+                    Text(
+                        '${(_currentFileProgress * 100).toStringAsFixed(0)}% of current file'),
+                    UiConsts.SizedBoxGapVertical_large,
+                    const Text("Overall progress..."),
+                    LinearProgressIndicator(
+                      value: _overallProgress,
+                      minHeight: 6,
+                      color: Colors.green,
+                    ),
+                    Text(
+                        '${(_overallProgress * 100).toStringAsFixed(0)}% overall'),
+                  ],
+                )
+              : null,
+    );
+  }
+
+  Widget _buildRetryBtn() {
+    {
+      return Align(
+        alignment: Alignment.topRight,
+        child: Padding(
+          padding: UiConsts.PaddingAll_large,
+          child: ElevatedButton.icon(
+            onPressed: _retryFailedUploads,
+            icon: const Icon(Icons.refresh),
+            label: const Text("Retry Failed Files"),
           ),
         ),
       );
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return mainView(
-      context,
-      appBarTitle: 'Cloud Files Uploader',
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!_isUploading && !_isDone)
-            ElevatedButton.icon(
+  Widget _buildSelectFilesMedium() {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: (!_isUploading && !_isDone)
+          ? ElevatedButton.icon(
               onPressed: _pickFiles,
               icon: const Icon(Icons.upload_file),
               label: const Text('Select Files'),
-            ),
-          UiConsts.SizedBoxGapVertical_standard,
-          if (_selectedFiles.isNotEmpty)
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: _selectedFiles.map((file) {
-                return Stack(
-                  alignment: Alignment.topRight,
-                  children: [
-                    _buildFilePreview(file),
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 18),
-                      onPressed: () {
-                        setState(() {
-                          _selectedFiles.remove(file);
-                        });
-                      },
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
-          UiConsts.SizedBoxGapVertical_large,
-          if (_selectedFiles.isNotEmpty && !_isUploading)
-            ElevatedButton.icon(
-              onPressed: _uploadFiles,
-              icon: const Icon(Icons.cloud_upload),
-              label: const Text('Upload Files'),
-            ),
-          if (_isUploading) ...[
-            const Text("Uploading current file..."),
-            LinearProgressIndicator(
-              value: _currentFileProgress,
-              minHeight: 6,
-              color: Colors.blue,
-            ),
-            Text(
-                '${(_currentFileProgress * 100).toStringAsFixed(0)}% of current file'),
-            UiConsts.SizedBoxGapVertical_large,
-            const Text("Overall progress..."),
-            LinearProgressIndicator(
-              value: _overallProgress,
-              minHeight: 6,
-              color: Colors.green,
-            ),
-            Text('${(_overallProgress * 100).toStringAsFixed(0)}% overall'),
-          ],
-          if (_statusMessage != null) ...[
-            UiConsts.SizedBoxGapVertical_large,
-            Text(
-              _statusMessage!,
-              style: const TextStyle(color: Colors.grey),
-            ),
-            if (_failedFiles.isNotEmpty)
-              ElevatedButton.icon(
-                onPressed: _retryFailedUploads,
-                icon: const Icon(Icons.refresh),
-                label: const Text("Retry Failed Files"),
-              ),
-          ],
-        ],
-      ),
+            )
+          : null,
     );
   }
 }

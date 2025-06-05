@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 
+/// display a popup menu with a list of actions
 class MoreActionsBtn extends StatelessWidget {
   final List<ActionsBtnModel> actions;
   final Icon displayIcon;

@@ -95,7 +95,7 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
                 hintText: "Search files...",
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: UiConsts.BorderRadiusCircular_standard,
+                  borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
                 ),
               ),
             ),
@@ -125,8 +125,8 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
                                 onSelected: (_) => _toggleSelection(obj),
                                 tooltip: obj.fileName,
                                 shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        UiConsts.BorderRadiusCircular_standard),
+                                    borderRadius: UiConsts
+                                        .BorderRadiusCircular_mediumLarge),
                                 // avatar: const Icon(Icons.open_in_full_rounded),
                                 // avatarBoxConstraints:
                                 //     BoxConstraints.tightFor(width: 20),

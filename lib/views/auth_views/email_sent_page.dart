@@ -1,7 +1,5 @@
 /// lib/views/auth_views/email_sent_page.dart
 ///
-///
-/// this is the confirmation page that the email is now sent to the given address
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +7,7 @@ import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/quick_settings_menu.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
+/// this is the confirmation page that the email is now sent to the given address
 class EmailSentPage extends StatelessWidget {
   final String email;
   const EmailSentPage({super.key, required this.email});
@@ -67,10 +66,11 @@ class EmailSentPage extends StatelessWidget {
                             Theme.of(context).colorScheme.tertiaryContainer,
                         padding: UiConsts.PaddingElevBtn,
                         shape: RoundedRectangleBorder(
-                          borderRadius: UiConsts.BorderRadiusCircular_standard,
+                          borderRadius:
+                              UiConsts.BorderRadiusCircular_mediumLarge,
                         ),
                       ),
-                      child: Text("Go LOGIN now"),
+                      child: const Text("Go LOGIN now"),
                     ),
                   ],
                 ),

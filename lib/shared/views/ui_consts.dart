@@ -73,8 +73,23 @@ class UiConsts {
     width: 4,
   );
 
+  /// BorderRadius.circular(4)
+  static var BorderRadiusCircular_small = BorderRadius.circular(4);
+
+  /// BorderRadius.circular(8)
+  static var BorderRadiusCircular_standard = BorderRadius.circular(8);
+
+  /// BorderRadius.circular(16)
+  static var BorderRadiusCircular_medium = BorderRadius.circular(16);
+
+  /// BorderRadius.circular(18)
+  static var BorderRadiusCircular_smallLarge = BorderRadius.circular(18);
+
   /// BorderRadius.circular(20)
-  static var BorderRadiusCircular_standard = BorderRadius.circular(20);
+  static var BorderRadiusCircular_mediumLarge = BorderRadius.circular(20);
+
+  /// BorderRadius.circular(24)
+  static var BorderRadiusCircular_superLarge = BorderRadius.circular(24);
 
   /// borderRadius = 20.0
   static const double borderRadius = 20.0;

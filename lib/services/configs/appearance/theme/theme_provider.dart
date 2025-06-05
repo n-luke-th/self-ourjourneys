@@ -28,16 +28,9 @@ class ThemeProvider with ChangeNotifier {
   }
 
   Future<void> loadFromPrefs() async {
-    _themeMode =
-        ThemeMode.values[_prefs.getInt('themeMode') ?? ThemeMode.system.index];
-
-    // Apply user preference before falling back to system default
-    if (_themeMode == ThemeMode.system) {
-      final brightness =
-          WidgetsBinding.instance.platformDispatcher.platformBrightness;
-      _themeMode =
-          brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
-    }
+    _themeMode = ThemeMode.values[_prefs.getInt('themeMode') ??
+        ThemeMode.system
+            .index]; // apply the theme mode, system default as the fallback
     notifyListeners();
   }
 

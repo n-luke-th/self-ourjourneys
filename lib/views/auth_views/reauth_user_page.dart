@@ -1,6 +1,5 @@
 /// lib/views/auth_views/reauth_user_page.dart
 ///
-/// reauthenticate user page
 
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -13,6 +12,7 @@ import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/pref/shared_pref_service.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
+/// reauthenticate user page
 class ReauthUserPage extends StatefulWidget {
   final String routeToBePushed;
   const ReauthUserPage({super.key, required this.routeToBePushed});
@@ -142,25 +142,25 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                                       .inverseSurface),
                               errorBorder: UnderlineInputBorder(
                                   borderRadius:
-                                      UiConsts.BorderRadiusCircular_standard,
+                                      UiConsts.BorderRadiusCircular_mediumLarge,
                                   borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error,
                                   )),
                               focusedErrorBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).focusColor),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -223,25 +223,25 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                                       .inverseSurface),
                               errorBorder: UnderlineInputBorder(
                                   borderRadius:
-                                      UiConsts.BorderRadiusCircular_standard,
+                                      UiConsts.BorderRadiusCircular_mediumLarge,
                                   borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error,
                                   )),
                               focusedErrorBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).focusColor),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -260,10 +260,10 @@ class _ReauthUserPage extends State<ReauthUserPage> {
                           padding: UiConsts.PaddingAll_large,
                           shape: RoundedRectangleBorder(
                             borderRadius:
-                                UiConsts.BorderRadiusCircular_standard,
+                                UiConsts.BorderRadiusCircular_mediumLarge,
                           ),
                         ),
-                        child: Text("reauthenticate".toUpperCase()),
+                        child: const Text("REAUTHENTICATE"),
                       ),
                     ],
                   ),

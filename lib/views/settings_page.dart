@@ -9,6 +9,10 @@ import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
@@ -18,11 +22,9 @@ import 'package:ourjourneys/services/configs/utils/permission_service.dart';
 import 'package:ourjourneys/services/notifications/notification_manager.dart';
 import 'package:ourjourneys/services/notifications/notification_service.dart';
 import 'package:ourjourneys/services/package/package_info_provider.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
+/// the settings page
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -99,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: UiConsts.PaddingAll_standard,
             child: Center(
               child: Text(
-                  'version: ${packageInfo.version}+${packageInfo.buildNumber}'),
+                  'version: ${packageInfo.version}${packageInfo.buildNumber.isEmpty ? '' : '+${packageInfo.buildNumber}'}'),
             ),
           );
         })
@@ -195,9 +197,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                             borderRadius:
-                                UiConsts.BorderRadiusCircular_standard,
+                                UiConsts.BorderRadiusCircular_mediumLarge,
                           ),
                         ),
                         Text(
@@ -467,7 +469,7 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // UiConsts.SizedBoxGapVertical_small,
+              UiConsts.SizedBoxGapVertical_small,
               Text(
                 _authWrapper.displayName == "_OurJourneys user_"
                     ? _authWrapper.emailAddress
@@ -602,7 +604,6 @@ class SettingBottomSheet<T> extends StatelessWidget {
     return Container(
       padding: UiConsts.PaddingAll_large,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
         borderRadius: const BorderRadius.vertical(
             top: Radius.circular(UiConsts.borderRadius)),
       ),
@@ -614,8 +615,7 @@ class SettingBottomSheet<T> extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
             ),
           ),
           Text(
@@ -624,6 +624,8 @@ class SettingBottomSheet<T> extends StatelessWidget {
           ),
           UiConsts.SizedBoxGapVertical_large,
           ...items.map((item) => ListTile(
+                shape: RoundedRectangleBorder(
+                    borderRadius: UiConsts.BorderRadiusCircular_mediumLarge),
                 title: itemBuilder(item),
                 onTap: () async {
                   await onChanged(item);

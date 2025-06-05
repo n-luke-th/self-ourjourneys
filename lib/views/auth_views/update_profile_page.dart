@@ -1,6 +1,5 @@
 /// lib/views/auth_views/update_profile_page.dart
 ///
-/// a page where user can update their profile settings
 // TODO: edit this page
 // ignore_for_file: use_build_context_synchronously
 
@@ -15,8 +14,12 @@ import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/quick_settings_menu.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
+/// a page where user can update their profile settings
+///
+/// as of now, only the display name can be updated
+/// the profile picture is not yet supported
 class UpdateProfilePage extends StatefulWidget {
   const UpdateProfilePage({super.key});
 
@@ -91,25 +94,25 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                                   Theme.of(context).colorScheme.inverseSurface),
                           errorBorder: UnderlineInputBorder(
                               borderRadius:
-                                  UiConsts.BorderRadiusCircular_standard,
+                                  UiConsts.BorderRadiusCircular_mediumLarge,
                               borderSide: BorderSide(
                                 color: Theme.of(context).colorScheme.error,
                               )),
                           focusedErrorBorder: UnderlineInputBorder(
                             borderRadius:
-                                UiConsts.BorderRadiusCircular_standard,
+                                UiConsts.BorderRadiusCircular_mediumLarge,
                             borderSide: BorderSide(
                                 color: Theme.of(context).colorScheme.error),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius:
-                                UiConsts.BorderRadiusCircular_standard,
+                                UiConsts.BorderRadiusCircular_mediumLarge,
                             borderSide:
                                 BorderSide(color: Theme.of(context).focusColor),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius:
-                                UiConsts.BorderRadiusCircular_standard,
+                                UiConsts.BorderRadiusCircular_mediumLarge,
                             borderSide: BorderSide(
                                 color: Theme.of(context).colorScheme.onPrimary),
                           ),
@@ -125,7 +128,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                           Theme.of(context).colorScheme.primaryContainer,
                       padding: UiConsts.PaddingElevBtn,
                       shape: RoundedRectangleBorder(
-                        borderRadius: UiConsts.BorderRadiusCircular_standard,
+                        borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
                       ),
                     ),
                     child: const Text("UPDATE PROFILE"),

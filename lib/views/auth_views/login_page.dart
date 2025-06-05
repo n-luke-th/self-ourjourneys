@@ -1,6 +1,5 @@
 /// lib/views/auth_views/login_page.dart
 ///
-/// login page
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +12,7 @@ import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/pref/shared_pref_service.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
+/// login page
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -138,25 +138,25 @@ class _LoginPage extends State<LoginPage> {
                                       .inverseSurface),
                               errorBorder: UnderlineInputBorder(
                                   borderRadius:
-                                      UiConsts.BorderRadiusCircular_standard,
+                                      UiConsts.BorderRadiusCircular_mediumLarge,
                                   borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error,
                                   )),
                               focusedErrorBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).focusColor),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -222,25 +222,25 @@ class _LoginPage extends State<LoginPage> {
                                       .inverseSurface),
                               errorBorder: UnderlineInputBorder(
                                   borderRadius:
-                                      UiConsts.BorderRadiusCircular_standard,
+                                      UiConsts.BorderRadiusCircular_mediumLarge,
                                   borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error,
                                   )),
                               focusedErrorBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).colorScheme.error),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context).focusColor),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius:
-                                    UiConsts.BorderRadiusCircular_standard,
+                                    UiConsts.BorderRadiusCircular_mediumLarge,
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -280,7 +280,7 @@ class _LoginPage extends State<LoginPage> {
                           padding: UiConsts.PaddingAll_large,
                           shape: RoundedRectangleBorder(
                             borderRadius:
-                                UiConsts.BorderRadiusCircular_standard,
+                                UiConsts.BorderRadiusCircular_mediumLarge,
                           ),
                         ),
                         child: const Text("LOGIN"),

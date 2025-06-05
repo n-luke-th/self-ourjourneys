@@ -1,13 +1,13 @@
 /// lib/services/configs/settings_service.dart
 ///
 ///
-/// services for settings of the app
 ///
 
 import 'package:flutter/material.dart'
     show ChangeNotifier, ThemeData, ThemeMode;
 import 'package:ourjourneys/services/configs/appearance/theme/theme_provider.dart';
 
+/// service class for settings of the app
 class SettingsService with ChangeNotifier {
   final ThemeProvider themeProvider;
   SettingsService({required this.themeProvider}) {

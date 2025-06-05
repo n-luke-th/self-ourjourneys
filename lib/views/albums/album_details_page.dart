@@ -12,7 +12,7 @@ import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
 import 'package:ourjourneys/components/more_actions_btn.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
@@ -135,8 +135,8 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                             fetchSourceMethod: FetchSourceMethod.server,
                             cloudImageAllowCache: widget.cloudImageAllowCache,
                             imageFilterQuality: FilterQuality.low,
-                            mediaItem: FileUtils.getThumbnailKeyFromObjectKey(
-                                objectKey),
+                            mediaItem:
+                                Utils.getThumbnailKeyFromObjectKey(objectKey),
                             mediaAndDescriptionBarFlexValue: (8, 1),
                             descriptionTxtMaxLines: 1,
                             extraMapData: {
@@ -200,7 +200,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
       type: DialogType.information,
       title: "Information",
       message:
-          "Media type: ${FileUtils.detectFileTypeFromFilepath(objectKey)}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
+          "Media type: ${FileUtils.detectFileTypeFromFilepath(objectKey).stringValue}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
     );
   }
 

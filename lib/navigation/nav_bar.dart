@@ -47,7 +47,7 @@ class _NavBarState extends State<NavBar> {
                 elevation: 20,
                 shadowColor: Theme.of(context).colorScheme.primaryContainer,
                 indicatorShape: RoundedRectangleBorder(
-                    borderRadius: UiConsts.BorderRadiusCircular_standard),
+                    borderRadius: UiConsts.BorderRadiusCircular_mediumLarge),
                 labelBehavior:
                     NavigationDestinationLabelBehavior.onlyShowSelected,
                 surfaceTintColor: Colors.amber,

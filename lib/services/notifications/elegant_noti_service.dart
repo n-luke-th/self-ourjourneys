@@ -25,7 +25,7 @@ class ElegantNotificationService implements NotificationService {
             description: Text(data.message,
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onSecondary)),
-            borderRadius: UiConsts.BorderRadiusCircular_standard,
+            borderRadius: UiConsts.BorderRadiusCircular_medium,
             icon: Icon(_getIcon(data.type), color: _getColor(data.type)),
             toastDuration: data.duration,
             animationDuration: const Duration(milliseconds: 300),

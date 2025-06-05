@@ -1,11 +1,12 @@
 /// lib/components/paginated_files_grid.dart
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'
+    show DocumentSnapshot, Query;
 import 'package:flutter/material.dart';
 // import 'package:logger/logger.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
@@ -14,9 +15,10 @@ import 'package:ourjourneys/services/dialog/dialog_service.dart'
     show DialogService, DialogType;
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 import 'package:ourjourneys/views/albums/full_media_view.dart';
 
+/// A widget that displays a paginated grid of all files on the server.
 class PaginatedFilesGrid extends StatefulWidget {
   final String? filterContentTypePrefix;
   final bool cloudImageAllowCache;
@@ -137,11 +139,13 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.2,
             child: MediaItemContainer(
+              showDescriptionBar: false,
               cloudImageAllowCache: widget.cloudImageAllowCache,
-              mimeType: "image/",
+              mimeType: objectsData.contentType,
               fetchSourceMethod: FetchSourceMethod.server,
               mediaItem: objectsData.objectThumbnailKey,
               mediaAndDescriptionBarFlexValue: (18, 1),
+              imageFilterQuality: FilterQuality.low,
               descriptionTxtMaxLines: 1,
               extraMapData: {"description": objectKey.split("/").last},
               onLongPress: () async {
@@ -150,7 +154,7 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
               onDoubleTap: () async {
                 await _onDoubleTapItem(objectKey);
               },
-              onTap: () => _onTapItem(objectKey),
+              onTap: () => _onTapItem(objectsData),
             ),
           );
         } else if (FileUtils.detectFileTypeFromMimeType(
@@ -168,14 +172,18 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
     );
   }
 
-  Future<dynamic> _onTapItem(String objectKey) {
+  Future<dynamic> _onTapItem(ObjectsData objectData) {
     return Navigator.push(
         context,
         MaterialPageRoute(
             builder: (b) => FullMediaView(
                   fetchSourceMethod: FetchSourceMethod.server,
-                  onlineObjectKey: objectKey,
+                  cloudImageAllowCache: widget.cloudImageAllowCache,
+                  onlineObjectKey: objectData.objectKey,
                   objectType: MediaObjectType.image,
+                  extraMapData: {
+                    "fileSizeInBytes": objectData.objectSizeInBytes
+                  },
                 )));
   }
 

@@ -1,6 +1,5 @@
 /// lib/views/albums/new_album_page.dart
 ///
-/// a page where is meant to create new album
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -17,12 +16,13 @@ import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/views/albums/album_creation_live_result_page.dart';
 import 'package:ourjourneys/components/server_file_selector.dart';
 import 'package:ourjourneys/components/main_view.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart' show DateTimeUtils, FileUtils;
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
 import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
+/// a page where is meant to create new album
 class NewAlbumPage extends StatefulWidget {
   const NewAlbumPage({super.key});
 
@@ -107,7 +107,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         );
       }
     } else {
-      _logger.d(
+      _logger.i(
           "Creating album: '${_nameController.text}' with files: [${_selectedLocalFiles.map((i) => i.localFile?.name).join(', ')}, ${_selectedServerObjects.map((i) => i.objectKey).join(', ')}]");
       final List<String> fileNames =
           _selectedLocalFiles.map((e) => e.localFile!.name).toList();
@@ -117,8 +117,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
           builder: (context) => AlbumCreationLiveResultPage(
             isNoNeedNewUpload: fileNames.isEmpty ? true : false,
             albumName: _nameController.text.trim(),
-            folderPath:
-                "uploads/${DateTimeUtils.getUtcTimestampString()}-${_authWrapper.uid}",
+            folderPath: Utils.getFolderPath(_authWrapper.uid),
             listOfXFiles: _selectedLocalFiles.map((f) => f.localFile!).toList(),
             selectedExistingObjectKeys:
                 _selectedServerObjects.map((e) => e.objectKey).toList(),
@@ -149,20 +148,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
           persistentFooterAlignment: AlignmentDirectional.center,
           appBarLeading: BackButton(
             onPressed: () async {
-              await DialogService.showConfirmationDialog(
-                      context: context,
-                      title: "Leaave the page?",
-                      message:
-                          "Are you sure to discard the progress and leave the page?",
-                      confirmText: "DISCARD & LEAVE",
-                      cancelText: "CANCEL")
-                  .then((value) async {
-                if (value == true) {
-                  if (Navigator.canPop(context)) {
-                    Navigator.of(context).pop();
-                  }
-                }
-              });
+              await MethodsComponents.showPopPageConfirmationDialog(context);
             },
           ),
           bottomSheet: Padding(
@@ -176,7 +162,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 padding: UiConsts.PaddingAll_large,
                 shape: RoundedRectangleBorder(
-                  borderRadius: UiConsts.BorderRadiusCircular_standard,
+                  borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
                 ),
               ),
               label: const Text("CREATE ALBUM"),
@@ -276,7 +262,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: UiConsts.BorderRadiusCircular_standard,
+        borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
         border: Border.all(
           color: backgroundColor,
         ),
@@ -299,7 +285,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
               "Server files selected:",
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
             )),
         UiConsts.SizedBoxGapVertical_small,
         FilePickerPreview(
@@ -319,7 +305,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: UiConsts.BorderRadiusCircular_standard,
+        borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
         border: Border.all(
           color: backgroundColor,
         ),
@@ -342,7 +328,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
               "Local files selected:",
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
             )),
         UiConsts.SizedBoxGapVertical_small,
         FilePickerPreview(
@@ -377,21 +363,21 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             errorStyle:
                 TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
             errorBorder: UnderlineInputBorder(
-                borderRadius: UiConsts.BorderRadiusCircular_standard,
+                borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
                 borderSide: BorderSide(
                   color: Theme.of(context).colorScheme.error,
                 )),
             focusedErrorBorder: UnderlineInputBorder(
-              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
               borderSide:
                   BorderSide(color: Theme.of(context).colorScheme.error),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
               borderSide: BorderSide(color: Theme.of(context).focusColor),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: UiConsts.BorderRadiusCircular_standard,
+              borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
               borderSide:
                   BorderSide(color: Theme.of(context).colorScheme.onPrimary),
             ),

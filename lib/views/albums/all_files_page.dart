@@ -3,8 +3,15 @@
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/paginated_files_grid.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/helpers/utils.dart' show Utils;
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart'
+    show AuthWrapper;
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
+import 'package:ourjourneys/views/cloud_file_uploader.dart'
+    show CloudFileUploader;
 
+/// a page to display all files which calls the [PaginatedFilesGrid] component under the hood
 class AllFilesPage extends StatefulWidget {
   const AllFilesPage({super.key});
 
@@ -14,6 +21,7 @@ class AllFilesPage extends StatefulWidget {
 
 class _AllFilesPageState extends State<AllFilesPage>
     with TickerProviderStateMixin {
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   late final TabController _tabController;
 
   final List<_MediaTab> _tabs = [
@@ -66,11 +74,29 @@ class _AllFilesPageState extends State<AllFilesPage>
     return mainView(
       context,
       appBarTitle: "All Uploaded Files",
+      appbarActions: [
+        Padding(
+          padding: UiConsts.PaddingHorizontal_small,
+          child: IconButton.outlined(
+              tooltip: "Upload files to server",
+              enableFeedback: true,
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => CloudFileUploader(
+                            folderPath: Utils.getFolderPath(_authWrapper.uid),
+                          ))),
+              icon: const Icon(
+                Icons.cloud_upload_outlined,
+                color: Colors.blueAccent,
+              )),
+        )
+      ],
       appbarBottom: TabBar(
         controller: _tabController,
         isScrollable: false,
-        labelPadding: UiConsts.PaddingAll_standard,
-        // indicatorPadding: UiConsts.PaddingHorizontal_small,
+        labelPadding: UiConsts.PaddingAll_small,
+        padding: UiConsts.PaddingHorizontal_small,
         tabAlignment: TabAlignment.fill,
         enableFeedback: true,
         labelColor: Theme.of(context).colorScheme.onSurface,

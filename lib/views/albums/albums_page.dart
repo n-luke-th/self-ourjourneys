@@ -1,6 +1,5 @@
 /// lib/views/albums/albums_page.dart
 ///
-///
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:cloud_firestore/cloud_firestore.dart'
@@ -13,15 +12,19 @@ import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/more_actions_btn.dart'
     show MoreActionsBtn;
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart';
+import 'package:ourjourneys/helpers/utils.dart' show Utils;
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
-import 'package:ourjourneys/shared/services/firestore_commons.dart';
+import 'package:ourjourneys/services/dialog/dialog_service.dart';
+import 'package:ourjourneys/shared/services/firestore_commons.dart'
+    show FirestoreCollections;
 import 'package:ourjourneys/shared/views/screen_sizes.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
+import 'package:ourjourneys/views/cloud_file_uploader.dart';
 
+/// a page to display a list of albums
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
 
@@ -63,7 +66,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
       final idToken = _authWrapper.idToken;
       _logger.d("idToken: $idToken");
     } catch (e) {
-      _logger.e(e);
+      _logger.e(e.toString(), error: e, stackTrace: StackTrace.current);
     }
   }
 
@@ -78,7 +81,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
 
   Future<void> _fetch({bool forceRefresh = false}) async {
     context.loaderOverlay.show();
-    _logger.i("fetching albums...");
+    _logger.t("fetching albums...");
     setState(() => _isLoading = true);
     if (forceRefresh) {
       _docs.clear();
@@ -136,6 +139,16 @@ class _AlbumsPageState extends State<AlbumsPage> {
                       Icons.folder_outlined,
                     ),
                     onPressed: () => context.pushNamed("ViewAllFilesPage")),
+                ActionsBtnModel(
+                    actionName: "Upload files to server",
+                    icon: const Icon(Icons.cloud_upload_outlined),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => CloudFileUploader(
+                                  folderPath:
+                                      Utils.getFolderPath(_authWrapper.uid),
+                                )))),
                 if (_docs.isNotEmpty)
                   ActionsBtnModel(
                       actionName: "Select Albums",
@@ -153,99 +166,140 @@ class _AlbumsPageState extends State<AlbumsPage> {
         floatingActionButtonIcon: Icons.add_to_photos_outlined,
         onFloatingActionButtonPressed: () => context.pushNamed("NewAlbumPage"),
         body: Center(
-            child: Padding(
-                padding: UiConsts.PaddingAll_small,
-                child: (_docs.isEmpty)
-                    ? const Center(child: Text("No albums yet"))
-                    : GridView.builder(
-                        controller: _scrollController,
-                        padding: UiConsts.PaddingAll_standard,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          childAspectRatio: Utils.getScreenSize(
-                                      MediaQuery.sizeOf(context).width) ==
-                                  ScreenSize.large
-                              ? 2
-                              : 0.9,
-                        ),
-                        itemCount: _docs.length + (_hasMore ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index == _docs.length) {
-                            // if (_isLoading) {
-                            //   context.loaderOverlay.show();
-                            // } else if (!_isLoading) {
-                            //   context.loaderOverlay.hide();
-                            // }
-
-                            return const Center(child: SizedBox.shrink());
-                          } else if (_docs.isEmpty) {
-                            return const Center(child: Text("No albums yet"));
-                          } else {
-                            final data = _docs[index];
-                            return _albumTile(data, index);
-                          }
-                        },
-                      ))));
+            child: (_docs.isEmpty)
+                ? Padding(
+                    padding: UiConsts.PaddingAll_standard,
+                    child: const Center(child: Text("No albums yet")),
+                  )
+                : GridView.builder(
+                    controller: _scrollController,
+                    padding: UiConsts.PaddingAll_small,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: Utils.getScreenSize(
+                                  MediaQuery.sizeOf(context).width) ==
+                              ScreenSize.large
+                          ? 2
+                          : 0.9,
+                    ),
+                    itemCount: _docs.length + (_hasMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == _docs.length) {
+                        // if (_isLoading) {
+                        //   context.loaderOverlay.show();
+                        // } else if (!_isLoading) {
+                        //   context.loaderOverlay.hide();
+                        // }
+                        return const Center(child: SizedBox.shrink());
+                      } else if (_docs.isEmpty) {
+                        return const Center(child: Text("No albums yet"));
+                      } else {
+                        final data = _docs[index];
+                        return _albumCard(data, index);
+                      }
+                    },
+                  )));
   }
 
   void _onPressedSelectAlbumsActionBtn() =>
       _logger.d("select albums action pressed");
 
-  Widget _albumTile(Map<String, dynamic> data, int index) {
-    final name = data['albumName'] as String;
+  Card _albumCard(Map<String, dynamic> albumData, int index) {
+    final name = albumData['albumName'] as String;
     final modData = ModificationData.fromMap(
-        data['modificationData'] as Map<String, dynamic>);
+        albumData['modificationData'] as Map<String, dynamic>);
     final (String createdString, String modifiedString) =
         ModificationData.getModificationDataString(
             modData: modData, uid: _authWrapper.uid);
     if (_authWrapper.uid == "") {
       _authWrapper.refreshUid();
     }
-    return Container(
-      margin: UiConsts.PaddingAll_small,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: UiConsts.BorderRadiusCircular_standard,
-      ),
-      child: ListTile(
-        shape: RoundedRectangleBorder(
-          borderRadius: UiConsts.BorderRadiusCircular_standard,
+    final ShapeBorder shape = BeveledRectangleBorder(
+      borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
+    );
+    return Card(
+      shape: shape,
+      elevation: 5,
+      shadowColor: Theme.of(context).highlightColor,
+      surfaceTintColor: Theme.of(context).canvasColor,
+      child: InkWell(
+        borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
+        customBorder: shape,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 4, bottom: 4, left: 8),
+          child: Stack(
+            children: [
+              Align(
+                alignment: AlignmentDirectional.topStart,
+                child: Padding(
+                  padding: UiConsts.PaddingAll_standard,
+                  child: Text(
+                      "${albumData["linkedObjects"].length.toString()}${albumData["linkedObjects"].length <= 1 ? ' item' : ' items'}",
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall
+                          ?.copyWith(color: Theme.of(context).disabledColor)),
+                ),
+              ),
+              Align(
+                  alignment: AlignmentDirectional.topEnd,
+                  child: IconButton.filled(
+                    color: Colors.red,
+                    onPressed: () async => await _deleteSelectedAlbums(),
+                    icon: const Icon(Icons.delete_outline_rounded),
+                  )),
+              Align(
+                alignment: AlignmentDirectional.bottomStart,
+                child: Padding(
+                  padding: UiConsts.PaddingAll_small,
+                  child: Text(
+                    modifiedString,
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelSmall
+                        ?.copyWith(color: Theme.of(context).hintColor),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  name,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                  maxLines: 2,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(decoration: TextDecoration.underline),
+                ),
+              ),
+            ],
+          ),
         ),
-        visualDensity: VisualDensity.comfortable,
-        enableFeedback: true,
-        contentPadding: UiConsts.PaddingHorizontal_small,
-        titleAlignment: ListTileTitleAlignment.center,
-        isThreeLine: true,
-        // leading: Text((index + 1).toString()),
-        trailing: Text(
-          "${data["linkedObjects"].length.toString()}\n${data["linkedObjects"].length <= 1 ? 'item' : 'items'}",
-          maxLines: 2,
-          softWrap: true,
-          textAlign: TextAlign.center,
-        ),
-        title: Text(
-          name,
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge!
-              .copyWith(decoration: TextDecoration.underline),
-        ),
-        subtitle: Text(
-          modifiedString,
-          softWrap: true,
-          maxLines: 5,
-          overflow: TextOverflow.clip,
-        ),
-        style: ListTileStyle.drawer,
-        onTap: () => context.goNamed("AlbumDetailsPage", extra: data),
-        onLongPress: () => _onLongPressAlbumTile(data),
+        onTap: () => context.goNamed("AlbumDetailsPage", extra: albumData),
+        onLongPress: () => _onLongPressAlbumTile(
+            albumData: albumData,
+            modifiedString: modifiedString,
+            createdString: createdString),
       ),
     );
   }
 
-  void _onLongPressAlbumTile(Map<String, dynamic> data) {}
+  Future<void> _onLongPressAlbumTile(
+      {required Map<String, dynamic> albumData,
+      required String modifiedString,
+      required String createdString}) async {
+    await DialogService.showInfoDialog(
+        context: context,
+        title: "Album Info",
+        message:
+            "Name: ${albumData["albumName"]}\nContains: ${albumData["linkedObjects"].length.toString()} ${albumData["linkedObjects"].length <= 1 ? 'item' : 'items'}\n$createdString\n$modifiedString");
+  }
+
+  Future<void> _deleteSelectedAlbums() async {}
 }

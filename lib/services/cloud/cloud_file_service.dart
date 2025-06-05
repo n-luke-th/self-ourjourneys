@@ -12,7 +12,7 @@ import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 
 import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
+import 'package:ourjourneys/helpers/utils.dart' show Utils;
 import 'package:ourjourneys/models/storage/file_model.dart' show DeleteResult;
 import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/services/api/api_service.dart';
@@ -85,7 +85,7 @@ class CloudFileService {
           contentType: lookupMimeType(uploadTarget.fileName) ??
               'application/octet-stream',
           objectThumbnailKey:
-              FileUtils.getThumbnailKeyFromObjectKey(uploadTarget.key),
+              Utils.getThumbnailKeyFromObjectKey(uploadTarget.key),
           objectUploadRequestedAt: requestedTime,
           tags: tags,
           linkedAlbums: linkedAlbums,
@@ -185,7 +185,7 @@ class CloudFileService {
               contentType:
                   lookupMimeType(result.fileName) ?? 'application/octet-stream',
               objectThumbnailKey:
-                  FileUtils.getThumbnailKeyFromObjectKey(result.key),
+                  Utils.getThumbnailKeyFromObjectKey(result.key),
               objectUploadRequestedAt: requestedTime,
               tags: tags,
               linkedAlbums: linkedAlbums,

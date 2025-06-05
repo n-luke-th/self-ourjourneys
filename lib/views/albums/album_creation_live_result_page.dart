@@ -227,7 +227,7 @@ class _AlbumCreationLiveResultPageState
               children: [
                 if (_isUploading)
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                           "Processing/Uploading file: ${_currentIndex + 1}${widget.listOfXFiles.isEmpty ? "" : " of ${widget.listOfXFiles.length}"}"),

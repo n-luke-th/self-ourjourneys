@@ -43,7 +43,7 @@ class DialogService {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-              borderRadius: UiConsts.BorderRadiusCircular_standard),
+              borderRadius: UiConsts.BorderRadiusCircular_mediumLarge),
           title: Text(
             title,
             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -99,7 +99,7 @@ class DialogService {
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(
-                  borderRadius: UiConsts.BorderRadiusCircular_standard),
+                  borderRadius: UiConsts.BorderRadiusCircular_mediumLarge),
             ),
             onPressed: button.onPressed,
             child: Text(
