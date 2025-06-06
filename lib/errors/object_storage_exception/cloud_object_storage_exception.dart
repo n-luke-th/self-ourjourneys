@@ -1,5 +1,5 @@
 /// lib/errors/object_storage_exception/cloud_object_storage_exception.dart
-/// Authentication-related exceptions
+/// Cloud object-related exceptions
 import 'package:ourjourneys/errors/base/base_exception.dart';
 
 class CloudObjectStorageException extends BaseException {

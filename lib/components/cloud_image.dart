@@ -1,19 +1,16 @@
 /// lib/components/cloud_image.dart
 // TODO: enhance performance for image widget
-import 'dart:typed_data';
+
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:dio/dio.dart';
-import 'package:logger/logger.dart';
-import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
+import 'package:logger/logger.dart' show Logger;
+import 'package:shimmer/shimmer.dart';
+
 import 'package:ourjourneys/errors/object_storage_exception/cloud_object_storage_exception.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/services/auth/acc/auth_service.dart';
-import 'package:ourjourneys/services/network/dio_handler.dart';
-import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/shared/errors_code_and_msg/cloud_object_storage_errors.dart';
 import 'package:ourjourneys/shared/services/network_const.dart';
-import 'package:shimmer/shimmer.dart';
 
 /// The [CloudImage] widget is a wrapper around the Image widget that allows for caching of images fetched from a server.
 /// used to handle display the images from the cloud storage
@@ -32,6 +29,8 @@ class CloudImage extends StatefulWidget {
   /// Allow caching of the image, also attempts to load from cache first
   final bool allowCache;
 
+  final ExtendedImageMode displayImageMode;
+
   const CloudImage({
     super.key,
     required this.objectKey,
@@ -39,11 +38,12 @@ class CloudImage extends StatefulWidget {
     this.width,
     this.height,
     this.fadeDuration = const Duration(milliseconds: 500),
-    this.errorWidget = const Icon(Icons.error_outline),
+    this.errorWidget = const Center(child: Icon(Icons.error_outline)),
     this.shimmerBaseOpacity = 0.5,
     this.filterQuality = FilterQuality.medium,
     this.allowCache = true,
     this.errorBuilder,
+    this.displayImageMode = ExtendedImageMode.none,
   });
 
   @override
@@ -51,93 +51,66 @@ class CloudImage extends StatefulWidget {
 }
 
 class _CloudImageState extends State<CloudImage> with TickerProviderStateMixin {
-  late Future<Uint8List> _imageFuture;
-  final cache = DefaultCacheManager();
-  final AuthService _auth = getIt<AuthService>();
+  final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final Logger _logger = getIt<Logger>();
-  final DioHandler _dioHandler = getIt<DioHandler>();
+
+  late final String _idToken;
 
   @override
   void initState() {
     super.initState();
-    _imageFuture = _loadImageSecurely();
-  }
-
-  Future<Uint8List> _loadImageSecurely() async {
-    final cacheKey = widget.objectKey.hashCode.toString();
-    if (widget.allowCache) {
-      // Check local cache first
-      final cachedFile = await cache.getFileFromCache(cacheKey);
-      if (cachedFile != null) {
-        _logger.i("Loaded image from cache: ${widget.objectKey}");
-        return cachedFile.file.readAsBytes();
-      }
-    }
-
-    if (!_auth.isUserLoggedIn()) {
-      throw AuthException(
-        errorEnum: AuthErrors.AUTH_C12,
-        errorDetailsFromDependency: 'User not authenticated',
-        st: StackTrace.current,
-      );
-    }
-
-    final objectUrl = "${NetworkConsts.cdnUrl}/${widget.objectKey}";
-    _logger.d('objectKey: ${widget.objectKey} | object URL: $objectUrl');
-
-    try {
-      final Dio dio = await _dioHandler.getClient(
-          withAuth: true,
-          jsonContentTypeForAuth: false,
-          baseUrl: NetworkConsts.cdnUrl);
-      final response = await dio.get<List<int>>(
-        objectUrl,
-        options: Options(responseType: ResponseType.bytes),
-      );
-
-      final bytes = Uint8List.fromList(response.data!);
-      if (widget.allowCache) {
-        await cache.putFile(cacheKey, bytes);
-      }
-      return bytes;
-    } catch (e, stack) {
-      _logger.e("Failed to load image from server",
-          error: e, stackTrace: stack);
-      throw CloudObjectStorageException(
-        st: StackTrace.current,
-        errorDetailsFromDependency: 'Failed to load image bytes from server',
-        errorEnum: CloudObjectStorageErrors.CLOS_S01,
-      );
-    }
+    _authWrapper.refreshIdToken();
+    _idToken = _authWrapper.idToken ?? '';
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Uint8List>(
-      future: _imageFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _buildShimmer();
-        } else if (snapshot.hasError || snapshot.data == null) {
-          _logger.e('Error loading cloud image', error: snapshot.error);
-          return widget.errorWidget ??
-              Center(child: Icon(Icons.broken_image, color: Colors.grey[400]));
-        } else {
-          return AnimatedSwitcher(
-            duration: widget.fadeDuration,
-            child: Image.memory(
-              snapshot.data!,
-              key: ValueKey(widget.objectKey),
-              width: widget.width,
-              height: widget.height,
-              fit: widget.fit,
-              filterQuality: widget.filterQuality,
-              errorBuilder: widget.errorBuilder,
-            ),
-          );
-        }
-      },
-    );
+    try {
+      _logger.d(
+          "Building CloudImage widget for objectKey: '${widget.objectKey}', allowCache: '${widget.allowCache}'");
+      return ExtendedImage.network(
+        "${NetworkConsts.cdnUrl}/${widget.objectKey}",
+        headers: {
+          NetworkConsts.headerAuthorization:
+              '${NetworkConsts.headerAuthorizationBearer} $_idToken',
+        },
+        width: widget.width,
+        height: widget.height,
+        mode: widget.displayImageMode,
+        fit: widget.fit,
+        cache: widget.allowCache,
+        cacheKey: widget.objectKey.hashCode.toString(),
+        cacheMaxAge: const Duration(days: 15),
+        // border: BoxBorder.all(color: Colors.blueGrey),
+        shape: BoxShape.rectangle,
+        // borderRadius: UiConsts.BorderRadiusCircular_superLarge,
+        filterQuality: widget.filterQuality,
+        timeRetry: const Duration(milliseconds: 500),
+        enableLoadState: true,
+        loadStateChanged: (ExtendedImageState state) {
+          switch (state.extendedImageLoadState) {
+            case LoadState.loading:
+              return _buildShimmer();
+            case LoadState.completed:
+              return state.completedWidget;
+            case LoadState.failed:
+              if (widget.errorBuilder != null) {
+                return widget.errorBuilder!(
+                    context, state.lastException!, state.lastStack);
+              } else {
+                return widget.errorWidget!;
+              }
+          }
+        },
+      );
+    } on Exception catch (e) {
+      throw CloudObjectStorageException(
+        error: e,
+        st: StackTrace.current,
+        errorDetailsFromDependency: 'Failed to load image from server',
+        errorEnum: CloudObjectStorageErrors.CLOS_S01,
+      );
+    }
   }
 
   Widget _buildShimmer() {

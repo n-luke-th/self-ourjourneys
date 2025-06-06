@@ -4,15 +4,16 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:form_builder_validators/form_builder_validators.dart'
+    show FormBuilderValidators;
 import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/logger.dart' show Logger;
 import 'package:universal_io/io.dart' show File;
 
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/quick_settings_menu.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 

@@ -67,3 +67,4 @@
 - Initial Development: Seamless Thumbnail integration is implemented, internal code enhanced, performance enhancement for media display system (primarily for image), and other improvements on June 2, 2025 -> **0.3.10** by Luke
 - Initial Development: Upgraded the dependencies constraints, internal code clean up and enhancement, and other improvements on June 2, 2025 -> **0.3.10+1** by Luke
 - Initial Development: Added the auto format bytes to approopriate unit, enhanced the UI/UX of the albums page, included dedicated cloud file uploader, and other improvements on June 5, 2025 -> **0.3.11** by Luke
+- Initial Development: Upgraded the dependencies constraints, performance optimization of the image renderer in progress, and other improvements on June 6, 2025 -> **0.3.12** by Luke

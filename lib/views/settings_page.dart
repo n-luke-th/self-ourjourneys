@@ -14,7 +14,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:ourjourneys/components/main_view.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart';
 import 'package:ourjourneys/services/configs/settings_service.dart';
@@ -22,6 +23,7 @@ import 'package:ourjourneys/services/configs/utils/permission_service.dart';
 import 'package:ourjourneys/services/notifications/notification_manager.dart';
 import 'package:ourjourneys/services/notifications/notification_service.dart';
 import 'package:ourjourneys/services/package/package_info_provider.dart';
+import 'package:ourjourneys/shared/helpers/platform_enum.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 /// the settings page
@@ -101,7 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: UiConsts.PaddingAll_standard,
             child: Center(
               child: Text(
-                  'version: ${packageInfo.version}${packageInfo.buildNumber.isEmpty ? '' : '+${packageInfo.buildNumber}'}'),
+                  'version: ${packageInfo.version}${packageInfo.buildNumber.isEmpty || PlatformDetectionService.currentPlatform == PlatformEnum.iOS ? '' : '+${packageInfo.buildNumber}'}'),
             ),
           );
         })

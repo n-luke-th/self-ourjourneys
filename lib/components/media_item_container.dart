@@ -110,13 +110,10 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
 
     return Center(
       child: SizedBox(
-        child: Wrap(
-          direction: Axis.vertical,
-          alignment: WrapAlignment.spaceEvenly,
-          runAlignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 16,
-          runSpacing: 8,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 8,
           children: [
             const Icon(
               Icons.error_outline,
