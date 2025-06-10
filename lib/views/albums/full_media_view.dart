@@ -2,6 +2,7 @@
 ///
 // TODO: add ability to fetch the object data from server and display
 
+import 'package:extended_image/extended_image.dart' show ExtendedImageMode;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:ourjourneys/components/main_view.dart';
@@ -23,7 +24,8 @@ class FullMediaView extends StatelessWidget {
   final Map<String, dynamic>? extraMapData;
   final FetchSourceMethod fetchSourceMethod;
   final bool cloudImageAllowCache;
-  final bool allowDownload;
+  final ExtendedImageMode displayImageMode;
+  final bool allowShare;
   FullMediaView(
       {super.key,
       this.onlineObjectKey,
@@ -32,7 +34,8 @@ class FullMediaView extends StatelessWidget {
       this.extraMapData,
       required this.fetchSourceMethod,
       this.cloudImageAllowCache = false,
-      this.allowDownload = true}) {
+      this.displayImageMode = ExtendedImageMode.none,
+      this.allowShare = true}) {
     if (onlineObjectKey == null &&
         fetchSourceMethod == FetchSourceMethod.server) {
       throw Exception('FullMediaView: onlineObjectKey is null');
@@ -57,12 +60,13 @@ class FullMediaView extends StatelessWidget {
             icon: const Icon(Icons.edit_document),
             onPressed: () => _onPressedEditMediaFile(),
           ),
-          if (allowDownload)
+          if (allowShare)
+            // TODO: implement share feature
             Padding(
               padding: UiConsts.PaddingAll_small,
               child: IconButton.filled(
-                  onPressed: () => _onPressDownloadMediaFile(),
-                  icon: const Icon(Icons.download_rounded)),
+                  onPressed: () => _onPressShareMediaFile(),
+                  icon: const Icon(Icons.share_outlined)),
             ),
         ],
         body: Center(
@@ -120,14 +124,16 @@ class FullMediaView extends StatelessWidget {
   }
 
   void _onPressedEditMediaFile() {}
-  void _onPressDownloadMediaFile() {}
+  void _onPressShareMediaFile() {}
 
   MediaItemContainer _buildImageView() {
     return fetchSourceMethod == FetchSourceMethod.server
         ? MediaItemContainer(
+            showWidgetBorder: false,
             widgetRatio: 1,
             showDescriptionBar: false,
             fetchSourceMethod: FetchSourceMethod.server,
+            displayImageMode: displayImageMode,
             cloudImageAllowCache: cloudImageAllowCache,
             imageFilterQuality: FilterQuality.high,
             fitting: BoxFit.contain,
@@ -137,8 +143,10 @@ class FullMediaView extends StatelessWidget {
                     "image/*",
           )
         : MediaItemContainer(
+            showWidgetBorder: false,
             widgetRatio: 1,
             showDescriptionBar: false,
+            displayImageMode: displayImageMode,
             cloudImageAllowCache: cloudImageAllowCache,
             fetchSourceMethod: FetchSourceMethod.local,
             imageFilterQuality: FilterQuality.high,

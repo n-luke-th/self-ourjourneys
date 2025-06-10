@@ -5,8 +5,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart'
     show FieldValue, Timestamp;
+import 'package:extended_image/extended_image.dart' show ExtendedImageMode;
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
@@ -24,7 +25,7 @@ import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 import 'package:ourjourneys/views/albums/full_media_view.dart';
 
 /// a page to display the details of an album and a list of items associate with it
@@ -191,6 +192,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                   onlineObjectKey: objectKey,
                   objectType: MediaObjectType.image,
                   cloudImageAllowCache: true,
+                  displayImageMode: ExtendedImageMode.gesture,
                 )));
   }
 

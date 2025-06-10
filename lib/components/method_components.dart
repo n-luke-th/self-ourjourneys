@@ -14,6 +14,34 @@ import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 /// A class of methods components
 class MethodsComponents {
+  /// a widget to display a bottom sheet line decoration
+  ///
+  /// mostly be on the top of the bottom sheet to indicate the adjustable size of the bottom sheet
+  static Container buildBottomSheetLineDec(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 4,
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+        borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
+      ),
+    );
+  }
+
+  /// a widget to show has action to take on settings page
+  static Row buildSettingPageTakeOnActionBtn(
+      {List<Widget> children = const []}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ...children,
+        UiConsts.spaceForTextAndElement,
+        const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
+      ],
+    );
+  }
+
   /// upload source selector component
   ///
   /// this component is used to select the source of the upload
@@ -26,6 +54,7 @@ class MethodsComponents {
         builder: (context, scrollController) {
           return Column(
             children: [
+              buildBottomSheetLineDec(context),
               const Text("Select File Source"),
               const Divider(),
               ListTile(

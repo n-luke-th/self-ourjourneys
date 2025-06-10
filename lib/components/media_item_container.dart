@@ -3,11 +3,12 @@
 
 import 'dart:typed_data' show Uint8List;
 
+import 'package:extended_image/extended_image.dart' show ExtendedImageMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PointerHoverEvent;
 import 'package:image_picker/image_picker.dart' show XFile;
-import 'package:logger/logger.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:logger/logger.dart' show Logger;
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/models/storage/objects_data.dart'
@@ -49,6 +50,7 @@ class MediaItemContainer extends StatefulWidget {
 
   /// if true and mediaItem is a String, CloudImage will be used to fetch the image with caching allowed
   final bool cloudImageAllowCache;
+  final ExtendedImageMode displayImageMode;
 
   // gesture callbacks
   final VoidCallback? onTap;
@@ -79,6 +81,7 @@ class MediaItemContainer extends StatefulWidget {
     this.showWidgetBorder = true,
     this.widgetBorder,
     this.cloudImageAllowCache = true,
+    this.displayImageMode = ExtendedImageMode.none,
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
@@ -170,6 +173,7 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
           height: double.infinity,
           filterQuality: widget.imageFilterQuality,
           allowCache: widget.cloudImageAllowCache,
+          displayImageMode: widget.displayImageMode,
           errorBuilder: (context, error, stackTrace) => _handleBuildMediaError(
               context, error, stackTrace, MediaObjectType.image),
         );

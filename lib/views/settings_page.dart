@@ -8,9 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:logger/logger.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:logger/logger.dart' show Logger;
+import 'package:ourjourneys/components/method_components.dart';
+import 'package:ourjourneys/services/dialog/dialog_service.dart';
+import 'package:package_info_plus/package_info_plus.dart' show PackageInfo;
+import 'package:permission_handler/permission_handler.dart'
+    show Permission, PermissionStatus;
 import 'package:provider/provider.dart';
 
 import 'package:ourjourneys/components/main_view.dart';
@@ -48,65 +51,33 @@ class _SettingsPageState extends State<SettingsPage> {
     Future.microtask(
         () => context.read<PackageInfoProvider>().loadPackageInfo());
 
-    _statuses = _permissionsService.checkPermissions();
+    _statuses = _permissionsService.requestAndCheckPermissions();
   }
 
   @override
   Widget build(BuildContext context) {
-    return mainView(
-      context,
-      appBarTitle: "Settings".toUpperCase(),
-      appbarActions: [
-        IconButton(
-          tooltip: "logout",
-          onPressed: () async => _showLogoutConfirmation(context),
-          icon: Icon(
-            Icons.logout_outlined,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        )
-      ],
-      body: buildSettingsPageBody(),
-    );
+    return mainView(context,
+        appBarTitle: "SETTINGS",
+        appbarActions: [
+          IconButton(
+            tooltip: "logout",
+            onPressed: () async => _showLogoutConfirmation(),
+            icon: Icon(
+              Icons.logout_outlined,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          )
+        ],
+        body: buildSettingsPageBody(),
+        backgroundColor: Colors.transparent);
   }
 
-  Column buildSettingsPageBody() {
-    // ignore: no_leading_underscores_for_local_identifiers
+  Widget buildSettingsPageBody() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Expanded(
-            flex: 2,
-            child: Scaffold(
-                extendBody: true,
-                body: Padding(
-                  padding: UiConsts.PaddingHorizontal_large,
-                  child: profileSection(),
-                ),
-                extendBodyBehindAppBar: true)),
-        Expanded(
-            flex: 5,
-            child: Scaffold(
-              body: settingsListSection(),
-              extendBody: true,
-              extendBodyBehindAppBar: true,
-            )),
-        Consumer<PackageInfoProvider>(builder: (context, provider, child) {
-          final packageInfo = provider.packageInfo;
-
-          if (packageInfo == null) {
-            return const Center(child: Text("No version found!"));
-          }
-          _logger.i(
-              "version: ${packageInfo.version} | build num: ${packageInfo.buildNumber}");
-          return Padding(
-            padding: UiConsts.PaddingAll_standard,
-            child: Center(
-              child: Text(
-                  'version: ${packageInfo.version}${packageInfo.buildNumber.isEmpty || PlatformDetectionService.currentPlatform == PlatformEnum.iOS ? '' : '+${packageInfo.buildNumber}'}'),
-            ),
-          );
-        })
+        Flexible(flex: 2, child: profileSection()),
+        Expanded(flex: 8, child: settingsListSection()),
       ],
     );
   }
@@ -122,25 +93,22 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       child: Consumer<SettingsService>(
         builder: (context, settings, child) {
-          return Padding(
-            padding: UiConsts.PaddingBottom_extraLarge,
-            child: ListView(
-              clipBehavior: Clip.antiAlias,
-              children: [
-                _accountSection(context),
-                _appearanceSection(context, settings),
-                _permissionSection(context),
-                _accessibilitySection(context),
-                _aboutSection(context)
-              ],
-            ),
+          return ListView(
+            clipBehavior: Clip.antiAlias,
+            children: [
+              _accountSection(),
+              _appearanceSection(settings),
+              _permissionSection(),
+              _accessibilitySection(),
+              _aboutSection()
+            ],
           );
         },
       ),
     );
   }
 
-  Column _accountSection(BuildContext context) {
+  Column _accountSection() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -158,57 +126,28 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: const Text("Update Profile"),
-          onTap: () => context.pushReplacementNamed("UpdateProfilePage"),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              UiConsts.spaceForTextAndElement,
-              const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
-            ],
-          ),
-        ),
+            title: const Text("Update Profile"),
+            onTap: () => context.pushReplacementNamed("UpdateProfilePage"),
+            trailing: MethodsComponents.buildSettingPageTakeOnActionBtn()),
         ListTile(
           title: Text("Update Password/Email"),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              UiConsts.spaceForTextAndElement,
-              const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
-            ],
-          ),
+          trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
           onTap: () {
             BottomSheetService.showCustomBottomSheet(
                 context: context,
                 builder: (context, scroll) {
-                  return Container(
+                  return Padding(
                     padding: UiConsts.PaddingAll_large,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(UiConsts.borderRadius)),
-                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          width: 40,
-                          height: 4,
-                          margin: const EdgeInsets.only(bottom: 20),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.3),
-                            borderRadius:
-                                UiConsts.BorderRadiusCircular_mediumLarge,
-                          ),
-                        ),
+                        MethodsComponents.buildBottomSheetLineDec(context),
                         Text(
                           "Update Password or Email",
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                        UiConsts.SizedBoxGapVertical_large,
+                        const Divider(),
+                        UiConsts.SizedBoxGapVertical_standard,
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -222,6 +161,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             //       }),
                             // ),
                             ListTile(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: UiConsts
+                                      .BorderRadiusCircular_mediumLarge),
                               title: const Text("Update password"),
                               onTap: () => context.pushReplacementNamed(
                                   "ReauthPage",
@@ -241,7 +183,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Column _appearanceSection(BuildContext context, SettingsService settings) {
+  Column _appearanceSection(SettingsService settings) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -273,7 +215,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Column _permissionSection(BuildContext context) {
+  Column _permissionSection() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -292,22 +234,19 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         ListTile(
           title: const Text("Current permission status"),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              UiConsts.spaceForTextAndElement,
-              const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
-            ],
-          ),
+          trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
           onTap: () => BottomSheetService.showCustomBottomSheet(
             context: context,
-            initialChildSize: 0.6,
+            initialChildSize: 0.8,
+            maxChildSize: 0.9,
             builder: (context, scrollController) {
               return Column(
                 children: [
+                  MethodsComponents.buildBottomSheetLineDec(context),
                   Text(
-                    "Current permission status",
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    "Permissions status (${_permissionsService.permissionsList.length})",
+                    style: Theme.of(context).textTheme.headlineSmall,
+                    textAlign: TextAlign.center,
                   ),
                   const Divider(),
                   StreamBuilder(
@@ -324,15 +263,18 @@ class _SettingsPageState extends State<SettingsPage> {
                           itemBuilder: (BuildContext context, int index) {
                             Permission permission =
                                 _permissionsService.permissionsList[index];
-                            PermissionStatus status =
-                                snapshot.data![permission] ??
-                                    PermissionStatus.permanentlyDenied;
-                            String statusText =
-                                _permissionsService.getStatusText(status);
-
                             return ListTile(
-                              title: Text(permission.toString()),
-                              subtitle: Text(statusText),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: UiConsts
+                                      .BorderRadiusCircular_mediumLarge),
+                              title: Text(_permissionsService
+                                  .getPermissionNameByPermission(permission)),
+                              subtitle: Text(
+                                _permissionsService.getStatusText(
+                                    snapshot.data![permission] ??
+                                        PermissionStatus.permanentlyDenied),
+                                softWrap: true,
+                              ),
                             );
                           },
                         );
@@ -353,7 +295,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Column _accessibilitySection(BuildContext context) {
+  Column _accessibilitySection() {
     return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
       Align(
         alignment: Alignment.topLeft,
@@ -370,18 +312,12 @@ class _SettingsPageState extends State<SettingsPage> {
       ListTile(
         title: const Text("Biometric protection"),
         onTap: () => {},
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            UiConsts.spaceForTextAndElement,
-            const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
-          ],
-        ),
+        trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
       ),
     ]);
   }
 
-  Column _aboutSection(BuildContext context) {
+  Column _aboutSection() {
     return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
       Align(
         alignment: Alignment.topLeft,
@@ -400,53 +336,47 @@ class _SettingsPageState extends State<SettingsPage> {
       //   onTap: () {
       //     context.pushReplacementNamed("GitStampPage");
       //   },
-      //   trailing: Row(
-      //     mainAxisSize: MainAxisSize.min,
-      //     children: [
-      //       UiConsts.spaceForTextAndElement,
-      //       const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
-      //     ],
-      //   ),
-      // ),
+      //   trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
       // ListTile(
       //   title: Text("Privacy Policy"),
       //   onTap: () {
       //     context.pushReplacementNamed("PrivacyPolicyPage");
       //   },
-      //   trailing: Row(
-      //     mainAxisSize: MainAxisSize.min,
-      //     children: [
-      //       UiConsts.spaceForTextAndElement,
-      //       const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
-      //     ],
-      //   ),
+      //   trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
       // ),
       // ListTile(
       //   title: Text("Terms of Service"),
       //   onTap: () {
       //     context.pushReplacementNamed("TermsOfServicePage");
       //   },
-      //   trailing: Row(
-      //     mainAxisSize: MainAxisSize.min,
-      //     children: [
-      //       UiConsts.spaceForTextAndElement,
-      //       const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
-      //     ],
-      //   ),
+      //   trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
       // ),
       ListTile(
         title: const Text("Licenses"),
         onTap: () {
           showLicensePage(context: context);
         },
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            UiConsts.spaceForTextAndElement,
-            const Icon(Icons.arrow_forward_ios, size: UiConsts.smallIconSize),
-          ],
-        ),
+        trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
       ),
+      ListTile(
+        title: const Text("Version"),
+        trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
+        onTap: () async {
+          final PackageInfoProvider? packageInfoProv =
+              Provider.of<PackageInfoProvider?>(context, listen: false);
+          if (packageInfoProv?.packageInfo != null) {
+            _logger.t(
+                "version: ${packageInfoProv!.packageInfo?.version} | build num: ${packageInfoProv.packageInfo?.buildNumber}");
+            await DialogService.showInfoDialog(
+                context: context,
+                title: "App Version",
+                message:
+                    "${"Version: ${packageInfoProv.packageInfo!.version}"}\n${packageInfoProv.packageInfo!.buildNumber.isEmpty || (PlatformDetectionService.currentPlatform == PlatformEnum.iOS) ? "" : "Build Number: ${packageInfoProv.packageInfo!.buildNumber}"}");
+          } else {
+            _logger.t("'packageInfoProv' is null");
+          }
+        },
+      )
     ]);
   }
 
@@ -483,7 +413,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ));
   }
 
-  Future<void> _showLogoutConfirmation(BuildContext context) async {
+  Future<void> _showLogoutConfirmation() async {
     await _authWrapper.handleLogout(context);
   }
 }
@@ -548,36 +478,26 @@ class _SettingDropdownState<T> extends State<SettingDropdown<T>> {
       trailing: _isChanging
           ? LoadingAnimationWidget.beat(
               color: Theme.of(context).colorScheme.onSurface, size: 22)
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                widget.itemBuilder(widget.value),
-                UiConsts.spaceForTextAndElement,
-                const Icon(Icons.arrow_forward_ios,
-                    size: UiConsts.smallIconSize),
-              ],
-            ),
+          : MethodsComponents.buildSettingPageTakeOnActionBtn(
+              children: [widget.itemBuilder(widget.value)]),
       onTap: () {
         BottomSheetService.showCustomBottomSheet(
           context: context,
-          builder: (_, scrollController) => SingleChildScrollView(
-            controller: scrollController,
-            child: Column(
-              children: [
-                SettingBottomSheet<T>(
-                  title: widget.title,
-                  value: widget.value,
-                  items: widget.items,
-                  onChanged: (T newValue) async {
-                    setState(() => _isChanging = true);
-                    await widget.onChanged(newValue);
-                    setState(() => _isChanging = false);
-                  },
-                  itemBuilder: widget.itemBuilder,
-                ),
-                if (widget.previewButton != null) widget.previewButton!,
-              ],
-            ),
+          builder: (_, scrollController) => Column(
+            children: [
+              SettingBottomSheet<T>(
+                title: widget.title,
+                value: widget.value,
+                items: widget.items,
+                onChanged: (T newValue) async {
+                  setState(() => _isChanging = true);
+                  await widget.onChanged(newValue);
+                  setState(() => _isChanging = false);
+                },
+                itemBuilder: widget.itemBuilder,
+              ),
+              if (widget.previewButton != null) widget.previewButton!,
+            ],
           ),
         );
       },
@@ -604,7 +524,7 @@ class SettingBottomSheet<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: UiConsts.PaddingAll_large,
+      padding: UiConsts.PaddingAll_standard,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.vertical(
             top: Radius.circular(UiConsts.borderRadius)),
@@ -612,19 +532,13 @@ class SettingBottomSheet<T> extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-              borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
-            ),
-          ),
+          MethodsComponents.buildBottomSheetLineDec(context),
           Text(
             title,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          UiConsts.SizedBoxGapVertical_large,
+          const Divider(),
+          UiConsts.SizedBoxGapVertical_standard,
           ...items.map((item) => ListTile(
                 shape: RoundedRectangleBorder(
                     borderRadius: UiConsts.BorderRadiusCircular_mediumLarge),

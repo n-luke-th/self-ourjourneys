@@ -1,9 +1,12 @@
-import 'dart:convert';
+/// lib/models/storage/objects_data.dart
+import 'dart:convert' show json;
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart'
+    show AuthWrapper;
 
+/// The [ObjectsData] class is used to store the data of an object in the database.
 class ObjectsData {
   final String objectKey;
   final String fileName;

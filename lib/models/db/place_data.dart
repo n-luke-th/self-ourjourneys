@@ -1,10 +1,11 @@
 /// lib/models/db/place_data.dart
 ///
-/// memories model
-import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert' show json;
 
+import 'package:cloud_firestore/cloud_firestore.dart' show GeoPoint;
+
+/// the place data used in the [MemoriesModel]
 class PlaceData {
   final GeoPoint? geoPoint;
   final String placeName;

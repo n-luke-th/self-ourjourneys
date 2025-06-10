@@ -51,6 +51,15 @@ class _NavBarState extends State<NavBar> {
                 labelBehavior:
                     NavigationDestinationLabelBehavior.onlyShowSelected,
                 surfaceTintColor: Colors.amber,
+                // labelTextStyle: Theme.of(context)
+                //     .navigationBarTheme
+                //     .copyWith(
+                //         indicatorShape: BeveledRectangleBorder(),
+                //         labelTextStyle: WidgetStateProperty.all(TextStyle(
+                //             fontSize: 14,
+                //             height: 1.3,
+                //             color: Theme.of(context).colorScheme.onSurface)))
+                //     .labelTextStyle,
                 destinations: [
                   // memories
                   NavigationDestination(
@@ -60,6 +69,7 @@ class _NavBarState extends State<NavBar> {
                       color: ThemeData.light().colorScheme.tertiaryContainer,
                     ),
                     label: "Memories",
+                    tooltip: "Memories",
                   ),
                   // albums
                   NavigationDestination(
@@ -69,6 +79,7 @@ class _NavBarState extends State<NavBar> {
                       color: ThemeData.light().colorScheme.tertiaryContainer,
                     ),
                     label: "Albums",
+                    tooltip: "Albums",
                   ),
                   // Anniversaries
                   NavigationDestination(
@@ -78,6 +89,7 @@ class _NavBarState extends State<NavBar> {
                       color: ThemeData.light().colorScheme.tertiaryContainer,
                     ),
                     label: "Anniversaries",
+                    tooltip: "Anniversaries",
                   ),
                   // collections
                   NavigationDestination(
@@ -97,6 +109,7 @@ class _NavBarState extends State<NavBar> {
                       color: ThemeData.light().colorScheme.tertiaryContainer,
                     ),
                     label: "Settings",
+                    tooltip: "Settings",
                   ),
                 ],
               ),

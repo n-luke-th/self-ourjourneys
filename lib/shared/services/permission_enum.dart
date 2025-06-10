@@ -1,8 +1,8 @@
 /// lib/shared/permission_enum.dart
-/// for consistent implementation of the app
-/// we will define the enum for Permission that might be reusable here
 ///
 
+/// the Permission enum
+/// contains all the required permissions for the app
 enum PermissionEnum {
   photos,
   locationWhenInUse,

@@ -1,11 +1,12 @@
 /// lib/models/db/memories_model.dart
 ///
-/// memories model
-import 'dart:convert';
+
+import 'dart:convert' show json;
 
 import 'package:ourjourneys/models/db/place_data.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 
+/// memories feature data model
 class MemoriesModel {
   final String id;
   final String memoryName;
