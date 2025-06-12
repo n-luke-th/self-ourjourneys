@@ -6,7 +6,6 @@ import 'package:flutter/services.dart' show PointerHoverEvent;
 import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
-import 'package:ourjourneys/models/interface/base_image_configs.dart';
 import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
 import 'package:ourjourneys/models/storage/fetch_source_data.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart'
@@ -21,7 +20,7 @@ import 'package:ourjourneys/shared/views/ui_consts.dart';
 /// component for displaying media items (images, videos, etc.)
 /// - for images, using [ImageRenderer]
 /// - for videos, using [VideoPlayer]
-class MediaItemContainer extends StatefulWidget with BaseImageConfigs {
+class MediaItemContainer extends StatefulWidget {
   final String mimeType;
 
   /// tells how to fetch the media from, also included all the necessary data to fetch the media from the source
@@ -49,8 +48,7 @@ class MediaItemContainer extends StatefulWidget with BaseImageConfigs {
   final VoidCallback? onLongPress;
   final void Function(PointerHoverEvent)? onHover;
 
-  /// the image to be displayed configs
-  @override
+  /// the configs for the image to be displayed
   final ImageDisplayConfigsModel imageRendererConfigs;
 
   const MediaItemContainer({
@@ -83,8 +81,7 @@ class MediaItemContainer extends StatefulWidget with BaseImageConfigs {
   State<MediaItemContainer> createState() => _MediaItemContainerState();
 }
 
-class _MediaItemContainerState extends State<MediaItemContainer>
-    with BaseImageConfigs {
+class _MediaItemContainerState extends State<MediaItemContainer> {
   final Logger _logger = getIt<Logger>();
   bool _hovering = false;
   bool get isImage =>
@@ -96,7 +93,6 @@ class _MediaItemContainerState extends State<MediaItemContainer>
 
   FetchSourceData get fetchSourceData => widget.fetchSourceData;
 
-  @override
   ImageDisplayConfigsModel get imageRendererConfigs =>
       widget.imageRendererConfigs;
 

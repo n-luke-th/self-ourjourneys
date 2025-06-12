@@ -1,16 +1,19 @@
 /// lib/main.dart
 /// a starting point of the application
 
-import 'dart:async';
+import 'dart:async' show Future, runZonedGuarded;
 
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart' show Firebase, FirebaseApp;
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/logger.dart' show Logger;
+import 'package:provider/provider.dart';
+
 import 'package:ourjourneys/firebase_options.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart'
+    show getIt, setupDependencies, setupLoggers;
 import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/navigation/page_router.dart';
 import 'package:ourjourneys/services/configs/appearance/theme/theme_provider.dart';
@@ -19,7 +22,6 @@ import 'package:ourjourneys/services/notifications/notification_manager.dart';
 import 'package:ourjourneys/services/package/package_info_provider.dart';
 import 'package:ourjourneys/services/package/package_info_service.dart';
 import 'package:ourjourneys/services/pref/shared_pref_service.dart';
-import 'package:provider/provider.dart';
 
 Future<void> _configureServices() async {
   setupLoggers();

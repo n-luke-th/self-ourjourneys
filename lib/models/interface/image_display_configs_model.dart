@@ -15,9 +15,9 @@ import 'package:flutter/material.dart'
 
 /// the model for the image display configs
 /// tells how image would be rendered to the user.
+///
 /// did not handle how the image is gathered from source, for that refer to [FetchSourceData].
 ///
-/// mainly used in [BaseImageConfigs]
 class ImageDisplayConfigsModel {
   /// how the image would be rendered in the image viewer
   final BoxFit fit;

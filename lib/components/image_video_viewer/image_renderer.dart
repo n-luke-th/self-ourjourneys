@@ -16,7 +16,6 @@ import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/errors/local_storage_exception/local_storage_exception.dart'
     show LocalStorageException;
 
-import 'package:ourjourneys/models/interface/base_image_configs.dart';
 import 'package:ourjourneys/components/method_components.dart'
     show MethodsComponents;
 import 'package:ourjourneys/errors/object_storage_exception/cloud_object_storage_exception.dart';
@@ -32,11 +31,11 @@ import 'package:ourjourneys/shared/services/network_const.dart'
 import 'package:universal_io/io.dart' show File, HttpException;
 
 /// The [ImageRenderer] widget is a wrapper around the [ExtendedImage] to display the image from the appropriate source with given configurations.
-class ImageRenderer extends StatefulWidget with BaseImageConfigs {
+class ImageRenderer extends StatefulWidget {
   /// tells how to fetch the image from, also included all the necessary data to fetch the image from the source
   final FetchSourceData fetchSourceData;
 
-  @override
+  /// the configurations for display the image
   final ImageDisplayConfigsModel imageRendererConfigs;
 
   const ImageRenderer({
@@ -49,14 +48,13 @@ class ImageRenderer extends StatefulWidget with BaseImageConfigs {
   State<ImageRenderer> createState() => _ImageRendererState();
 }
 
-class _ImageRendererState extends State<ImageRenderer> with BaseImageConfigs {
+class _ImageRendererState extends State<ImageRenderer> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final Logger _logger = getIt<Logger>();
   late final String _idToken;
 
   FetchSourceData get fetchSourceData => widget.fetchSourceData;
 
-  @override
   ImageDisplayConfigsModel get imageRendererConfigs =>
       widget.imageRendererConfigs;
 
@@ -149,7 +147,7 @@ class _ImageRendererState extends State<ImageRenderer> with BaseImageConfigs {
   @override
   Widget build(BuildContext context) {
     _logger.d(
-        "Building 'ImageRender' for objectKey: '${fetchSourceData.cloudFileObjectKey}', allowCache: '${imageRendererConfigs.allowCache}', fetchSourceMethod: '${fetchSourceData.fetchSourceMethod.stringValue}', displayImageMode: '${imageRendererConfigs.displayImageMode}', quality: '${imageRendererConfigs.filterQuality}', fit: '${imageRendererConfigs.fit}', width: '${imageRendererConfigs.width}', height: '${imageRendererConfigs.height}'");
+        "'ImageRender' for objectKey/name: '${fetchSourceData.cloudFileObjectKey ?? fetchSourceData.localFile?.name}', allowCache: '${imageRendererConfigs.allowCache}', fetchSourceMethod: '${fetchSourceData.fetchSourceMethod.stringValue}', displayImageMode: '${imageRendererConfigs.displayImageMode.name}', quality: '${imageRendererConfigs.filterQuality.name}', fit: '${imageRendererConfigs.fit}', width: '${imageRendererConfigs.width}', height: '${imageRendererConfigs.height}'");
     switch (fetchSourceData.fetchSourceMethod) {
       case FetchSourceMethod.server:
         try {

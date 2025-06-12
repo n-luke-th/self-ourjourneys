@@ -28,19 +28,9 @@ class FetchSourceData {
     switch (fetchSourceMethod) {
       case FetchSourceMethod.local:
         assert(localFile != null || localFileBytes != null);
-        if (localFile == null) {
-          throw ArgumentError.value(localFile, "localFile",
-              "'localFile' must be provided if the 'fetchSourceMethod' is 'local'");
-        } else if (localFileBytes == null) {
-          throw ArgumentError.value(localFileBytes, "localFileBytes",
-              "'localFileBytes' must be provided if the 'fetchSourceMethod' is 'local'");
-        }
         break;
       case FetchSourceMethod.server:
-        if (cloudFileObjectKey == null) {
-          throw ArgumentError.value(cloudFileObjectKey, "cloudFileObjectKey",
-              "'cloudFileObjectKey' must be provided if the 'fetchSourceMethod' is 'server'");
-        }
+        assert(cloudFileObjectKey != null);
         break;
     }
   }
