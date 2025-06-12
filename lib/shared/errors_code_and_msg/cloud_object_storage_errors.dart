@@ -5,7 +5,7 @@
 
 import 'package:ourjourneys/errors/base/base_error_enum.dart';
 
-/// This enum contains key-value pairs for `CloudObjectStorageErrors`
+/// This enum contains key-value pairs for [CloudObjectStorageErrors]
 ///
 /// which key is used for error code
 ///
@@ -23,10 +23,19 @@ enum CloudObjectStorageErrors implements ErrorType {
   CLOS_C03(
       'Invalid object key, same object already exists or incorrect object key format.'),
 
+  /// Invalid object extension, object extension is not supported.
+  CLOS_C04('Invalid object extension, object extension is not supported.'),
+
+  /// Network error, please check your network connection.
+  CLOS_C05('Network error, please check your network connection.'),
+
   // Server-side errors (CLOS_S)
 
   /// Failed to load the object from the cloud object storage.
   CLOS_S01('Failed to load the object from the cloud object storage.'),
+
+  /// Invalid HTTP response from server, please try again later.
+  CLOS_S02('Invalid HTTP response from server, please try again later.'),
 
   // unknown/unsure origin errors (CLOS_U)
 
@@ -45,7 +54,7 @@ enum CloudObjectStorageErrors implements ErrorType {
   @override
   String get message => msg;
 
-  /// Find an CloudObjectStorageErrors instance by its error code
+  /// Find an [CloudObjectStorageErrors] instance by its error code
   static CloudObjectStorageErrors? fromCode(String code) {
     try {
       return CloudObjectStorageErrors.values
@@ -55,7 +64,7 @@ enum CloudObjectStorageErrors implements ErrorType {
     }
   }
 
-  /// Find an CloudObjectStorageErrors instance by its error message
+  /// Find an [CloudObjectStorageErrors] instance by its error message
   static CloudObjectStorageErrors? fromMessage(String message) {
     try {
       return CloudObjectStorageErrors.values

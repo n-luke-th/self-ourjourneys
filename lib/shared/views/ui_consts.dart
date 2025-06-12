@@ -1,12 +1,12 @@
 /// lib/shared/views/ui_consts.dart
-/// for consistent design and user interface of the app
-/// we will define the spacing or things that might be reusable here
-/// e.g. padding style, padding amount, font size, etc.
-///
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 /// TODO: edit this page
 import 'package:flutter/widgets.dart';
 
+/// for consistent design and user interface of the app.
+/// define the spacing or things that might be reusable here
+/// e.g. padding style, padding amount, font size, etc.
+///
 class UiConsts {
   UiConsts._();
 

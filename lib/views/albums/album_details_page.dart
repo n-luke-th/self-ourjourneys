@@ -16,7 +16,9 @@ import 'package:ourjourneys/helpers/dependencies_injection.dart';
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
+import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
+import 'package:ourjourneys/models/storage/fetch_source_data.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
@@ -127,52 +129,22 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                     spacing: 16,
                     runSpacing: 8.0,
                     children: albumData.linkedObjects.map((objectKey) {
-                      if (FileUtils.detectFileTypeFromFilepath(objectKey) ==
-                          MediaObjectType.image) {
-                        return SizedBox(
-                          width: MediaQuery.sizeOf(context).width * 0.4,
-                          child: MediaItemContainer(
-                            mimeType: "image/",
-                            fetchSourceMethod: FetchSourceMethod.server,
-                            cloudImageAllowCache: widget.cloudImageAllowCache,
-                            imageFilterQuality: FilterQuality.low,
-                            mediaItem:
-                                Utils.getThumbnailKeyFromObjectKey(objectKey),
-                            mediaAndDescriptionBarFlexValue: (8, 1),
-                            descriptionTxtMaxLines: 1,
-                            extraMapData: {
-                              "description": objectKey.split("/").last
-                            },
-                            showActionWidget: true,
-                            actionWidget: IconButton(
-                              color: Colors.redAccent,
-                              onPressed: () async {
-                                await _deleteCurrentItem(objectKey);
-                              },
-                              icon: const Icon(
-                                Icons.delete_forever_outlined,
-                              ),
-                              // const Icon(
-                              //   Icons.more_vert_outlined,
-                              // ),
+                      switch (FileUtils.detectFileTypeFromFilepath(objectKey)) {
+                        case MediaObjectType.image:
+                          return _buildImageObject(objectKey);
+                        default:
+                          return SizedBox(
+                            width: MediaQuery.sizeOf(context).width * 0.3,
+                            child: MediaItemContainer(
+                              mimeType: "",
+                              fetchSourceData: FetchSourceData(
+                                  fetchSourceMethod: FetchSourceMethod.server,
+                                  cloudFileObjectKey:
+                                      Utils.getThumbnailKeyFromObjectKey(
+                                          objectKey)),
+                              extraMapData: {"description": objectKey},
                             ),
-                            onLongPress: () async =>
-                                await _onLongPressMediaItem(),
-                            onDoubleTap: () async =>
-                                await _onDoubleTapMediaItem(objectKey),
-                            onTap: () => _onTapMediaItem(objectKey),
-                          ),
-                        );
-                      } else {
-                        return SizedBox(
-                          width: MediaQuery.sizeOf(context).width * 0.2,
-                          child: MediaItemContainer(
-                            mimeType: "text/",
-                            fetchSourceMethod: FetchSourceMethod.server,
-                            mediaItem: null,
-                            extraMapData: {"description": objectKey},
-                          ),
-                        );
+                          );
                       }
                     }).toList(),
                   ),
@@ -183,16 +155,58 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
     }
   }
 
+  SizedBox _buildImageObject(String objectKey) {
+    return SizedBox(
+      width: MediaQuery.sizeOf(context).width * 0.4,
+      child: MediaItemContainer(
+        mimeType: FileUtils.detectMimeTypeFromFilepath(objectKey) ?? "image/*",
+        fetchSourceData: FetchSourceData(
+            fetchSourceMethod: FetchSourceMethod.server,
+            cloudFileObjectKey: Utils.getThumbnailKeyFromObjectKey(objectKey)),
+        imageRendererConfigs: ImageDisplayConfigsModel(
+            filterQuality: FilterQuality.low,
+            allowCache: widget.cloudImageAllowCache,
+            width: double.infinity,
+            height: double.infinity),
+        mediaAndDescriptionBarFlexValue: (8, 1),
+        descriptionTxtMaxLines: 1,
+        extraMapData: {"description": objectKey.split("/").last},
+        showActionWidget: true,
+        actionWidget: IconButton(
+          color: Colors.redAccent,
+          onPressed: () async {
+            await _deleteCurrentItem(objectKey);
+          },
+          icon: const Icon(
+            Icons.delete_forever_outlined,
+          ),
+          // const Icon(
+          //   Icons.more_vert_outlined,
+          // ),
+        ),
+        onLongPress: () async => await _onLongPressMediaItem(),
+        onDoubleTap: () async => await _onDoubleTapMediaItem(objectKey),
+        onTap: () => _onTapMediaItem(objectKey),
+      ),
+    );
+  }
+
   Future<dynamic> _onTapMediaItem(String objectKey) {
     return Navigator.push(
         context,
         MaterialPageRoute(
             builder: (b) => FullMediaView(
-                  fetchSourceMethod: FetchSourceMethod.server,
-                  onlineObjectKey: objectKey,
+                  fetchSourceData: FetchSourceData(
+                      fetchSourceMethod: FetchSourceMethod.server,
+                      cloudFileObjectKey: objectKey),
+                  imageRendererConfigs: ImageDisplayConfigsModel(
+                    filterQuality: FilterQuality.high,
+                    displayImageMode: ExtendedImageMode.gesture,
+                    allowCache: true,
+                    // width: double.infinity,
+                    // height: double.infinity
+                  ),
                   objectType: MediaObjectType.image,
-                  cloudImageAllowCache: true,
-                  displayImageMode: ExtendedImageMode.gesture,
                 )));
   }
 

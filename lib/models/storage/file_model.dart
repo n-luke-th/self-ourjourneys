@@ -1,7 +1,11 @@
 /// data models for object storage and api requests/responses
+///
 /// lib/models/storage/file_model.dart
 ///
+///
+///
 
+/// data model for response from upload request
 class FileResult {
   final String fileName;
   final String key;
@@ -22,6 +26,7 @@ class FileResult {
   }
 }
 
+/// data model for response from delete request
 class DeleteResult {
   final String key;
 

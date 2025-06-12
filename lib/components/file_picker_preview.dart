@@ -1,11 +1,13 @@
 /// lib/components/file_picker_preview.dart
 ///
-/// a widget that shows a preview of selected local files
 
+import 'package:extended_image/extended_image.dart' show ExtendedImageMode;
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/media_item_container.dart';
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
-import 'package:ourjourneys/models/storage/objects_data.dart';
+import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
+import 'package:ourjourneys/models/storage/fetch_source_data.dart';
+import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/models/storage/selected_file.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart';
@@ -13,6 +15,7 @@ import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 import 'package:ourjourneys/views/albums/full_media_view.dart';
 
+/// a widget that shows a preview of selected local/cloud files
 class FilePickerPreview extends StatelessWidget {
   final List<SelectedFile> files;
   final void Function(List<SelectedFile>, {bool isReplacing})?
@@ -64,12 +67,11 @@ class FilePickerPreview extends StatelessWidget {
                   file: file, mimeType: mimeType),
               child: MediaItemContainer(
                 mimeType: mimeType,
-                fetchSourceMethod: file.fetchSourceMethod,
-                cloudImageAllowCache: cloudImageAllowCache,
-                imageFilterQuality: FilterQuality.low,
-                mediaItem: file.fetchSourceMethod == FetchSourceMethod.local
-                    ? file.localFile
-                    : file.cloudObjectData!.objectThumbnailKey,
+                fetchSourceData: FetchSourceData(
+                    fetchSourceMethod: file.fetchSourceMethod,
+                    cloudFileObjectKey:
+                        file.cloudObjectData?.objectThumbnailKey,
+                    localFile: file.localFile),
                 extraMapData: {
                   "description":
                       file.fetchSourceMethod == FetchSourceMethod.local
@@ -95,7 +97,6 @@ class FilePickerPreview extends StatelessWidget {
                 widgetRatio: 1,
                 mediaAndDescriptionBarFlexValue: (18, 2),
                 mediaRatio: 1,
-                fitting: BoxFit.cover,
                 shape: BoxShape.rectangle,
               ),
             );
@@ -112,11 +113,13 @@ class FilePickerPreview extends StatelessWidget {
         context,
         MaterialPageRoute(
             builder: (context) => FullMediaView(
-                fetchSourceMethod: file.fetchSourceMethod,
-                onlineObjectKey: file.cloudObjectData?.objectKey,
-                localFile: file.localFile,
+                fetchSourceData: FetchSourceData(
+                    fetchSourceMethod: file.fetchSourceMethod,
+                    cloudFileObjectKey: file.cloudObjectData?.objectKey,
+                    localFile: file.localFile),
+                imageRendererConfigs: const ImageDisplayConfigsModel(
+                    displayImageMode: ExtendedImageMode.gesture),
                 allowShare: false,
-                cloudImageAllowCache: true,
                 extraMapData: {"fileSizeInBytes": fileSize},
                 objectType: FileUtils.detectFileTypeFromMimeType(mimeType))));
   }

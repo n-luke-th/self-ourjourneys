@@ -3,18 +3,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart' show XFile;
-import 'package:logger/logger.dart';
+import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart';
 import 'package:ourjourneys/components/method_components.dart'
     show MethodsComponents;
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
+import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
+import 'package:ourjourneys/models/storage/fetch_source_data.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
 import 'package:ourjourneys/shared/common/allowed_extensions.dart'
     show AllowedExtensions;
 import 'package:ourjourneys/shared/helpers/misc.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 /// a dedicated general purpose file picker and uploader page
 class CloudFileUploader extends StatefulWidget {
@@ -180,25 +182,27 @@ ${_uploadedKeys.map((k) => '- $k').join('\n')}
     return SizedBox(
       width: MediaQuery.sizeOf(context).width * 0.4,
       child: MediaItemContainer(
-          mimeType: file.mimeType ??
-              FileUtils.detectMimeTypeFromFilepath(file.path) ??
-              "",
-          fetchSourceMethod: FetchSourceMethod.local,
-          showActionWidget: true,
-          actionWidget: IconButton.outlined(
-            icon: const Icon(Icons.close, size: 18, color: Colors.red),
-            onPressed: () {
-              setState(() {
-                _selectedFiles.remove(file);
-              });
-            },
-          ),
-          showDescriptionBar: true,
-          descriptionTxtMaxLines: 1,
-          mediaAndDescriptionBarFlexValue: (8, 2),
-          imageFilterQuality: FilterQuality.low,
-          extraMapData: {"description": file.name},
-          mediaItem: file),
+        mimeType: file.mimeType ??
+            FileUtils.detectMimeTypeFromFilepath(file.path) ??
+            "",
+        imageRendererConfigs:
+            ImageDisplayConfigsModel(filterQuality: FilterQuality.low),
+        fetchSourceData: FetchSourceData(
+            fetchSourceMethod: FetchSourceMethod.local, localFile: file),
+        showActionWidget: true,
+        actionWidget: IconButton.outlined(
+          icon: const Icon(Icons.close, size: 18, color: Colors.red),
+          onPressed: () {
+            setState(() {
+              _selectedFiles.remove(file);
+            });
+          },
+        ),
+        showDescriptionBar: true,
+        descriptionTxtMaxLines: 1,
+        mediaAndDescriptionBarFlexValue: (8, 2),
+        extraMapData: {"description": file.name},
+      ),
     );
   }
 

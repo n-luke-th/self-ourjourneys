@@ -8,6 +8,9 @@ import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
 import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
+import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
+import 'package:ourjourneys/models/storage/fetch_source_data.dart'
+    show FetchSourceData;
 import 'package:ourjourneys/models/storage/objects_data.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
@@ -140,12 +143,14 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
             width: MediaQuery.of(context).size.width * 0.2,
             child: MediaItemContainer(
               showDescriptionBar: false,
-              cloudImageAllowCache: widget.cloudImageAllowCache,
+              fetchSourceData: FetchSourceData(
+                  fetchSourceMethod: FetchSourceMethod.server,
+                  cloudFileObjectKey: objectsData.objectThumbnailKey),
+              imageRendererConfigs: ImageDisplayConfigsModel(
+                  filterQuality: FilterQuality.low,
+                  allowCache: widget.cloudImageAllowCache),
               mimeType: objectsData.contentType,
-              fetchSourceMethod: FetchSourceMethod.server,
-              mediaItem: objectsData.objectThumbnailKey,
               mediaAndDescriptionBarFlexValue: (18, 1),
-              imageFilterQuality: FilterQuality.low,
               descriptionTxtMaxLines: 1,
               extraMapData: {"description": objectKey.split("/").last},
               onLongPress: () async {
@@ -177,9 +182,11 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
         context,
         MaterialPageRoute(
             builder: (b) => FullMediaView(
-                  fetchSourceMethod: FetchSourceMethod.server,
-                  cloudImageAllowCache: widget.cloudImageAllowCache,
-                  onlineObjectKey: objectData.objectKey,
+                  fetchSourceData: FetchSourceData(
+                      fetchSourceMethod: FetchSourceMethod.server,
+                      cloudFileObjectKey: objectData.objectKey),
+                  imageRendererConfigs: ImageDisplayConfigsModel(
+                      allowCache: widget.cloudImageAllowCache),
                   objectType: MediaObjectType.image,
                   extraMapData: {
                     "fileSizeInBytes": objectData.objectSizeInBytes

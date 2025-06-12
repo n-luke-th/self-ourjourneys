@@ -1,13 +1,14 @@
 /// lib/views/auth_views/reset_password_page.dart
 ///
-/// TODO: edit this page
 import 'package:flutter/material.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:loader_overlay/loader_overlay.dart';
+import 'package:form_builder_validators/form_builder_validators.dart'
+    show FormBuilderValidators;
+import 'package:loader_overlay/loader_overlay.dart'
+    show OverlayControllerWidgetExtension;
 
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/quick_settings_menu.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 

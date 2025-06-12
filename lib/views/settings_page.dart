@@ -435,7 +435,7 @@ Future<void> _updateSetting(
       throw Exception('Failed to update setting');
     }
   } catch (e) {
-    // TODO: add the global exception
+    // TODO: add the app custom exception
     context.read<NotificationManager>().showNotification(
           context,
           NotificationData(

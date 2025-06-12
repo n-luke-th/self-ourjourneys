@@ -1,35 +1,32 @@
 /// lib/components/media_item_container.dart
 ///
 
-import 'dart:typed_data' show Uint8List;
-
-import 'package:extended_image/extended_image.dart' show ExtendedImageMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PointerHoverEvent;
-import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
-import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
+import 'package:ourjourneys/models/interface/base_image_configs.dart';
+import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
+import 'package:ourjourneys/models/storage/fetch_source_data.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
-import 'package:universal_io/io.dart' show File;
 import 'package:video_player/video_player.dart';
 
-import 'package:ourjourneys/components/cloud_image.dart';
-import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
+import 'package:ourjourneys/components/image_video_viewer/image_renderer.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart';
 
 /// media item container
 ///
 /// component for displaying media items (images, videos, etc.)
-/// - for images, if local file using [Image.file] or if a cloud object using [CloudImage]
-class MediaItemContainer extends StatefulWidget {
+/// - for images, using [ImageRenderer]
+/// - for videos, using [VideoPlayer]
+class MediaItemContainer extends StatefulWidget with BaseImageConfigs {
   final String mimeType;
-  final FetchSourceMethod fetchSourceMethod;
 
-  /// Video: URL (String) | Image: ObjectKey (String) or XFile or Bytes (Uint8List)
-  final dynamic mediaItem;
+  /// tells how to fetch the media from, also included all the necessary data to fetch the media from the source
+  final FetchSourceData fetchSourceData;
+
   final bool showActionWidget;
   final Widget? actionWidget;
   final ActionWidgetPlace actionWidgetPlace;
@@ -38,8 +35,6 @@ class MediaItemContainer extends StatefulWidget {
   final double? height;
   final double? width;
   final double? mediaRatio;
-  final BoxFit fitting;
-  final FilterQuality imageFilterQuality;
   final BoxShape shape;
   final bool showDescriptionBar;
   final int descriptionTxtMaxLines;
@@ -48,21 +43,20 @@ class MediaItemContainer extends StatefulWidget {
   final bool showWidgetBorder;
   final BoxBorder? widgetBorder;
 
-  /// if true and mediaItem is a String, CloudImage will be used to fetch the image with caching allowed
-  final bool cloudImageAllowCache;
-  final ExtendedImageMode displayImageMode;
-
   // gesture callbacks
   final VoidCallback? onTap;
   final VoidCallback? onDoubleTap;
   final VoidCallback? onLongPress;
   final void Function(PointerHoverEvent)? onHover;
 
+  /// the image to be displayed configs
+  @override
+  final ImageDisplayConfigsModel imageRendererConfigs;
+
   const MediaItemContainer({
     super.key,
     required this.mimeType,
-    required this.fetchSourceMethod,
-    required this.mediaItem,
+    required this.fetchSourceData,
     this.showActionWidget = false,
     this.actionWidget,
     this.actionWidgetPlace = ActionWidgetPlace.topRight,
@@ -71,8 +65,6 @@ class MediaItemContainer extends StatefulWidget {
     this.height,
     this.width,
     this.mediaRatio,
-    this.fitting = BoxFit.cover,
-    this.imageFilterQuality = FilterQuality.medium,
     this.shape = BoxShape.rectangle,
     this.showDescriptionBar = true,
     this.descriptionTxtMaxLines = 3,
@@ -80,19 +72,19 @@ class MediaItemContainer extends StatefulWidget {
     this.extraMapData,
     this.showWidgetBorder = true,
     this.widgetBorder,
-    this.cloudImageAllowCache = true,
-    this.displayImageMode = ExtendedImageMode.none,
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
     this.onHover,
+    this.imageRendererConfigs = const ImageDisplayConfigsModel(),
   });
 
   @override
   State<MediaItemContainer> createState() => _MediaItemContainerState();
 }
 
-class _MediaItemContainerState extends State<MediaItemContainer> {
+class _MediaItemContainerState extends State<MediaItemContainer>
+    with BaseImageConfigs {
   final Logger _logger = getIt<Logger>();
   bool _hovering = false;
   bool get isImage =>
@@ -102,10 +94,16 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
       FileUtils.detectFileTypeFromMimeType(widget.mimeType) ==
       MediaObjectType.video;
 
+  FetchSourceData get fetchSourceData => widget.fetchSourceData;
+
+  @override
+  ImageDisplayConfigsModel get imageRendererConfigs =>
+      widget.imageRendererConfigs;
+
   Widget _handleBuildMediaError(BuildContext context, Object error,
       StackTrace? stackTrace, MediaObjectType mediaType) {
     _logger.d(
-        "mimetype: ${widget.mimeType}\tmediaType: $mediaType\tfetchSourceMethod: ${widget.fetchSourceMethod.stringValue}\tmediaItem: ${widget.mediaItem.runtimeType}");
+        "mimetype: ${widget.mimeType}\tmediaType: $mediaType\tfetchSourceMethod: ${widget.fetchSourceData.fetchSourceMethod.stringValue}");
     _logger.e(
         "Error loading ${mediaType.stringValue} item in 'MediaItemContainer': ${error.toString()}",
         error: error,
@@ -134,103 +132,32 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
   }
 
   Widget _buildMedia() {
-    if (isImage) {
-      if (widget.fetchSourceMethod == FetchSourceMethod.local &&
-          widget.mediaItem is Uint8List) {
-        // local image using bytes.
-        return _buildMemoryImage();
-      } else if (widget.fetchSourceMethod == FetchSourceMethod.local &&
-          widget.mediaItem is XFile) {
-        // local image using XFile
-        if (PlatformDetectionService.isWeb && widget.mediaItem.path.isEmpty) {
-          // can not handle path, need pure Uint8List (bytes)
-          return _buildMemoryImage();
-        } else if (PlatformDetectionService.isMobile &&
-            widget.mediaItem.path.isNotEmpty) {
-          // can handle path, use Image.file
-          _logger.d("using Image.file");
-          return Image.file(
-            File(widget.mediaItem.path),
-            fit: widget.fitting,
-            width: double.infinity,
-            height: double.infinity,
-            filterQuality: widget.imageFilterQuality,
-            errorBuilder: (context, error, stackTrace) =>
-                _handleBuildMediaError(
-                    context, error, stackTrace, MediaObjectType.image),
-          );
-        } else {
-          // fallback to Uint8List (bytes)
-          return _buildMemoryImage();
-        }
-      } else if (widget.fetchSourceMethod == FetchSourceMethod.server &&
-          widget.mediaItem is String) {
-        // server image using objectKey
-        return CloudImage(
-          objectKey: widget.mediaItem,
-          fit: widget.fitting,
-          width: double.infinity,
-          height: double.infinity,
-          filterQuality: widget.imageFilterQuality,
-          allowCache: widget.cloudImageAllowCache,
-          displayImageMode: widget.displayImageMode,
-          errorBuilder: (context, error, stackTrace) => _handleBuildMediaError(
-              context, error, stackTrace, MediaObjectType.image),
+    switch (FileUtils.detectFileTypeFromMimeType(widget.mimeType)) {
+      case MediaObjectType.image:
+        return _buildImage();
+      case MediaObjectType.video:
+        return _buildVideo();
+      default:
+        return const Center(
+          child: Icon(
+            Icons.insert_drive_file_rounded,
+            size: 46,
+            color: Colors.blueGrey,
+          ),
         );
-      } else {
-        // fallback to error
-        return _handleBuildMediaError(
-            context, 'Unknown error', null, MediaObjectType.image);
-      }
     }
-
-    if (isVideo &&
-        widget.mediaItem is String &&
-        widget.fetchSourceMethod == FetchSourceMethod.server) {
-      return _VideoPlayerWidget(videoUrl: widget.mediaItem);
-    }
-
-    return const Center(
-        child: Icon(Icons.insert_drive_file, size: 48, color: Colors.grey));
   }
 
-  /// render image using bytes by loading the entire image file into memory.
-  /// significant performance consumption, avoid using.
-  Widget _buildMemoryImage() {
-    _logger.d("using Image.memory");
-    if (widget.mediaItem is Uint8List) {
-      return Image.memory(
-        widget.mediaItem,
-        fit: widget.fitting,
-        width: double.infinity,
-        height: double.infinity,
-        filterQuality: widget.imageFilterQuality,
-        errorBuilder: (context, error, stackTrace) => _handleBuildMediaError(
-            context, error, stackTrace, MediaObjectType.image),
-      );
-    } else {
-      return FutureBuilder<Uint8List>(
-          future: widget.mediaItem.readAsBytes(),
-          builder: (context, asyncSnapshot) {
-            if (asyncSnapshot.connectionState == ConnectionState.done) {
-              return Image.memory(
-                asyncSnapshot.data ?? Uint8List(0),
-                fit: widget.fitting,
-                width: double.infinity,
-                height: double.infinity,
-                colorBlendMode: BlendMode.clear,
-                filterQuality: widget.imageFilterQuality,
-                errorBuilder: (context, error, stackTrace) =>
-                    _handleBuildMediaError(
-                        context, error, stackTrace, MediaObjectType.image),
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          });
-    }
+  Widget _buildImage() {
+    return ImageRenderer(
+      fetchSourceData: fetchSourceData,
+      imageRendererConfigs: imageRendererConfigs,
+    );
+  }
+
+  Widget _buildVideo() {
+    return _handleBuildMediaError(context, "Video is not yet supported",
+        StackTrace.current, MediaObjectType.video);
   }
 
   Alignment _getAlignment(ActionWidgetPlace place) {
@@ -259,6 +186,7 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
     final mediaContent = AspectRatio(
       aspectRatio: widget.mediaRatio ?? 4 / 3,
       child: Stack(
+        alignment: AlignmentDirectional.center,
         children: [
           ClipRRect(
             borderRadius: widget.shape == BoxShape.circle

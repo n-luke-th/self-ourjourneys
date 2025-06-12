@@ -5,7 +5,7 @@
 
 import 'package:ourjourneys/errors/base/base_error_enum.dart';
 
-/// This enum contains key-value pairs for `AuthErrors`
+/// This enum contains key-value pairs for [AuthErrors]
 ///
 /// which key is used for error code
 ///
@@ -102,7 +102,7 @@ enum AuthErrors implements ErrorType {
   @override
   String get message => msg;
 
-  /// Find an AuthErrors instance by its error code
+  /// Find an [AuthErrors] instance by its error code
   static AuthErrors? fromCode(String code) {
     try {
       return AuthErrors.values.firstWhere((error) => error.code == code);
@@ -111,7 +111,7 @@ enum AuthErrors implements ErrorType {
     }
   }
 
-  /// Find an AuthErrors instance by its error message
+  /// Find an [AuthErrors] instance by its error message
   static AuthErrors? fromMessage(String message) {
     try {
       return AuthErrors.values.firstWhere((error) => error.message == message);

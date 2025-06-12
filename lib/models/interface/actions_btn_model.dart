@@ -1,8 +1,9 @@
 /// lib/models/interface/actions_btn_model.dart
 ///
-/// model for the action buttons
+
 import 'package:flutter/widgets.dart' show Icon;
 
+/// model for the action buttons to be used in the [MoreActionsBtn] widget
 class ActionsBtnModel {
   final String actionName;
   final String? actionDes;

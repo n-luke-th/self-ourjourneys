@@ -1,18 +1,15 @@
 /// lib/services/auth/acc/auth_wrapper.dart
-/// the authentication wrapper functions
-/// are the top-level functions that will perform
-/// neccessary auth actions called when user trigger call to action btn (login btn, send password reset email, etc.)
-
 // ignore_for_file: use_build_context_synchronously
 // TODO: edit this auth wrapper
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart'
+    show BuildContext, Durations, TextEditingController;
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:logger/logger.dart';
-import 'package:provider/provider.dart';
+import 'package:logger/logger.dart' show Logger;
+import 'package:provider/provider.dart' show ReadContext;
 import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/services/notifications/notification_manager.dart';
@@ -21,6 +18,10 @@ import 'package:ourjourneys/services/pref/shared_pref_service.dart'
     show SharedPreferencesService;
 import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart'
     show AuthErrors;
+
+/// the authentication wrapper functions
+/// are the top-level functions that will perform
+/// neccessary auth actions called when user trigger call to action btn (login btn, send password reset email, etc.)
 
 class AuthWrapper {
   final Logger _logger = getIt<Logger>();
@@ -72,7 +73,6 @@ class AuthWrapper {
 
   Future<void> refreshIdToken({bool forceNewToken = false}) async {
     if (_auth.isUserLoggedIn()) {
-      // _logger.d("refreshing id token...");
       _idToken = await _auth.currentUser?.getIdToken(forceNewToken);
     }
   }
@@ -234,7 +234,7 @@ class AuthWrapper {
       {bool suppressNotification = false,
       NotificationData? overrideNotiData,
       NotificationData? overrideErrorNotiData}) async {
-    _logger.i("user submitted a request to change password");
+    _logger.t("user submitted a request to change password");
     try {
       await _auth.updateUserAccountPassword(newPasswordController.text);
 
@@ -289,7 +289,7 @@ class AuthWrapper {
       {bool suppressNotification = false,
       NotificationData? overrideNotiData,
       NotificationData? overrideErrorNotiData}) async {
-    _logger.i(
+    _logger.t(
         "trying to send the password reset email to ${emailController.text.trim()}");
     try {
       await _auth.resetPassword(emailController.text.trim());
@@ -322,10 +322,10 @@ class AuthWrapper {
       BuildContext context, TextEditingController newEmailController,
       {bool suppressNotification = false,
       NotificationData? overrideErrorNotiData}) {
-    _logger.i("user have to verify their new email before change the email");
+    _logger.t("user have to verify their new email before change the email");
     if (newEmailController.text.trim().isEmpty) {
       context.loaderOverlay.hide();
-      _logger.i("user did not enter their new email");
+      _logger.t("user did not enter their new email");
       if (!suppressNotification) {
         context.read<NotificationManager>().showNotification(
               context,
@@ -435,7 +435,7 @@ class AuthWrapper {
       {bool suppressNotification = false,
       NotificationData? overrideNotiData,
       NotificationData? overrideErrorNotiData}) async {
-    _logger.d("user selected to update the display name");
+    _logger.t("user selected to update the display name");
     try {
       context.loaderOverlay.show();
       await _auth.updateUserAccountDisplayName(displayNameController.text);
@@ -448,7 +448,7 @@ class AuthWrapper {
                     message: "Changed to '${displayNameController.text}'",
                     type: CustomNotificationType.success),
           );
-      _logger.d("user's display name updated");
+      _logger.i("user's display name updated");
       _logger
           .d("user attributes: ${_auth.getCurrentUserAttributes().toString()}");
     } on FirebaseAuthException catch (e) {
@@ -498,7 +498,7 @@ class AuthWrapper {
   void _handleRequiresRecentLogin(BuildContext context, FirebaseAuthException e,
       {bool toPasswordPage = false}) {
     if (e.code == 'requires-recent-login') {
-      _logger.d("user is not recently signed in, authenticating again...");
+      _logger.i("user is not recently signed in, authenticating again...");
       if (toPasswordPage) {
         context.push("/settings/reauth:ChangePassword");
       } else {

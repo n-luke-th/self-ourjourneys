@@ -3,12 +3,15 @@
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/models/storage/objects_data.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
+import 'package:ourjourneys/models/storage/fetch_source_data.dart'
+    show FetchSourceData;
+import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 class ServerFileSelector extends StatefulWidget {
   final void Function(List<ObjectsData>) onSelectionChanged;
@@ -132,25 +135,30 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
                                 //     BoxConstraints.tightFor(width: 20),
                                 labelPadding: UiConsts.PaddingVertical_small,
                                 label: MediaItemContainer(
-                                    showDescriptionBar: false,
-                                    showWidgetBorder: false,
-                                    showActionWidget: true,
-                                    actionWidget: Icon(
-                                      isSelected
-                                          ? Icons.check_box
-                                          : Icons.check_box_outline_blank,
-                                      color: isSelected
-                                          ? Colors.green
-                                          : Colors.grey,
-                                    ),
-                                    fitting: BoxFit.contain,
-                                    mimeType: obj.contentType,
-                                    widgetRatio: 1,
-                                    fetchSourceMethod: FetchSourceMethod.server,
-                                    imageFilterQuality: FilterQuality.low,
-                                    cloudImageAllowCache:
-                                        widget.cloudImageAllowCache,
-                                    mediaItem: obj.objectThumbnailKey),
+                                  showDescriptionBar: false,
+                                  showWidgetBorder: false,
+                                  showActionWidget: true,
+                                  actionWidget: Icon(
+                                    isSelected
+                                        ? Icons.check_box
+                                        : Icons.check_box_outline_blank,
+                                    color:
+                                        isSelected ? Colors.green : Colors.grey,
+                                  ),
+                                  mimeType: obj.contentType,
+                                  widgetRatio: 1,
+                                  fetchSourceData: FetchSourceData(
+                                      fetchSourceMethod:
+                                          FetchSourceMethod.server,
+                                      cloudFileObjectKey:
+                                          obj.objectThumbnailKey),
+                                  imageRendererConfigs:
+                                      ImageDisplayConfigsModel(
+                                    filterQuality: FilterQuality.low,
+                                    allowCache: widget.cloudImageAllowCache,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
                               ),
                             );
                           }).toList(),

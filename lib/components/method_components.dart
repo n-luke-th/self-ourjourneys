@@ -11,6 +11,7 @@ import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart'
 import 'package:ourjourneys/services/dialog/dialog_service.dart'
     show DialogService;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
+import 'package:shimmer/shimmer.dart' show Shimmer, ShimmerDirection;
 
 /// A class of methods components
 class MethodsComponents {
@@ -80,6 +81,9 @@ class MethodsComponents {
         });
   }
 
+  /// show pop page confirmation dialog
+  ///
+  /// useful when you want to confirm the user before leaving the page
   static Future<void> showPopPageConfirmationDialog(
       BuildContext context) async {
     await DialogService.showConfirmationDialog(
@@ -95,5 +99,31 @@ class MethodsComponents {
         }
       }
     });
+  }
+
+  /// show shimmer effect
+  ///
+  /// useful when you want to show a shimmer loading effect for loading progress placeholder widget
+  ///
+  /// - [Shimmer] which [gradient] is [LinearGradient] made up of [baseColor] and [highlightColor] along with [shimmerBaseOpacity]
+  /// - [effectDirection] optionally defines the direction of the [Shimmer] effect
+  /// - [height] and [width] are optional
+  static Shimmer renderShimmerEffect(
+      {Color baseColor = Colors.blueGrey,
+      Color highlightColor = Colors.white,
+      double shimmerBaseOpacity = 0.5,
+      double? height,
+      double? width,
+      ShimmerDirection effectDirection = ShimmerDirection.ltr}) {
+    return Shimmer.fromColors(
+      baseColor: baseColor.withValues(alpha: shimmerBaseOpacity),
+      highlightColor: highlightColor.withValues(alpha: shimmerBaseOpacity),
+      direction: effectDirection,
+      child: Container(
+        width: width,
+        height: height,
+        color: baseColor,
+      ),
+    );
   }
 }

@@ -2,53 +2,48 @@
 ///
 // TODO: add ability to fetch the object data from server and display
 
-import 'package:extended_image/extended_image.dart' show ExtendedImageMode;
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
+import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
+import 'package:ourjourneys/models/storage/fetch_source_data.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
-import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 /// display a full screen media file (image, video, audio, etc)
 ///
 /// which behind the scenes, using the [MediaItemContainer] component
 class FullMediaView extends StatelessWidget {
-  final String? onlineObjectKey;
-  final XFile? localFile;
+  final FetchSourceData fetchSourceData;
   final MediaObjectType objectType;
-  final Map<String, dynamic>? extraMapData;
-  final FetchSourceMethod fetchSourceMethod;
-  final bool cloudImageAllowCache;
-  final ExtendedImageMode displayImageMode;
   final bool allowShare;
-  FullMediaView(
-      {super.key,
-      this.onlineObjectKey,
-      this.localFile,
-      required this.objectType,
-      this.extraMapData,
-      required this.fetchSourceMethod,
-      this.cloudImageAllowCache = false,
-      this.displayImageMode = ExtendedImageMode.none,
-      this.allowShare = true}) {
-    if (onlineObjectKey == null &&
-        fetchSourceMethod == FetchSourceMethod.server) {
-      throw Exception('FullMediaView: onlineObjectKey is null');
-    } else if (localFile == null &&
-        fetchSourceMethod == FetchSourceMethod.local) {
-      throw Exception('FullMediaView: localFile is null');
+  final Map<String, dynamic>? extraMapData;
+  final ImageDisplayConfigsModel? imageRendererConfigs;
+  FullMediaView({
+    super.key,
+    required this.fetchSourceData,
+    required this.objectType,
+    this.allowShare = true,
+    this.extraMapData,
+    this.imageRendererConfigs,
+  }) {
+    switch (objectType) {
+      case MediaObjectType.image:
+        assert(imageRendererConfigs != null);
+        break;
+      default:
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final String? fileName =
-        onlineObjectKey?.split("/").last ?? localFile?.name;
+        fetchSourceData.cloudFileObjectKey?.split("/").last ??
+            fetchSourceData.localFile?.name;
     final String appBarTitle =
         "FULL ${FileUtils.detectFileTypeFromFilepath(fileName ?? "OurJourneys File").stringValue.toUpperCase()} VIEW";
 
@@ -74,13 +69,14 @@ class FullMediaView extends StatelessWidget {
             child: Wrap(
               alignment: WrapAlignment.center,
               runAlignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
               runSpacing: 10,
               children: [
                 _mediaView(),
                 Padding(
                   padding: UiConsts.PaddingAll_small,
                   child: Text(
-                    "Media type:\t\t${objectType.stringValue}\nFile extension:\t\t${fileName!.split(".").last}\nName:\t\t$fileName\nSize:\t\t${_getFileSizeInBytes()} bytes ${_getFileSizeInUnit()}\nInitial origin:\t\t${fetchSourceMethod.stringValue}\n${extraMapData?['objectTags'] ?? ""}",
+                    "Media type:\t\t${objectType.stringValue}\nFile extension:\t\t${fileName!.split(".").last}\nName:\t\t$fileName\nSize:\t\t${_getFileSizeInBytes()} bytes ${_getFileSizeInUnit()}\nInitial origin:\t\t${fetchSourceData.fetchSourceMethod.stringValue}\n${extraMapData?['objectTags'] ?? ""}",
                     maxLines: 8,
                     softWrap: true,
                     textAlign: TextAlign.start,
@@ -127,34 +123,18 @@ class FullMediaView extends StatelessWidget {
   void _onPressShareMediaFile() {}
 
   MediaItemContainer _buildImageView() {
-    return fetchSourceMethod == FetchSourceMethod.server
-        ? MediaItemContainer(
-            showWidgetBorder: false,
-            widgetRatio: 1,
-            showDescriptionBar: false,
-            fetchSourceMethod: FetchSourceMethod.server,
-            displayImageMode: displayImageMode,
-            cloudImageAllowCache: cloudImageAllowCache,
-            imageFilterQuality: FilterQuality.high,
-            fitting: BoxFit.contain,
-            mediaItem: onlineObjectKey,
-            mimeType:
-                FileUtils.detectMimeTypeFromFilepath(onlineObjectKey ?? "") ??
-                    "image/*",
-          )
-        : MediaItemContainer(
-            showWidgetBorder: false,
-            widgetRatio: 1,
-            showDescriptionBar: false,
-            displayImageMode: displayImageMode,
-            cloudImageAllowCache: cloudImageAllowCache,
-            fetchSourceMethod: FetchSourceMethod.local,
-            imageFilterQuality: FilterQuality.high,
-            fitting: BoxFit.contain,
-            mediaItem: localFile,
-            mimeType: localFile?.mimeType ??
-                FileUtils.detectMimeTypeFromFilepath(localFile?.path ?? "") ??
-                "image/*",
-          );
+    return MediaItemContainer(
+      fetchSourceData: fetchSourceData,
+      mimeType: fetchSourceData.localFile?.mimeType ??
+          FileUtils.detectMimeTypeFromFilepath(
+              fetchSourceData.cloudFileObjectKey ??
+                  fetchSourceData.localFile?.path ??
+                  "") ??
+          "image/*",
+      imageRendererConfigs: imageRendererConfigs!,
+      showWidgetBorder: false,
+      widgetRatio: 1,
+      showDescriptionBar: false,
+    );
   }
 }

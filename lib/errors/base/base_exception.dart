@@ -1,10 +1,11 @@
 /// lib/errors/base_exception.dart
 ///
-/// base class for global error exception
-import 'package:logger/logger.dart';
-import 'package:ourjourneys/errors/base/base_error_enum.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
 
+import 'package:logger/logger.dart' show Logger;
+import 'package:ourjourneys/errors/base/base_error_enum.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+
+/// base class for global error exception
 abstract class BaseException implements Exception {
   final ErrorType errorEnum;
   final String? process;

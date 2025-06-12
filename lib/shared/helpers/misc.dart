@@ -1,3 +1,6 @@
+/// lib/shared/helpers/misc.dart
+
+/// the enum for the source to fetch the media from
 enum FetchSourceMethod {
   server("server"),
   local("local");

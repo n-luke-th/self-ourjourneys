@@ -1,15 +1,20 @@
+/// lib/services/network/dio_handler.dart
 // ignore_for_file: unused_element_parameter
 
-import 'package:dio/dio.dart';
-import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/shared/services/network_const.dart';
-import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
-import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
-import 'package:logger/logger.dart';
-import 'dart:math';
+import 'dart:math' show Random, pow;
 
+import 'package:dio/dio.dart';
+import 'package:logger/logger.dart' show Logger;
+import 'package:pretty_dio_logger/pretty_dio_logger.dart' show PrettyDioLogger;
+
+import 'package:ourjourneys/errors/auth_exception/auth_exception.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
+import 'package:ourjourneys/shared/errors_code_and_msg/auth_errors.dart';
+import 'package:ourjourneys/shared/services/network_const.dart';
+
+/// A wrapper class for the Dio client
+/// to conveniently handle the network requests
 class DioHandler {
   final Dio _baseDio;
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
@@ -45,7 +50,7 @@ class DioHandler {
       ..options = _baseDio.options.copyWith(baseUrl: baseUrl)
       ..interceptors.addAll(_baseDio.interceptors);
 
-    _logger.i("Getting new Dio client for '$baseUrl' with auth: '$withAuth'");
+    _logger.t("Getting new Dio client for '$baseUrl' with auth: '$withAuth'");
 
     if (withAuth) {
       if (!_authWrapper.isUserLoggedIn()) {
