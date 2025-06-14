@@ -11,6 +11,8 @@ import 'package:image_picker/image_picker.dart'
     show XFile, ImageSource, CameraDevice;
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:mime/mime.dart' show lookupMimeType;
+import 'package:ourjourneys/errors/platform_exception/custom_platform_exception.dart';
+import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
 import 'package:ourjourneys/models/storage/selected_file.dart'
@@ -18,6 +20,7 @@ import 'package:ourjourneys/models/storage/selected_file.dart'
 import 'package:ourjourneys/shared/common/allowed_extensions.dart'
     show AllowedExtensions;
 import 'package:ourjourneys/shared/common/file_enum.dart' show FileSizeUnit;
+import 'package:ourjourneys/shared/errors_code_and_msg/platform_errors.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
 import 'package:path/path.dart' as path show extension;
@@ -329,16 +332,35 @@ class FileUtils {
     CameraDevice preferredCameraDevice = CameraDevice.rear,
     Duration? videoMaxDuration,
   }) async {
-    List<XFile> result = await FilesPickerService.pickPhotosOrVideos();
+    if (PlatformDetectionService.isMobile) {
+      List<XFile> result = await FilesPickerService.pickPhotosOrVideos(
+        allowMultiple: allowMultiple,
+        mediaSource: mediaSource,
+        fullMetaData: fullMetaData,
+        photoQuality: photoQuality,
+        photoMaxWidth: photoMaxWidth,
+        photoMaxHeight: photoMaxHeight,
+        limit: limit,
+        mediaType: mediaType,
+        preferredCameraDevice: preferredCameraDevice,
+        videoMaxDuration: videoMaxDuration,
+      );
 
-    if (result.isEmpty) return;
+      if (result.isEmpty) return;
 
-    final picked = result
-        .map((f) => SelectedFile(
-            fetchSourceMethod: FetchSourceMethod.local, localFile: f))
-        .toList();
+      final picked = result
+          .map((f) => SelectedFile(
+              fetchSourceMethod: FetchSourceMethod.local, localFile: f))
+          .toList();
 
-    onMediaSelected(picked);
+      onMediaSelected(picked);
+    } else {
+      throw CustomPlatformException(
+          errorEnum: PlatformErrors.PLAT_C01,
+          process: FileUtils.pickLocalPhotosOrVideos.runtimeType.toString(),
+          errorDetailsFromDependency:
+              "Attempt to pick photos or videos on platform: '${PlatformDetectionService.currentPlatform}'");
+    }
 
     onCompleted?.call();
   }

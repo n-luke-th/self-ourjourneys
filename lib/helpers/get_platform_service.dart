@@ -3,7 +3,7 @@
 /// a helper service to detect the platform and related info
 
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:universal_io/io.dart';
+import 'package:universal_io/io.dart' show Platform;
 import 'package:ourjourneys/shared/helpers/platform_enum.dart';
 
 class PlatformDetectionService {

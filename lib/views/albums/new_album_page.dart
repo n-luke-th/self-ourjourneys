@@ -6,7 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart'
     show FormBuilderValidators;
-import 'package:logger/logger.dart';
+import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/components/file_picker_preview.dart';
 import 'package:ourjourneys/components/method_components.dart';
 import 'package:ourjourneys/helpers/get_platform_service.dart';
@@ -289,6 +289,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             )),
         UiConsts.SizedBoxGapVertical_small,
         FilePickerPreview(
+            imageAllowCache: true,
             onServerObjectDeleted: (obj) => _onServerObjectDeleted(obj),
             files: _selectedServerObjects.map((objD) {
               return SelectedFile(
@@ -332,6 +333,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             )),
         UiConsts.SizedBoxGapVertical_small,
         FilePickerPreview(
+          imageAllowCache: false,
           files: [..._selectedLocalFiles],
           onLocalSelectedFilesChanged: (files, {bool isReplacing = false}) =>
               _onLocalFilesSelected(files, isReplacing: isReplacing),

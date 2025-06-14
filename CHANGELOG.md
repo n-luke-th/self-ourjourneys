@@ -71,3 +71,4 @@
 - Initial Development: Upgraded the dependencies constraints, updated the data models to v3.1, and other improvements on June 10, 2025 -> **0.3.13** by Luke
 - Initial Development: Enhanced the media item display system as well as specific image type media item rendering system, and other improvements on June 12, 2025 -> **0.3.14** by Luke
 - Initial Development: Upgraded the dependencies constraints, reduced complexity from adding mixin from the previous release, and other improvements on June 12, 2025 -> **0.3.15** by Luke
+- Initial Development: Upgraded the dependencies constraints, ensure compatibility for image rendering system for web, and other improvements on June 14, 2025 -> **0.3.16** by Luke

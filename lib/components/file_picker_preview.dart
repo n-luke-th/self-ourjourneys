@@ -21,13 +21,13 @@ class FilePickerPreview extends StatelessWidget {
   final void Function(List<SelectedFile>, {bool isReplacing})?
       onLocalSelectedFilesChanged;
   final void Function(ObjectsData)? onServerObjectDeleted;
-  final bool cloudImageAllowCache;
+  final bool imageAllowCache;
 
   const FilePickerPreview({
     super.key,
     this.onLocalSelectedFilesChanged,
     this.onServerObjectDeleted,
-    this.cloudImageAllowCache = true,
+    this.imageAllowCache = true,
     required this.files,
   });
 
@@ -68,10 +68,14 @@ class FilePickerPreview extends StatelessWidget {
               child: MediaItemContainer(
                 mimeType: mimeType,
                 fetchSourceData: FetchSourceData(
-                    fetchSourceMethod: file.fetchSourceMethod,
-                    cloudFileObjectKey:
-                        file.cloudObjectData?.objectThumbnailKey,
-                    localFile: file.localFile),
+                  fetchSourceMethod: file.fetchSourceMethod,
+                  cloudFileObjectKey: file.cloudObjectData?.objectThumbnailKey,
+                  localFile: file.localFile,
+                ),
+                imageRendererConfigs: ImageDisplayConfigsModel(
+                  filterQuality: FilterQuality.none,
+                  allowCache: imageAllowCache,
+                ),
                 extraMapData: {
                   "description":
                       file.fetchSourceMethod == FetchSourceMethod.local
@@ -118,6 +122,7 @@ class FilePickerPreview extends StatelessWidget {
                     cloudFileObjectKey: file.cloudObjectData?.objectKey,
                     localFile: file.localFile),
                 imageRendererConfigs: const ImageDisplayConfigsModel(
+                    allowCache: true,
                     displayImageMode: ExtendedImageMode.gesture),
                 allowShare: false,
                 extraMapData: {"fileSizeInBytes": fileSize},

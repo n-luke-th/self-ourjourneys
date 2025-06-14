@@ -45,7 +45,7 @@ class ImageDisplayConfigsModel {
 
   /// the widget to be displayed when there is an error fetching the image.
   /// ignored if [errorBuilder] is provided
-  final Widget? errorWidget;
+  final Widget errorWidget;
 
   /// the builder function to be called when there is an error fetching the image.
   ///

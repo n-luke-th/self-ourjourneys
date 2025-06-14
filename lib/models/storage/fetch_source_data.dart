@@ -34,4 +34,14 @@ class FetchSourceData {
         break;
     }
   }
+
+  /// attempt to get the [Uint8List]
+  /// from the [localFile]
+  Future<Uint8List?> get localFileAsUint8List async {
+    if (localFile != null) {
+      return await localFile!.readAsBytes();
+    } else {
+      return null;
+    }
+  }
 }
