@@ -5,14 +5,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart'
     show DocumentSnapshot, Query;
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/more_actions_btn.dart'
     show MoreActionsBtn;
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
-import 'package:ourjourneys/helpers/utils.dart' show Utils;
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/helpers/utils.dart' show InterfaceUtils, Utils;
+import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
@@ -20,7 +21,6 @@ import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart'
     show FirestoreCollections;
-import 'package:ourjourneys/shared/views/screen_sizes.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 import 'package:ourjourneys/views/cloud_file_uploader.dart';
 
@@ -36,14 +36,14 @@ class _AlbumsPageState extends State<AlbumsPage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
   final Logger _logger = getIt<Logger>();
-  final List<Map<String, dynamic>> _docs = [];
+  final List<AlbumsModel> _docs = [];
   final ScrollController _scrollController = ScrollController();
 
   bool _isLoading = false;
   bool _hasMore = true;
   DocumentSnapshot? _lastDoc;
 
-  static const _pageSize = 20;
+  static const _pageSize = 5;
 
   @override
   initState() {
@@ -101,11 +101,8 @@ class _AlbumsPageState extends State<AlbumsPage> {
       _lastDoc = snapshot.docs.last;
       _docs.addAll(
         snapshot.docs.where((d) => d.id != "_").map((d) {
-          final data = d.data() as Map<String, dynamic>;
-          return {
-            ...data,
-            'id': d.id,
-          };
+          return AlbumsModel.fromMap(
+              map: d.data() as Map<String, dynamic>, docId: d.id);
         }),
       );
     }
@@ -178,11 +175,8 @@ class _AlbumsPageState extends State<AlbumsPage> {
                       crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 8,
-                      childAspectRatio: Utils.getScreenSize(
-                                  MediaQuery.sizeOf(context).width) ==
-                              ScreenSize.large
-                          ? 2
-                          : 0.9,
+                      childAspectRatio:
+                          InterfaceUtils.isBigScreen(context) ? 2 : 0.9,
                     ),
                     itemCount: _docs.length + (_hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
@@ -196,8 +190,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                       } else if (_docs.isEmpty) {
                         return const Center(child: Text("No albums yet"));
                       } else {
-                        final data = _docs[index];
-                        return _albumCard(data, index);
+                        return _albumCard(_docs[index], index);
                       }
                     },
                   )));
@@ -206,13 +199,10 @@ class _AlbumsPageState extends State<AlbumsPage> {
   void _onPressedSelectAlbumsActionBtn() =>
       _logger.d("select albums action pressed");
 
-  Card _albumCard(Map<String, dynamic> albumData, int index) {
-    final name = albumData['albumName'] as String;
-    final modData = ModificationData.fromMap(
-        albumData['modificationData'] as Map<String, dynamic>);
+  Card _albumCard(AlbumsModel albumData, int index) {
     final (String createdString, String modifiedString) =
         ModificationData.getModificationDataString(
-            modData: modData, uid: _authWrapper.uid);
+            modData: albumData.modificationData, uid: _authWrapper.uid);
     if (_authWrapper.uid == "") {
       _authWrapper.refreshUid();
     }
@@ -236,7 +226,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                 child: Padding(
                   padding: UiConsts.PaddingAll_standard,
                   child: Text(
-                      "${albumData["linkedObjects"].length.toString()}${albumData["linkedObjects"].length <= 1 ? ' item' : ' items'}",
+                      "${albumData.linkedObjects.length.toString()}${albumData.linkedObjects.length <= 1 ? ' item' : ' items'}",
                       softWrap: true,
                       textAlign: TextAlign.center,
                       style: Theme.of(context)
@@ -247,10 +237,15 @@ class _AlbumsPageState extends State<AlbumsPage> {
               ),
               Align(
                   alignment: AlignmentDirectional.topEnd,
-                  child: IconButton.filled(
-                    color: Colors.red,
-                    onPressed: () async => await _deleteSelectedAlbums(),
-                    icon: const Icon(Icons.delete_outline_rounded),
+                  child: Padding(
+                    padding: InterfaceUtils.isBigScreen(context)
+                        ? UiConsts.PaddingAll_standard
+                        : EdgeInsetsGeometry.zero,
+                    child: IconButton.filled(
+                      color: Colors.red,
+                      onPressed: () async => await _deleteSelectedAlbums(),
+                      icon: const Icon(Icons.delete_outline_rounded),
+                    ),
                   )),
               Align(
                 alignment: AlignmentDirectional.bottomStart,
@@ -268,7 +263,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
               Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: Text(
-                  name,
+                  albumData.albumName,
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,
                   maxLines: 2,
@@ -291,14 +286,14 @@ class _AlbumsPageState extends State<AlbumsPage> {
   }
 
   Future<void> _onLongPressAlbumTile(
-      {required Map<String, dynamic> albumData,
+      {required AlbumsModel albumData,
       required String modifiedString,
       required String createdString}) async {
     await DialogService.showInfoDialog(
         context: context,
         title: "Album Info",
         message:
-            "Name: ${albumData["albumName"]}\nContains: ${albumData["linkedObjects"].length.toString()} ${albumData["linkedObjects"].length <= 1 ? 'item' : 'items'}\n$createdString\n$modifiedString");
+            "Name: ${albumData.albumName}\nContains: ${albumData.linkedObjects.length.toString()} ${albumData.linkedObjects.length <= 1 ? 'item' : 'items'}\n$createdString\n$modifiedString");
   }
 
   Future<void> _deleteSelectedAlbums() async {}

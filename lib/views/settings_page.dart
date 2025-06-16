@@ -4,13 +4,19 @@
 ///
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async' show FutureOr;
+
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/components/method_components.dart';
+import 'package:ourjourneys/helpers/get_platform_service.dart'
+    show PlatformDetectionService;
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
+import 'package:ourjourneys/shared/helpers/platform_enum.dart'
+    show PlatformEnum;
 import 'package:package_info_plus/package_info_plus.dart' show PackageInfo;
 import 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionStatus;
@@ -18,7 +24,6 @@ import 'package:provider/provider.dart';
 
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
-import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart';
 import 'package:ourjourneys/services/configs/settings_service.dart';
@@ -26,7 +31,6 @@ import 'package:ourjourneys/services/configs/utils/permission_service.dart';
 import 'package:ourjourneys/services/notifications/notification_manager.dart';
 import 'package:ourjourneys/services/notifications/notification_service.dart';
 import 'package:ourjourneys/services/package/package_info_provider.dart';
-import 'package:ourjourneys/shared/helpers/platform_enum.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 /// the settings page
@@ -41,16 +45,34 @@ class _SettingsPageState extends State<SettingsPage> {
   final AuthWrapper _authWrapper = getIt<AuthWrapper>();
   final Logger _logger = getIt<Logger>();
   final PermissionsService _permissionsService = getIt<PermissionsService>();
-  late PackageInfo packageInfo;
+
   late Future<Map<Permission, PermissionStatus>> _statuses;
+  late final String? _appVersion;
+  late final String? _buildNumber;
+
+  /// load app version and build number
+  void _loadVersionAndBuildNumber() async {
+    final PackageInfo? packageInfo =
+        await Provider.of<PackageInfoProvider?>(context, listen: false)
+            ?.loadPackageInfoAndGet();
+    if (packageInfo != null) {
+      if (PlatformDetectionService.currentPlatform == PlatformEnum.iOS &&
+          packageInfo.buildNumber.contains(".")) {
+        _appVersion = packageInfo.version;
+        _buildNumber = null;
+      } else {
+        _appVersion = packageInfo.version;
+        _buildNumber = packageInfo.buildNumber;
+      }
+      _logger.t("version: $_appVersion | build num: $_buildNumber");
+    } else {}
+  }
 
   @override
   void initState() {
     super.initState();
     _authWrapper.refreshAttributes();
-    Future.microtask(
-        () => context.read<PackageInfoProvider>().loadPackageInfo());
-
+    _loadVersionAndBuildNumber();
     _statuses = _permissionsService.requestAndCheckPermissions();
   }
 
@@ -125,15 +147,14 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ),
-        ListTile(
-            title: const Text("Update Profile"),
-            onTap: () => context.pushReplacementNamed("UpdateProfilePage"),
-            trailing: MethodsComponents.buildSettingPageTakeOnActionBtn()),
-        ListTile(
-          title: Text("Update Password/Email"),
-          trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
-          onTap: () {
-            BottomSheetService.showCustomBottomSheet(
+        _buildListTile(
+          "Update Profile",
+          () => context.pushReplacementNamed("UpdateProfilePage"),
+        ),
+        _buildListTile(
+          "Update Password/Email",
+          () async {
+            await BottomSheetService.showCustomBottomSheet(
                 context: context,
                 builder: (context, scroll) {
                   return Padding(
@@ -152,25 +173,21 @@ class _SettingsPageState extends State<SettingsPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // TODO: implement update email back
-                            // ListTile(
-                            //   title: Text("Update email"),
-                            //   onTap: () => context.pushReplacementNamed(
+                            // _buildListTile(
+                            //   "Update email",
+                            //    () => context.pushReplacementNamed(
                             //       "ReauthPage",
                             //       pathParameters: <String, String>{
                             //         "next": "ChangeEmailPage"
                             //       }),
                             // ),
-                            ListTile(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: UiConsts
-                                      .BorderRadiusCircular_mediumLarge),
-                              title: const Text("Update password"),
-                              onTap: () => context.pushReplacementNamed(
-                                  "ReauthPage",
+                            _buildListTile(
+                              "Update password",
+                              () => context.pushReplacementNamed("ReauthPage",
                                   pathParameters: {
                                     'next': 'ChangePasswordPage'
                                   }),
-                            ),
+                            )
                           ],
                         ),
                       ],
@@ -232,10 +249,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ),
-        ListTile(
-          title: const Text("Current permission status"),
-          trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
-          onTap: () => BottomSheetService.showCustomBottomSheet(
+        _buildListTile(
+          "Current permission status",
+          () async => await BottomSheetService.showCustomBottomSheet(
             context: context,
             initialChildSize: 0.8,
             maxChildSize: 0.9,
@@ -309,11 +325,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ),
-      ListTile(
-        title: const Text("Biometric protection"),
-        onTap: () => {},
-        trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
-      ),
+      _buildListTile("Biometric protection", () {})
     ]);
   }
 
@@ -331,52 +343,39 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ),
-      // ListTile(
-      //   title: const Text("Git Stamps"),
-      //   onTap: () {
+      // _buildListTile(
+      //    "Git Stamps",
+      //    () {
       //     context.pushReplacementNamed("GitStampPage");
       //   },
-      //   trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
-      // ListTile(
-      //   title: Text("Privacy Policy"),
-      //   onTap: () {
+      //
+      // _buildListTile(
+      //    "Privacy Policy",
+      //    () {
       //     context.pushReplacementNamed("PrivacyPolicyPage");
       //   },
-      //   trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
+      //
       // ),
-      // ListTile(
-      //   title: Text("Terms of Service"),
-      //   onTap: () {
+      // _buildListTile(
+      //    "Terms of Service"),
+      //    () {
       //     context.pushReplacementNamed("TermsOfServicePage");
       //   },
-      //   trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
+      //
       // ),
-      ListTile(
-        title: const Text("Licenses"),
-        onTap: () {
-          showLicensePage(context: context);
-        },
-        trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
-      ),
-      ListTile(
-        title: const Text("Version"),
-        trailing: MethodsComponents.buildSettingPageTakeOnActionBtn(),
-        onTap: () async {
-          final PackageInfoProvider? packageInfoProv =
-              Provider.of<PackageInfoProvider?>(context, listen: false);
-          if (packageInfoProv?.packageInfo != null) {
-            _logger.t(
-                "version: ${packageInfoProv!.packageInfo?.version} | build num: ${packageInfoProv.packageInfo?.buildNumber}");
-            await DialogService.showInfoDialog(
-                context: context,
-                title: "App Version",
-                message:
-                    "${"Version: ${packageInfoProv.packageInfo!.version}"}\n${packageInfoProv.packageInfo!.buildNumber.isEmpty || (PlatformDetectionService.currentPlatform == PlatformEnum.iOS) ? "" : "Build Number: ${packageInfoProv.packageInfo!.buildNumber}"}");
-          } else {
-            _logger.t("'packageInfoProv' is null");
-          }
-        },
-      )
+      _buildListTile(
+          "Licenses",
+          () => showLicensePage(
+              context: context, applicationVersion: _appVersion)),
+      _buildListTile("Version", () async {
+        if (_appVersion != null) {
+          await DialogService.showInfoDialog(
+              context: context,
+              title: "App Version",
+              message:
+                  "${"Version: $_appVersion"}${_buildNumber != null ? '\n${_buildNumber.isEmpty ? "" : "Build Number: $_buildNumber"}' : ""}");
+        }
+      }),
     ]);
   }
 
@@ -418,34 +417,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-Future<void> _updateSetting(
-    BuildContext context, Future<bool> Function() updateFunction) async {
-  try {
-    bool success = await updateFunction();
-    if (success) {
-      context.read<NotificationManager>().showNotification(
-            context,
-            NotificationData(
-              title: "New Change Applied",
-              message: "Your setting has been updated",
-              type: CustomNotificationType.success,
-            ),
-          );
-    } else {
-      throw Exception('Failed to update setting');
-    }
-  } catch (e) {
-    // TODO: add the app custom exception
-    context.read<NotificationManager>().showNotification(
-          context,
-          NotificationData(
-              title: "Update Failed",
-              message: 'error details',
-              type: CustomNotificationType.error),
-        );
-  }
-}
-
 class SettingDropdown<T> extends StatefulWidget {
   final String title;
   final T value;
@@ -473,14 +444,9 @@ class _SettingDropdownState<T> extends State<SettingDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(widget.title),
-      trailing: _isChanging
-          ? LoadingAnimationWidget.beat(
-              color: Theme.of(context).colorScheme.onSurface, size: 22)
-          : MethodsComponents.buildSettingPageTakeOnActionBtn(
-              children: [widget.itemBuilder(widget.value)]),
-      onTap: () {
+    return _buildListTile(
+      widget.title,
+      () {
         BottomSheetService.showCustomBottomSheet(
           context: context,
           builder: (_, scrollController) => Column(
@@ -501,6 +467,11 @@ class _SettingDropdownState<T> extends State<SettingDropdown<T>> {
           ),
         );
       },
+      trailing: _isChanging
+          ? LoadingAnimationWidget.beat(
+              color: Theme.of(context).colorScheme.onSurface, size: 22)
+          : MethodsComponents.buildSettingPageTakeOnActionBtn(
+              children: [widget.itemBuilder(widget.value)]),
     );
   }
 }
@@ -553,4 +524,47 @@ class SettingBottomSheet<T> extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> _updateSetting(
+    BuildContext context, Future<bool> Function() updateFunction) async {
+  try {
+    bool success = await updateFunction();
+    if (success) {
+      context.read<NotificationManager>().showNotification(
+            context,
+            NotificationData(
+              title: "New Change Applied",
+              message: "Your setting has been updated",
+              type: CustomNotificationType.success,
+            ),
+          );
+    } else {
+      throw Exception('Failed to update setting');
+    }
+  } catch (e) {
+    // TODO: add the app custom exception
+    context.read<NotificationManager>().showNotification(
+          context,
+          NotificationData(
+              title: "Update Failed",
+              message: 'error details',
+              type: CustomNotificationType.error),
+        );
+  }
+}
+
+ListTile _buildListTile(String title, FutureOr<void> Function()? onTap,
+    {Widget? trailing}) {
+  return ListTile(
+    // hoverColor: Colors.tealAccent,
+    // shape: RoundedSuperellipseBorder(
+    //     borderRadius: UiConsts.BorderRadiusCircular_medium),
+    shape: RoundedRectangleBorder(
+        borderRadius: UiConsts.BorderRadiusCircular_mediumLarge),
+    enableFeedback: true,
+    title: Text((title)),
+    trailing: trailing ?? MethodsComponents.buildSettingPageTakeOnActionBtn(),
+    onTap: () async => await onTap?.call(),
+  );
 }

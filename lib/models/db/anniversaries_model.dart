@@ -10,7 +10,7 @@ class AnniversariesModel {
   final String anniversaryName;
   final Timestamp anniversaryDate;
 
-  AnniversariesModel({
+  const AnniversariesModel({
     required this.id,
     required this.anniversaryName,
     required this.anniversaryDate,

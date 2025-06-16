@@ -4,6 +4,12 @@
 
 import 'package:flutter/material.dart';
 
+/// Returns a [Scaffold] with a [body] and an [AppBar] with a [title]
+/// that can be customized to fit the needs of each page of the app.
+///
+/// serves as a standard wrapper for all pages of the app.
+///
+/// see [Scaffold] for more information.
 Scaffold mainView(
   BuildContext context, {
   String? appBarTitle = 'changeMe',
@@ -16,6 +22,10 @@ Scaffold mainView(
   PreferredSizeWidget? appbarBottom,
   Color? appBarBackgroundColor,
   Color? backgroundColor,
+  Color? appBarShadowColor,
+  Widget? appBarFlexibleSpace,
+  EdgeInsetsGeometry? appBarActionsPadding,
+  bool? appBarTitleCentered,
   bool extendBody = false,
   bool extendBodyBehindAppBar = false,
   bool showFloatingActionButton = false,
@@ -51,6 +61,10 @@ Scaffold mainView(
             leadingWidth: leadingWidth,
             actions: appbarActions,
             bottom: appbarBottom,
+            centerTitle: appBarTitleCentered,
+            flexibleSpace: appBarFlexibleSpace,
+            actionsPadding: appBarActionsPadding,
+            shadowColor: appBarShadowColor,
           )
         : null,
     backgroundColor:

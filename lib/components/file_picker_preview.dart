@@ -4,7 +4,7 @@
 import 'package:extended_image/extended_image.dart' show ExtendedImageMode;
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/media_item_container.dart';
-import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils, InterfaceUtils;
 import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
 import 'package:ourjourneys/models/storage/fetch_source_data.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
@@ -47,11 +47,11 @@ class FilePickerPreview extends StatelessWidget {
             crossAxisCount: 2,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
-            childAspectRatio:
-                Utils.getScreenSize(MediaQuery.sizeOf(context).width) ==
-                        ScreenSize.large
-                    ? 2
-                    : 1,
+            childAspectRatio: InterfaceUtils.getScreenSize(
+                        MediaQuery.sizeOf(context).width) ==
+                    ScreenSize.large
+                ? 2
+                : 1,
           ),
           itemBuilder: (context, index) {
             final file = files[index];

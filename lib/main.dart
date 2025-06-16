@@ -9,6 +9,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart' show Logger;
+import 'package:ourjourneys/shared/helpers/platform_enum.dart';
 import 'package:provider/provider.dart';
 
 import 'package:ourjourneys/firebase_options.dart';
@@ -92,6 +93,7 @@ Future<void> logSettingsConfig({required ThemeProvider themeProvider}) async {
   logger.d("\tOurJourneys:\n"
       ">>> Platform: '${PlatformDetectionService.readableCurrentPlatform}'\n"
       ">>> Version '${packageInfo.version}'\n"
+      "${(PlatformDetectionService.currentPlatform == PlatformEnum.iOS && packageInfo.buildNumber.contains(".")) ? "" : ">>> Build Number: '${packageInfo.buildNumber}'\n"}"
       ">>> Package Name: '${packageInfo.packageName}'\n"
       //
       "\tUser Preferences:\n"

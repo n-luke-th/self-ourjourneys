@@ -13,7 +13,7 @@ class CollectionsModel {
   final String collectionBody;
   final Timestamp lastUpdatedAt;
 
-  CollectionsModel(
+  const CollectionsModel(
       {required this.id,
       required this.collectionName,
       required this.externalLinks,

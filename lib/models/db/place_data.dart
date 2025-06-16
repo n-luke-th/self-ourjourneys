@@ -11,7 +11,7 @@ class PlaceData {
   final String placeName;
   final String placeDes;
 
-  PlaceData({
+  const PlaceData({
     this.geoPoint,
     required this.placeName,
     required this.placeDes,

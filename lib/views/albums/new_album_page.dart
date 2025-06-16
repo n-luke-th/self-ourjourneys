@@ -181,16 +181,16 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
                   onServerSourceSelected: () => _onServerSourceSelected(),
                   onLocalSourceSelected: () async =>
                       await _onLocalSourceSelected()),
-          body: Center(
-            child: SingleChildScrollView(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 560),
-                margin: UiConsts.PaddingAll_small,
-                transformAlignment: AlignmentDirectional.centerStart,
-                child: Padding(
-                  padding: UiConsts.PaddingAll_large,
-                  child: Form(
-                    key: _formKey,
+          body: Form(
+            key: _formKey,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 560),
+                  margin: UiConsts.PaddingAll_small,
+                  transformAlignment: AlignmentDirectional.centerStart,
+                  child: Padding(
+                    padding: UiConsts.PaddingAll_large,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       crossAxisAlignment: CrossAxisAlignment.stretch,

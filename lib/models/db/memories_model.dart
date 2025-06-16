@@ -15,7 +15,7 @@ class MemoriesModel {
   final List<String> linkedObjects;
   final ModificationData modificationData;
 
-  MemoriesModel(
+  const MemoriesModel(
       {required this.id,
       required this.memoryName,
       required this.memoryDes,

@@ -18,4 +18,10 @@ class PackageInfoProvider extends ChangeNotifier {
     _packageInfo = await _service.getPackageInfo();
     notifyListeners();
   }
+
+  Future<PackageInfo?> loadPackageInfoAndGet() async {
+    _packageInfo = await _service.getPackageInfo();
+    notifyListeners();
+    return _packageInfo;
+  }
 }

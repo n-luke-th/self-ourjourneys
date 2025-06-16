@@ -6,6 +6,14 @@ import 'dart:typed_data' show Uint8List;
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:file_picker/file_picker.dart' show FileType, FilePickerResult;
+import 'package:flutter/widgets.dart'
+    show
+        MediaQuery,
+        BuildContext,
+        ScrollController,
+        WidgetsBinding,
+        Curves,
+        Curve;
 import 'package:get_time_ago/get_time_ago.dart' show GetTimeAgo;
 import 'package:image_picker/image_picker.dart'
     show XFile, ImageSource, CameraDevice;
@@ -81,6 +89,11 @@ class Utils {
   static String getFolderPath(String userId) {
     return "uploads/${DateTimeUtils.getUtcTimestampString()}-$userId";
   }
+}
+
+/// Utility class for interface related operations.
+class InterfaceUtils {
+  InterfaceUtils._(); // private constructor to prevent instantiation
 
   /// Utility function to determine the screen size of the device.
   /// Returns a [ScreenSize] enum value.
@@ -92,6 +105,25 @@ class Utils {
     } else {
       return ScreenSize.large;
     }
+  }
+
+  static bool isBigScreen(BuildContext context) {
+    return getScreenSize(MediaQuery.sizeOf(context).width) == ScreenSize.large;
+  }
+
+  /// this is a function that will scroll the scrollController to the top of the page
+  static void scrollToTop(ScrollController scrollController,
+      {Duration duration = const Duration(milliseconds: 300),
+      Curve curve = Curves.easeInOutCirc}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.minScrollExtent,
+          duration: duration,
+          curve: curve,
+        );
+      }
+    });
   }
 }
 

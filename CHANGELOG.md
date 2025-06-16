@@ -72,3 +72,4 @@
 - Initial Development: Enhanced the media item display system as well as specific image type media item rendering system, and other improvements on June 12, 2025 -> **0.3.14** by Luke
 - Initial Development: Upgraded the dependencies constraints, reduced complexity from adding mixin from the previous release, and other improvements on June 12, 2025 -> **0.3.15** by Luke
 - Initial Development: Upgraded the dependencies constraints, ensure compatibility for image rendering system for web, and other improvements on June 14, 2025 -> **0.3.16** by Luke
+- Initial Development: Improving the UI/UX of the album feature related pages, internal data gathering adjustment for albums page and album details page, refactored and improved settings page, and other improvements on June 16, 2025 -> **0.3.17** by Luke

@@ -2,9 +2,10 @@
 /// config what page to be display to users
 /// - page, initial route, route path, and name
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show GlobalKey, NavigatorState;
 import 'package:go_router/go_router.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
+import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/navigation/nav_bar.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/views/albums/album_details_page.dart';
@@ -191,7 +192,7 @@ final router = GoRouter(
                 name: 'AlbumDetailsPage',
                 builder: (context, state) => ProtectedAuthViewWrapper(
                     child: AlbumDetailsPage(
-                  album: state.extra as Map<String, dynamic>?,
+                  album: state.extra as AlbumsModel?,
                 )),
               ),
             ]),

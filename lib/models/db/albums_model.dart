@@ -1,14 +1,16 @@
-import 'dart:convert';
+/// lib/models/db/albums_model.dart
+import 'dart:convert' show json;
 
 import 'package:ourjourneys/models/modification_model.dart';
 
+/// data model for albums
 class AlbumsModel {
   final String id;
   final String albumName;
   final List<String> linkedObjects;
   final ModificationData modificationData;
 
-  AlbumsModel(
+  const AlbumsModel(
       {required this.id,
       required this.albumName,
       required this.linkedObjects,
