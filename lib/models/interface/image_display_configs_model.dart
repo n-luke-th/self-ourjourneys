@@ -62,7 +62,11 @@ class ImageDisplayConfigsModel {
     this.filterQuality = FilterQuality.medium,
     this.allowCache = true,
     this.displayImageMode = ExtendedImageMode.none,
-    this.errorWidget = const Center(child: Icon(Icons.error_outline)),
+    this.errorWidget = const Center(
+        child: Icon(
+      Icons.error_outline,
+      color: Colors.red,
+    )),
     this.errorBuilder,
   });
 
@@ -79,5 +83,32 @@ class ImageDisplayConfigsModel {
       'errorWidget': errorWidget.toString(),
       'errorBuilder': errorBuilder.toString(),
     };
+  }
+
+  ImageDisplayConfigsModel copyWith({
+    BoxFit? fit,
+    double? width,
+    double? height,
+    double? shimmerBaseOpacity,
+    Color? shimmerColor,
+    FilterQuality? filterQuality,
+    bool? allowCache,
+    ExtendedImageMode? displayImageMode,
+    Widget? errorWidget,
+    Widget Function(BuildContext context, Object error, StackTrace? stackTrace)?
+        errorBuilder,
+  }) {
+    return ImageDisplayConfigsModel(
+      fit: fit ?? this.fit,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      shimmerBaseOpacity: shimmerBaseOpacity ?? this.shimmerBaseOpacity,
+      shimmerColor: shimmerColor ?? this.shimmerColor,
+      filterQuality: filterQuality ?? this.filterQuality,
+      allowCache: allowCache ?? this.allowCache,
+      displayImageMode: displayImageMode ?? this.displayImageMode,
+      errorWidget: errorWidget ?? this.errorWidget,
+      errorBuilder: errorBuilder ?? this.errorBuilder,
+    );
   }
 }

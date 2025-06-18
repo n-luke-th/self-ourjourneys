@@ -1,4 +1,4 @@
-/// lib/views/albums/all_files_page.dart
+/// lib/views/media/all_files_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/main_view.dart';
@@ -8,7 +8,7 @@ import 'package:ourjourneys/helpers/utils.dart' show Utils;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart'
     show AuthWrapper;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
-import 'package:ourjourneys/views/cloud_file_uploader.dart'
+import 'package:ourjourneys/views/media/cloud_file_uploader.dart'
     show CloudFileUploader;
 
 /// a page to display all files which calls the [PaginatedFilesGrid] component under the hood

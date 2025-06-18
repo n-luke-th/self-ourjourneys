@@ -5,6 +5,7 @@ import 'dart:math' show log, pow;
 import 'dart:typed_data' show Uint8List;
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+import 'package:crypto/crypto.dart' show md5;
 import 'package:file_picker/file_picker.dart' show FileType, FilePickerResult;
 import 'package:flutter/widgets.dart'
     show
@@ -417,5 +418,11 @@ class FileUtils {
   /// Utility function to generate a thumbnail from a given [Uint8List].
   static Uint8List generateThumbnail(Uint8List originalBytes) {
     return compressImage(originalBytes, maxDimension: 300, quality: 60);
+  }
+
+  /// Utility function to generate a checksum from a given [Uint8List]
+  /// using the md5 algorithm.
+  static String generateChecksum(Uint8List data) {
+    return md5.convert(data).toString();
   }
 }

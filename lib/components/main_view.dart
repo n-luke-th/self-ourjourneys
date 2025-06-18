@@ -54,7 +54,11 @@ Scaffold mainView(
                 Theme.of(context).appBarTheme.backgroundColor,
             title: Text(
               appBarTitle!,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .inverseSurface
+                      .withRed(100)),
             ),
             automaticallyImplyLeading: automaticallyImplyLeading,
             leading: appBarLeading,

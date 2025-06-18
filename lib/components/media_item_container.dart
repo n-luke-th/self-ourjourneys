@@ -2,7 +2,6 @@
 ///
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show PointerHoverEvent;
 import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
@@ -20,7 +19,7 @@ import 'package:ourjourneys/shared/views/ui_consts.dart';
 /// component for displaying media items (images, videos, etc.)
 /// - for images, using [ImageRenderer]
 /// - for videos, using [VideoPlayer]
-class MediaItemContainer extends StatefulWidget {
+class MediaItemContainer extends StatelessWidget {
   final String mimeType;
 
   /// tells how to fetch the media from, also included all the necessary data to fetch the media from the source
@@ -28,7 +27,7 @@ class MediaItemContainer extends StatefulWidget {
 
   final bool showActionWidget;
   final Widget? actionWidget;
-  final ActionWidgetPlace actionWidgetPlace;
+  final Alignment actionWidgetPlace;
   final VoidCallback? onActionWidgetTriggered;
   final double widgetRatio;
   final double? height;
@@ -46,7 +45,7 @@ class MediaItemContainer extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDoubleTap;
   final VoidCallback? onLongPress;
-  final void Function(PointerHoverEvent)? onHover;
+  // final void Function(PointerHoverEvent)? onHover;
 
   /// the configs for the image to be displayed
   final ImageDisplayConfigsModel imageRendererConfigs;
@@ -57,7 +56,7 @@ class MediaItemContainer extends StatefulWidget {
     required this.fetchSourceData,
     this.showActionWidget = false,
     this.actionWidget,
-    this.actionWidgetPlace = ActionWidgetPlace.topRight,
+    this.actionWidgetPlace = Alignment.topRight,
     this.onActionWidgetTriggered,
     this.widgetRatio = 10 / 16,
     this.height,
@@ -73,35 +72,28 @@ class MediaItemContainer extends StatefulWidget {
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
-    this.onHover,
+    // this.onHover,
     this.imageRendererConfigs = const ImageDisplayConfigsModel(),
   });
 
-  @override
-  State<MediaItemContainer> createState() => _MediaItemContainerState();
-}
+  // bool _hovering = false;
 
-class _MediaItemContainerState extends State<MediaItemContainer> {
-  final Logger _logger = getIt<Logger>();
-  bool _hovering = false;
   bool get isImage =>
-      FileUtils.detectFileTypeFromMimeType(widget.mimeType) ==
-      MediaObjectType.image;
+      FileUtils.detectFileTypeFromMimeType(mimeType) == MediaObjectType.image;
+
   bool get isVideo =>
-      FileUtils.detectFileTypeFromMimeType(widget.mimeType) ==
-      MediaObjectType.video;
+      FileUtils.detectFileTypeFromMimeType(mimeType) == MediaObjectType.video;
 
-  FetchSourceData get fetchSourceData => widget.fetchSourceData;
+  // FetchSourceData get fetchSourceData => fetchSourceData;
 
-  ImageDisplayConfigsModel get imageRendererConfigs =>
-      widget.imageRendererConfigs;
+  // ImageDisplayConfigsModel get imageRendererConfigs =>
+  //     imageRendererConfigs;
 
   Widget _handleBuildMediaError(BuildContext context, Object error,
       StackTrace? stackTrace, MediaObjectType mediaType) {
-    _logger.d(
-        "mimetype: ${widget.mimeType}\tmediaType: $mediaType\tfetchSourceMethod: ${widget.fetchSourceData.fetchSourceMethod.stringValue}");
+    final Logger _logger = getIt<Logger>();
     _logger.e(
-        "Error loading ${mediaType.stringValue} item in 'MediaItemContainer': ${error.toString()}",
+        "mimetype: $mimeType\tmediaType: $mediaType\tfetchSourceMethod: ${fetchSourceData.fetchSourceMethod.stringValue}\nError loading ${mediaType.stringValue} item in 'MediaItemContainer': ${error.toString()}",
         error: error,
         stackTrace: stackTrace);
 
@@ -127,12 +119,12 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
     );
   }
 
-  Widget _buildMedia() {
-    switch (FileUtils.detectFileTypeFromMimeType(widget.mimeType)) {
+  Widget _buildMedia(BuildContext context) {
+    switch (FileUtils.detectFileTypeFromMimeType(mimeType)) {
       case MediaObjectType.image:
         return _buildImage();
       case MediaObjectType.video:
-        return _buildVideo();
+        return _buildVideo(context);
       default:
         return const Center(
           child: Icon(
@@ -147,57 +139,45 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
   Widget _buildImage() {
     return ImageRenderer(
       fetchSourceData: fetchSourceData,
-      imageRendererConfigs: imageRendererConfigs,
+      imageRendererConfigs: imageRendererConfigs.errorBuilder == null
+          ? imageRendererConfigs.copyWith(
+              errorBuilder: (context, error, stackTrace) =>
+                  _handleBuildMediaError(
+                    context,
+                    error,
+                    stackTrace,
+                    MediaObjectType.image,
+                  ))
+          : imageRendererConfigs,
     );
   }
 
-  Widget _buildVideo() {
+  Widget _buildVideo(BuildContext context) {
     return _handleBuildMediaError(context, "Video is not yet supported",
         StackTrace.current, MediaObjectType.video);
-  }
-
-  Alignment _getAlignment(ActionWidgetPlace place) {
-    switch (place) {
-      case ActionWidgetPlace.topRight:
-        return Alignment.topRight;
-      case ActionWidgetPlace.top:
-        return Alignment.topCenter;
-      case ActionWidgetPlace.topLeft:
-        return Alignment.topLeft;
-      case ActionWidgetPlace.bottomRight:
-        return Alignment.bottomRight;
-      case ActionWidgetPlace.bottom:
-        return Alignment.bottomCenter;
-      case ActionWidgetPlace.bottomLeft:
-        return Alignment.bottomLeft;
-      case ActionWidgetPlace.centerRight:
-        return Alignment.centerRight;
-      case ActionWidgetPlace.centerLeft:
-        return Alignment.centerLeft;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final mediaContent = AspectRatio(
-      aspectRatio: widget.mediaRatio ?? 4 / 3,
+      aspectRatio: mediaRatio ?? 4 / 3,
       child: Stack(
         alignment: AlignmentDirectional.center,
         children: [
           ClipRRect(
-            borderRadius: widget.shape == BoxShape.circle
+            borderRadius: shape == BoxShape.circle
                 ? BorderRadius.circular(999)
                 : BorderRadius.zero,
-            child: _buildMedia(),
+            child: _buildMedia(context),
           ),
-          if (widget.showActionWidget && widget.actionWidget != null)
+          if (showActionWidget && actionWidget != null)
             Align(
-              alignment: _getAlignment(widget.actionWidgetPlace),
+              alignment: actionWidgetPlace,
               child: GestureDetector(
-                onTap: widget.onActionWidgetTriggered,
+                onTap: onActionWidgetTriggered,
                 child: Padding(
                   padding: UiConsts.PaddingAll_standard,
-                  child: widget.actionWidget,
+                  child: actionWidget,
                 ),
               ),
             ),
@@ -209,11 +189,11 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
       padding: UiConsts.PaddingAll_small,
       width: double.infinity,
       color: Theme.of(context).colorScheme.primaryContainer,
-      child: (!widget.showDescriptionBar)
+      child: (!showDescriptionBar)
           ? const SizedBox.shrink()
           : Text(
-              widget.extraMapData?['description'] ?? 'No description',
-              maxLines: widget.descriptionTxtMaxLines,
+              extraMapData?['description'] ?? 'No description',
+              maxLines: descriptionTxtMaxLines,
               overflow: TextOverflow.ellipsis,
               softWrap: true,
               textAlign: TextAlign.center,
@@ -223,41 +203,39 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
 
     final content = Column(
       children: [
-        Expanded(
-            flex: widget.mediaAndDescriptionBarFlexValue.$1,
-            child: mediaContent),
-        if (widget.showDescriptionBar)
+        Expanded(flex: mediaAndDescriptionBarFlexValue.$1, child: mediaContent),
+        if (showDescriptionBar)
           Expanded(
-              flex: widget.mediaAndDescriptionBarFlexValue.$2,
+              flex: mediaAndDescriptionBarFlexValue.$2,
               child: descriptionContent),
       ],
     );
 
     final decoratedContainer = GestureDetector(
-      onTap: widget.onTap,
-      onDoubleTap: widget.onDoubleTap,
-      onLongPress: widget.onLongPress,
+      onTap: onTap,
+      onDoubleTap: onDoubleTap,
+      onLongPress: onLongPress,
       child: Container(
-        height: widget.height,
-        width: widget.width,
+        height: height,
+        width: width,
         decoration: BoxDecoration(
-          shape: widget.shape,
-          borderRadius: widget.shape == BoxShape.rectangle
+          shape: shape,
+          borderRadius: shape == BoxShape.rectangle
               ? UiConsts.BorderRadiusCircular_mediumLarge
               : null,
-          border: !widget.showWidgetBorder
+          border: !showWidgetBorder
               ? null
-              : (widget.widgetBorder == null)
+              : (widgetBorder == null)
                   ? Border.all(color: Colors.grey.shade300)
-                  : widget.widgetBorder,
-          boxShadow: _hovering
-              ? [
-                  BoxShadow(
-                      color: Colors.black54,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4))
-                ]
-              : [],
+                  : widgetBorder,
+          // boxShadow: _hovering
+          //     ? [
+          //         BoxShadow(
+          //             color: Colors.black54,
+          //             blurRadius: 8,
+          //             offset: const Offset(0, 4))
+          //       ]
+          //     : [],
         ),
         clipBehavior: Clip.hardEdge,
         child: content,
@@ -265,29 +243,29 @@ class _MediaItemContainerState extends State<MediaItemContainer> {
     );
 
     final gestures = GestureDetector(
-      onTap: widget.onTap,
-      onDoubleTap: widget.onDoubleTap,
-      onLongPress: widget.onLongPress,
+      onTap: onTap,
+      onDoubleTap: onDoubleTap,
+      onLongPress: onLongPress,
       child: decoratedContainer,
     );
 
-    final mouseRegion = MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovering = true),
-      onExit: (_) => setState(() => _hovering = false),
-      onHover: (PointerHoverEvent event) {
-        widget.onHover?.call(event);
-      },
-      child: gestures,
-    );
-    if (widget.height == null && widget.width == null) {
+    // final mouseRegion = MouseRegion(
+    //   cursor: SystemMouseCursors.click,
+    //   onEnter: (_) => setState(() => _hovering = true),
+    //   onExit: (_) => setState(() => _hovering = false),
+    //   onHover: (PointerHoverEvent event) {
+    //     widget.onHover?.call(event);
+    //   },
+    //   child: gestures,
+    // );
+    if (height == null && width == null) {
       return AspectRatio(
-        aspectRatio: widget.widgetRatio,
-        child: mouseRegion,
+        aspectRatio: widgetRatio,
+        child: gestures,
       );
     }
 
-    return mouseRegion;
+    return gestures;
   }
 }
 

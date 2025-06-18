@@ -8,5 +8,14 @@
 /// useful to limited user's action on the page
 enum PageMode {
   view,
-  edit,
+  edit;
+
+  String get getIng {
+    switch (this) {
+      case PageMode.view:
+        return "viewing";
+      case PageMode.edit:
+        return "editing";
+    }
+  }
 }

@@ -1,4 +1,4 @@
-/// lib/views/albums/full_media_view.dart
+/// lib/views/media/full_media_view.dart
 ///
 // TODO: add ability to fetch the object data from server and display
 

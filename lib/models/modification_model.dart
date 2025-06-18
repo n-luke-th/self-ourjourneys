@@ -58,14 +58,37 @@ class ModificationData {
   ///
   /// Returns `(createdString, modifiedString)`
   ///
-  /// Example: 'Created by You on 2022.01.01 @12:00'
-  /// or 'Last modified by Your lover on 2022.01.01 @12:00'
+  /// Example:
+  /// - if [combinedIfSame] is `false`: ('Created by You on 2022.01.01 @12:00',
+  /// 'Last modified by Your lover on 2022.01.01 @12:00')
+  /// - if [combinedIfSame] is `true`: ('Created and last modified by You on 2022.01.01 @12:00', '')
+  ///
   static (String createdString, String modifiedString)
       getModificationDataString(
-          {required ModificationData modData, required String uid}) {
-    return (
-      "Created by ${modData.createdByUserId == uid ? "You" : "Your lover"} on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.createdAt, pattern: "y.MM.d @H:mm")}",
-      "Last modified by ${modData.lastModifiedByUserId == uid ? "You" : "Your lover"} on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: "y.MM.d @H:mm")}"
-    );
+          {required ModificationData modData,
+          required String uid,
+          bool combinedIfSame = false}) {
+    final String timePattern = "y.MM.d @H:mm";
+    if (combinedIfSame &&
+        (modData.createdByUserId == modData.lastModifiedByUserId) &&
+        (modData.createdAt == modData.lastModifiedAt)) {
+      // if created and last modified by the same user as well as the created time and last modified time is the same
+      final String string =
+          "Created and last modified by ${modData.createdByUserId == uid ? "You" : "Your lover"} on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.createdAt, pattern: timePattern)}";
+      return (string, "");
+    } else if (combinedIfSame &&
+        (modData.createdByUserId == modData.lastModifiedByUserId) &&
+        (modData.createdAt != modData.lastModifiedAt)) {
+      // if created and last modified by the same user but the created time and last modified time is different
+      return (
+        "${modData.createdByUserId == uid ? "You" : "Your lover"} have created on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.createdAt, pattern: timePattern)} and modified on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: timePattern)}",
+        ""
+      );
+    } else {
+      return (
+        "Created by ${modData.createdByUserId == uid ? "You" : "Your lover"} on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.createdAt, pattern: timePattern)}",
+        "Last modified by ${modData.lastModifiedByUserId == uid ? "You" : "Your lover"} on ${DateTimeUtils.getReadableDateFromTimestamp(timestamp: modData.lastModifiedAt, pattern: timePattern)}"
+      );
+    }
   }
 }

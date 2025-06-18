@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/models/interface/actions_btn_model.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 
 /// display a popup menu with a list of actions
 class MoreActionsBtn extends StatelessWidget {
@@ -11,12 +12,16 @@ class MoreActionsBtn extends StatelessWidget {
   const MoreActionsBtn(
       {super.key,
       required this.actions,
-      required this.displayIcon,
+      this.displayIcon = const Icon(
+        Icons.menu_outlined,
+      ),
       this.tooltip});
 
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
+      shape: RoundedRectangleBorder(
+          borderRadius: UiConsts.BorderRadiusCircular_medium),
       position: PopupMenuPosition.under,
       icon: displayIcon,
       tooltip: tooltip,
@@ -34,6 +39,8 @@ class MoreActionsBtn extends StatelessWidget {
       return PopupMenuItem<String>(
         value: action.actionName,
         child: ListTile(
+          shape: RoundedRectangleBorder(
+              borderRadius: UiConsts.BorderRadiusCircular_medium),
           enableFeedback: true,
           leading: action.icon,
           title: Text(action.actionName),

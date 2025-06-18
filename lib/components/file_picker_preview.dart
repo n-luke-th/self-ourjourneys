@@ -13,7 +13,7 @@ import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/views/screen_sizes.dart' show ScreenSize;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
-import 'package:ourjourneys/views/albums/full_media_view.dart';
+import 'package:ourjourneys/views/media/full_media_view.dart';
 
 /// a widget that shows a preview of selected local/cloud files
 class FilePickerPreview extends StatelessWidget {

@@ -19,7 +19,7 @@ import 'package:ourjourneys/services/dialog/dialog_service.dart'
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
-import 'package:ourjourneys/views/albums/full_media_view.dart';
+import 'package:ourjourneys/views/media/full_media_view.dart';
 
 /// A widget that displays a paginated grid of all files on the server.
 class PaginatedFilesGrid extends StatefulWidget {

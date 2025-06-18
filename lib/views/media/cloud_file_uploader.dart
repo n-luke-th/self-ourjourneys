@@ -1,4 +1,4 @@
-/// lib/views/cloud_file_uploader.dart
+/// lib/views/media/cloud_file_uploader.dart
 ///
 
 import 'package:flutter/material.dart';

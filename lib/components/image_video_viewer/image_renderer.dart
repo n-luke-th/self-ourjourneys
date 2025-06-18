@@ -20,6 +20,7 @@ import 'package:ourjourneys/errors/object_storage_exception/cloud_object_storage
 import 'package:ourjourneys/errors/platform_exception/custom_platform_exception.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/get_platform_service.dart';
+import 'package:ourjourneys/helpers/utils.dart';
 import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
 import 'package:ourjourneys/models/storage/fetch_source_data.dart';
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
@@ -69,8 +70,9 @@ class _ImageRendererState extends State<ImageRenderer> {
 
   /// provide the base image renderer with the given image provider.
   ExtendedImage _baseImageRenderer(BuildContext context,
-      {required ImageProvider<Object> imageProvider}) {
+      {required ImageProvider<Object> imageProvider, required String key}) {
     return ExtendedImage(
+      key: ValueKey(key),
       image: imageProvider,
       width: imageRendererConfigs.width,
       height: imageRendererConfigs.height,
@@ -113,6 +115,7 @@ class _ImageRendererState extends State<ImageRenderer> {
         assert(objectKey != null && idToken != null);
         _logger.d("render using 'ExtendedNetworkImageProvider'");
         return _baseImageRenderer(context,
+            key: objectKey!,
             imageProvider: ExtendedNetworkImageProvider(
               "${NetworkConsts.cdnUrl}/$objectKey",
               headers: {
@@ -134,6 +137,7 @@ class _ImageRendererState extends State<ImageRenderer> {
           _logger.d("render using 'ExtendedMemoryImageProvider'");
           if (bytes != null) {
             return _baseImageRenderer(context,
+                key: FileUtils.generateChecksum(bytes),
                 imageProvider: ExtendedMemoryImageProvider(bytes));
           } else if (file != null) {
             return FutureBuilder<Uint8List>(
@@ -150,6 +154,7 @@ class _ImageRendererState extends State<ImageRenderer> {
                   if (asyncSnapshot.connectionState == ConnectionState.done &&
                       asyncSnapshot.hasData) {
                     return _baseImageRenderer(context,
+                        key: file.name,
                         imageProvider: ExtendedMemoryImageProvider(
                             asyncSnapshot.data!,
                             imageCacheName: file.name));
@@ -175,6 +180,7 @@ class _ImageRendererState extends State<ImageRenderer> {
           if (file != null && file.path.isNotEmpty) {
             _logger.d("render using 'ExtendedFileImageProvider'");
             return _baseImageRenderer(context,
+                key: file.name,
                 imageProvider:
                     image_provider_stub.localFileImageProvider(file));
           }

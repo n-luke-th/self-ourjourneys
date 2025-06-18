@@ -22,7 +22,7 @@ import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart'
     show FirestoreCollections;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
-import 'package:ourjourneys/views/cloud_file_uploader.dart';
+import 'package:ourjourneys/views/media/cloud_file_uploader.dart';
 
 /// a page to display a list of albums
 class AlbumsPage extends StatefulWidget {

@@ -1,0 +1,75 @@
+# Legacy changelog for OurJourneys by LukeCreated (discontinued)
+
+For the changelog of the current version, please visit the [CHANGELOG.md](CHANGELOG.md) file.
+
+- Initial Setup: Initial setup the project and possible dependencies & relevants setup on September 23, 2024 -> **0.0.0+1** by Luke
+- Initial Development: Place the app fundamentals on September 23, 2024 -> **0.0.1** by Luke
+- Initial Development: Setup Firebase for the app, added logger system, added the permission system + notification system & setting system (language), and other improvements on September 27, 2024 -> **0.0.2** by Luke
+- Initial Development: Added launch screen, and other improvements on September 28, 2024 -> **0.0.3** by Luke
+- Initial Development: Added Theme and l10n in actions, and other improvements on September 28, 2024 -> **0.0.4** by Luke
+- Initial Development: Setup the underlying global error exceptions, added local auth service file, and other improvements on September 28, 2024 -> **0.0.5** by Luke
+- Initial Development: Added the navigation and navbar as well as simple placeholder pages, and other improvements on September 28, 2024 -> **0.0.6** by Luke
+- Initial Development: Added router system, added setting page draft, and other improvements on September 29, 2024 -> **0.0.7** by Luke
+- Initial Development: Added a placeholder for auth and memories and album pages, improved settings page, improved navbar, and other improvements on September 29, 2024 -> **0.0.8** by Luke
+- Initial Development: Redesigned ui of reset password and login page, and other improvements on September 30, 2024 -> **0.0.9** by Luke
+- Initial Development: Added launcher icon on September 30, 2024 -> **0.1.0** by Luke
+- Initial Development: Attempted to fix launcher icon for Android on September 30, 2024 -> **0.1.0+1** by Luke
+- Initial Development: Launcher icon works on all platform on September 30, 2024 -> **0.1.0+2** by Luke
+- Initial Development: Updated launch screen on all platform on September 30, 2024 -> **0.1.0+3** by Luke
+- Initial Development: Setup the underlying authentication + cloud object storage service and their wrappers, improved the global error system + added auth error code and msg, and other improvements on October 1, 2024 -> **0.1.1** by Luke
+- Initial Development: Fixed the dead lock for dependencies creation with getIt, and other improvements on October 1, 2024 -> **0.1.2** by Luke
+- Initial Development: Made progress on authentication process, and other improvements on October 1, 2024 -> **0.1.3** by Luke
+- Initial Development: Login + logout and reset password seems working, and other improvements on October 2, 2024 -> **0.1.4** by Luke
+- Initial Development: Improved the authentication service, and other improvements on October 3, 2024 -> **0.1.5** by Luke
+- Initial Development: Improved the authentication process and experience, added place holder for change password page, added the display of profile and account settings menu on settings page, and other improvements on October 3, 2024 -> **0.1.6** by Luke
+- Initial Development: Improved the authentication process, added place holder for change email and update profile page, improved the settings page, and other improvements on October 5, 2024 -> **0.1.7** by Luke
+- Initial Development: Improved the authentication and edit account process, improved the settings page and ui design for edit account pages, and other improvements on October 5, 2024 -> **0.1.8** by Luke
+- Initial Development: Improved the authentication and edit account process, added auth protected view wrapper and git stamp page, and other improvements on October 5, 2024 -> **0.1.9** by Luke
+- Initial Development: All authentication and edit account processes are working now, and other improvements on October 5, 2024 -> **0.2.0** by Luke
+- Initial Development: Fixed the update account profile picture image rendering bug, and other improvements on October 5, 2024 -> **0.2.1** by Luke
+- Initial Development: Added the email sent page, and other improvements on October 6, 2024 -> **0.2.2** by Luke
+- Initial Development: Fixed the update account profile bug, added the placeholder for the 'Collections' page, and other improvements on October 8, 2024 -> **0.2.3** by Luke
+- Initial Development: Improved the authentication service and error exception, changed & improved the navbar arrangement and font size, and other improvements on October 8, 2024 -> **0.2.4** by Luke
+- Initial Development: Minor improvements on October 11, 2024 -> **0.2.5** by Luke
+- Initial Development: Added more log information, and upgraded the dependency constraints on October 26, 2024 -> **0.2.51** by Luke
+- Initial Development: Updated the localization method, upgraded the dependency constraints, and other improvements on April 3, 2025 -> **0.2.6** by Luke
+- Initial Development: Changed app & package name, and other improvements on April 7, 2025 -> **0.2.7** by Luke
+- Initial Development: Setting backend integration (cloud media), and other improvements on April 8, 2025 -> **0.2.8** by Luke
+- Initial Development: Lambda functions draft (verify is working) connected to the api gateway, and other improvements on April 10, 2025 -> **0.2.8+1** by Luke
+- Initial Development: Removed support for iOS and Android temporarily on April 10, 2025 -> **0.2.8+2** by Luke
+- Initial Development: All Lambda functions (verify, gen_uploads, gen_downloads, deletes) are working on basic features, and other improvements on April 11, 2025 -> **0.2.8+3** by Luke
+- Initial Development: Enhanced deletes Lambda function, tested the ability to retrieve and upload image, and other improvements on April 12, 2025 -> **0.2.9** by Luke
+- Initial Development: Added the JS code for verify Firebase token for viewing files as backend for object storage use has update [(issue #2)](https://github.com/n-luke-th/self-xiaokeai/issues/2#issuecomment-2800049499), and other improvements on April 14, 2025 -> **0.2.10** by Luke
+- Initial Development: Edited the JS code for verify token for CORS, adjusted the client side code to test viewing with the new backend (api v2) [(issue #2)](https://github.com/n-luke-th/self-xiaokeai/issues/2#issuecomment-2800049499), and other improvements on April 15, 2025 -> **0.2.11** by Luke
+- Initial Development: Added Python code for the new backend (api v2) [(issue #2)](https://github.com/n-luke-th/self-xiaokeai/issues/2#issuecomment-2800049499), setup some backend underlying, and other improvements on April 16, 2025 -> **0.2.12** by Luke
+- Initial Development: Improved the Python code for Lambda functions on April 16, 2025 -> **0.2.12+1** by Luke
+- Initial Development: Enhanced the authentication flow, tested the ability to upload with api v2, and other improvements on April 16, 2025 -> **0.2.13** by Luke
+- Initial Development: Hidden project id, upgraded dependency constraints, and improvements on April 16, 2025 -> **0.2.13+1** by Luke
+- Initial Development: Added the data models for the database, and other improvements on April 16, 2025 -> **0.2.13+2** by Luke
+- Initial Development: Updated the data models for the database to v1.1 & 2, added some data classes, and other improvements on April 17, 2025 -> **0.2.13+3** by Luke
+- Initial Development: Updated the data models for the database to v2 on April 17, 2025 -> **0.2.13+4** by Luke
+- Initial Development: Implementation of the integration of the database, tested multiple files upload with progress, and other improvements on April 18, 2025 -> **0.2.14** by Luke
+- Initial Development: Added the extension to create the document with custom ID on the database handler underlying system, upgraded the dependencies constraints, and other improvement on April 19, 2025 -> **0.2.14+1** by Luke
+- Initial Development: Setup underlying system for Albums feature and Memories feature, updated the data models for the database to v2.1, upgraded the dependencies constraints, and other improvement on April 26, 2025 -> **0.2.15** by Luke
+- Initial Development: Added the Albums feature (able to list and create albums as well as upload local or existing files), upgraded the dependencies constraints, and other improvements on May 4, 2025 -> **0.3.0** by Luke
+- Initial Development: Enhanced the Albums feature (able to see the album's details, see the enlarged images, enhanced the create new album), and other improvements on May 4, 2025 -> **0.3.1** by Luke
+- Initial Development: Enhanced the Albums feature (able to see the album's file details, enhanced the file selection for create new album and its picking file), added new all-in-one media file container, and other improvements on May 5, 2025 -> **0.3.2** by Luke
+- Initial Development: Enhanced the Albums feature (able to delete album's item, added the refresh albums button), able to delete image file from all files page, added support for both deleting files by keys and names, and other improvements on May 5, 2025 -> **0.3.3** by Luke
+- Initial Development: Enhanced the Albums feature (able to delete entire album with its items and draft the delete multiple albums at once ability, able to create an empty album), upgraded the dependencies constraints, and other improvements on May 19, 2025 -> **0.3.4** by Luke
+- Initial Development: Upgraded the dependencies constraints, added support for native Android and iOS, updated the launcher icons and splash screen, and other improvements on May 21, 2025 -> **0.3.4+1** by Luke
+- Initial Development: Upgraded the dependencies constraints, and other improvements on May 21, 2025 -> **0.3.4+2** by Luke
+- Initial Development: Enhanced code reusability and other improvements on May 22, 2025 -> **0.3.4+3** by Luke
+- Initial Development: Fixed unable to go through the reset password flow, and other improvements on May 22, 2025 -> **0.3.5** by Luke
+- Initial Development: Improved the UI/UX of the album tile + items in album details page + add new album page as well as full media view page, enhanced internal Widget classes/app functions, and other improvements on May 24, 2025 -> **0.3.6** by Luke
+- Initial Development: Enhanced the UI/UX of the server file selection, updated the data models for the database to v3, and other improvements on May 24, 2025 -> **0.3.7** by Luke
+- Initial Development: Upgraded the dependencies constraints, updated the data models for the database to v3.1, started the thumbnail helper system implementation, and other improvements on May 25, 2025 -> **0.3.8** by Luke
+- Initial Development: Prepared the thumbnail loading to UI to improve application performance, and other improvements on May 26, 2025 -> **0.3.9** by Luke
+- Initial Development: Seamless Thumbnail integration is implemented, internal code enhanced, performance enhancement for media display system (primarily for image), and other improvements on June 2, 2025 -> **0.3.10** by Luke
+- Initial Development: Upgraded the dependencies constraints, internal code clean up and enhancement, and other improvements on June 2, 2025 -> **0.3.10+1** by Luke
+- Initial Development: Added the auto format bytes to approopriate unit, enhanced the UI/UX of the albums page, included dedicated cloud file uploader, and other improvements on June 5, 2025 -> **0.3.11** by Luke
+- Initial Development: Upgraded the dependencies constraints, performance optimization of the image renderer in progress, and other improvements on June 6, 2025 -> **0.3.12** by Luke
+- Initial Development: Upgraded the dependencies constraints, updated the data models to v3.1, and other improvements on June 10, 2025 -> **0.3.13** by Luke
+- Initial Development: Enhanced the media item display system as well as specific image type media item rendering system, and other improvements on June 12, 2025 -> **0.3.14** by Luke
+- Initial Development: Upgraded the dependencies constraints, reduced complexity from adding mixin from the previous release, and other improvements on June 12, 2025 -> **0.3.15** by Luke
+- Initial Development: Upgraded the dependencies constraints, ensure compatibility for image rendering system for web, and other improvements on June 14, 2025 -> **0.3.16** by Luke
+- Initial Development: Improving the UI/UX of the album feature related pages, internal data gathering adjustment for albums page and album details page, refactored and improved settings page, and other improvements on June 16, 2025 -> **0.3.17** by Luke

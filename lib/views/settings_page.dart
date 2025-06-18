@@ -17,7 +17,6 @@ import 'package:ourjourneys/helpers/get_platform_service.dart'
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/helpers/platform_enum.dart'
     show PlatformEnum;
-import 'package:package_info_plus/package_info_plus.dart' show PackageInfo;
 import 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionStatus;
 import 'package:provider/provider.dart';
@@ -52,7 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   /// load app version and build number
   void _loadVersionAndBuildNumber() async {
-    final PackageInfo? packageInfo =
+    final packageInfo =
         await Provider.of<PackageInfoProvider?>(context, listen: false)
             ?.loadPackageInfoAndGet();
     if (packageInfo != null) {
@@ -65,7 +64,11 @@ class _SettingsPageState extends State<SettingsPage> {
         _buildNumber = packageInfo.buildNumber;
       }
       _logger.t("version: $_appVersion | build num: $_buildNumber");
-    } else {}
+    } else {
+      _appVersion = null;
+      _buildNumber = null;
+      _logger.t("failed to load version and build number");
+    }
   }
 
   @override
@@ -131,22 +134,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Column _accountSection() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return _buildSettingSection(
+      "Account",
       children: [
-        Align(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: UiConsts.PaddingAll_standard,
-            child: Text(
-              "Account",
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                  fontSize:
-                      Theme.of(context).textTheme.headlineMedium!.fontSize),
-            ),
-          ),
-        ),
         _buildListTile(
           "Update Profile",
           () => context.pushReplacementNamed("UpdateProfilePage"),
@@ -201,22 +191,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Column _appearanceSection(SettingsService settings) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return _buildSettingSection(
+      "Appearance",
       children: [
-        Align(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: UiConsts.PaddingAll_standard,
-            child: Text(
-              "Appearance",
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                  fontSize:
-                      Theme.of(context).textTheme.headlineMedium!.fontSize),
-            ),
-          ),
-        ),
         SettingDropdown<ThemeMode>(
           title: "Theme mode",
           value: settings.themeMode,
@@ -233,22 +210,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Column _permissionSection() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return _buildSettingSection(
+      "Permissions",
       children: [
-        Align(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: UiConsts.PaddingAll_standard,
-            child: Text(
-              "Permissions",
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                  fontSize:
-                      Theme.of(context).textTheme.headlineMedium!.fontSize),
-            ),
-          ),
-        ),
         _buildListTile(
           "Current permission status",
           () async => await BottomSheetService.showCustomBottomSheet(
@@ -312,37 +276,12 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Column _accessibilitySection() {
-    return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-      Align(
-        alignment: Alignment.topLeft,
-        child: Padding(
-          padding: UiConsts.PaddingAll_standard,
-          child: Text(
-            "Accessibility",
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onSecondary,
-                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
-          ),
-        ),
-      ),
-      _buildListTile("Biometric protection", () {})
-    ]);
+    return _buildSettingSection("Accessibility",
+        children: [_buildListTile("Biometric protection", () {})]);
   }
 
   Column _aboutSection() {
-    return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-      Align(
-        alignment: Alignment.topLeft,
-        child: Padding(
-          padding: UiConsts.PaddingAll_standard,
-          child: Text(
-            "About",
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onSecondary,
-                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize),
-          ),
-        ),
-      ),
+    return _buildSettingSection("About", children: [
       // _buildListTile(
       //    "Git Stamps",
       //    () {
@@ -373,7 +312,13 @@ class _SettingsPageState extends State<SettingsPage> {
               context: context,
               title: "App Version",
               message:
-                  "${"Version: $_appVersion"}${_buildNumber != null ? '\n${_buildNumber.isEmpty ? "" : "Build Number: $_buildNumber"}' : ""}");
+                  "${"Version: $_appVersion"}${_buildNumber != null ? _buildNumber.isEmpty ? "" : "\nBuild Number: $_buildNumber" : ""}");
+        } else {
+          await DialogService.showInfoDialog(
+              context: context,
+              title: "App Version",
+              message:
+                  "Unable to retrieve version information, please try again later.");
         }
       }),
     ]);
@@ -410,6 +355,30 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
         ));
+  }
+
+  Column _buildSettingSection(String title,
+      {List<Widget> children = const [], TextStyle? style}) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: UiConsts.PaddingAll_standard,
+            child:
+                Text(title, style: style ?? _getSettingSectionTitleTextStyle()),
+          ),
+        ),
+        ...children
+      ],
+    );
+  }
+
+  TextStyle _getSettingSectionTitleTextStyle() {
+    return TextStyle(
+        color: Theme.of(context).colorScheme.onSecondary,
+        fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize);
   }
 
   Future<void> _showLogoutConfirmation() async {

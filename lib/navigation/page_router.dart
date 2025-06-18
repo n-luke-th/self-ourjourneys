@@ -10,7 +10,7 @@ import 'package:ourjourneys/navigation/nav_bar.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/views/albums/album_details_page.dart';
 import 'package:ourjourneys/views/albums/albums_page.dart';
-import 'package:ourjourneys/views/albums/all_files_page.dart';
+import 'package:ourjourneys/views/media/all_files_page.dart';
 import 'package:ourjourneys/views/albums/new_album_page.dart';
 import 'package:ourjourneys/views/anniversaries/anniversary_page.dart';
 import 'package:ourjourneys/views/auth_views/change_password_page.dart';

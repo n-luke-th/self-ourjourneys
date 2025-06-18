@@ -11,12 +11,10 @@ import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
-import 'package:ourjourneys/components/more_actions_btn.dart';
-import 'package:ourjourneys/helpers/dependencies_injection.dart';
+import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/utils.dart'
     show FileUtils, InterfaceUtils, Utils;
 import 'package:ourjourneys/models/db/albums_model.dart';
-import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
 import 'package:ourjourneys/models/modification_model.dart';
 import 'package:ourjourneys/models/storage/fetch_source_data.dart';
@@ -29,9 +27,8 @@ import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/common/page_mode_enum.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
-import 'package:ourjourneys/shared/views/ui_consts.dart'
-    show PaddingAll_small, UiConsts;
-import 'package:ourjourneys/views/albums/full_media_view.dart';
+import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
+import 'package:ourjourneys/views/media/full_media_view.dart';
 
 /// a page to display the details of an album and a list of items associate with it
 class AlbumDetailsPage extends StatefulWidget {
@@ -52,8 +49,21 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
   final Logger _logger = getIt<Logger>();
   final ScrollController _scrollController = ScrollController();
 
+  final Set<String> _selectedItems = {};
+
   late AlbumsModel? albumData;
   late PageMode _mode;
+
+  bool _isActivatedSelectionMode = false;
+
+  bool get _isSelectedAllItems =>
+      _currentModeIs(PageMode.edit) &&
+      (_selectedItems.length == albumData?.linkedObjects.length);
+
+  bool get _isSelectingItems =>
+      _currentModeIs(PageMode.edit) &&
+      (_selectedItems.isNotEmpty) &&
+      _isActivatedSelectionMode;
 
   @override
   void initState() {
@@ -65,6 +75,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
   @override
   void dispose() {
     albumData = null;
+    _selectedItems.clear();
     _scrollController.dispose();
     super.dispose();
   }
@@ -74,45 +85,66 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
     return toCompareMode == _mode;
   }
 
+  void _resetToViewMode() {
+    _selectedItems.clear();
+    _isActivatedSelectionMode = false;
+  }
+
   /// change the current active mode to either of the following:
   /// - [PageMode.view]
   /// - [PageMode.edit]
   void _toggleMode() {
-    setState(() {
-      _mode = _mode == PageMode.edit ? PageMode.view : PageMode.edit;
-    });
+    if (albumData != null) {
+      setState(() {
+        _mode = _currentModeIs(PageMode.edit) ? PageMode.view : PageMode.edit;
+        _currentModeIs(PageMode.view) ? _resetToViewMode() : null;
+      });
+    }
     _logger.d("mode now is ${_mode.name}");
   }
 
-  void _selectOrDeselectAllItems() {
-    _logger.d("selectOrDeselectAllItems");
+  bool _isItemSelected(String objectKey) {
+    if (_isActivatedSelectionMode && _currentModeIs(PageMode.edit)) {
+      return _selectedItems.contains(objectKey);
+    } else {
+      return false;
+    }
   }
-
-  void _deleteSelectedItems() {}
 
   /// build the bottom page widget for the edit mode
   List<Widget> _buildActionsForEditMode() {
     return [
-      TextButton.icon(
-        onPressed: () => _selectOrDeselectAllItems(),
-        label: Text("select all/deselect all"),
-        icon: const Icon(
-          Icons.format_list_bulleted_outlined,
-        ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+            padding: UiConsts.PaddingAll_standard,
+            shape: RoundedSuperellipseBorder(
+                borderRadius: UiConsts.BorderRadiusCircular_medium)),
+        onPressed: () => _onTouchedSelectItemsActionBtn(),
+        child: const Text("Select items"),
       ),
-      // Icon(
-      //   Icons.unpublished_outlined,
-      // ),
-      IconButton.filled(
-          onPressed: () => _toAddMoreMediaToAlbumPage(),
-          tooltip: "Add more media to album",
+      if (!_isSelectingItems)
+        IconButton.filled(
+            onPressed: () => _toAddMoreMediaToAlbumPage(),
+            tooltip: "Add more media to album",
+            enableFeedback: true,
+            icon: const Icon(Icons.upload_file_outlined)),
+      if (_isSelectingItems)
+        IconButton.outlined(
+            enableFeedback: true,
+            tooltip: "Unlink from album",
+            onPressed: () async {
+              await _unlinkSelectedItems(_selectedItems.toList());
+            },
+            icon: const Icon(
+              Icons.do_disturb_outlined,
+              color: Colors.orange,
+            )),
+      IconButton.outlined(
           enableFeedback: true,
-          icon: const Icon(Icons.upload_file_outlined)),
-      TextButton.icon(
+          tooltip: _isSelectingItems ? "Delete selected items" : "Delete album",
           onPressed: () async =>
-              await _onTouchedDeleteSingleAlbumActionBtn(albumData!),
-          label: const Text("Delete Album"),
-          //
+              await _onTouchedDeleteSingleAlbumActionBtn(albumData),
           icon: const Icon(
             Icons.delete,
             color: Colors.redAccent,
@@ -123,10 +155,12 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
   /// build the bottom page widget for the view mode
   List<Widget> _buildActionsForViewMode() {
     return [
-      IconButton.outlined(
-        tooltip: "Tap to scroll to top of the page",
+      ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface),
+        label: const Text("To top of the page"),
+        iconAlignment: IconAlignment.end,
         onPressed: () => InterfaceUtils.scrollToTop(_scrollController),
-        color: Colors.black,
         icon: const Icon(
           Icons.keyboard_arrow_up_outlined,
         ),
@@ -151,7 +185,9 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
 
       final (String createdString, String modifiedString) =
           ModificationData.getModificationDataString(
-              modData: albumData!.modificationData, uid: _authWrapper.uid);
+              modData: albumData!.modificationData,
+              uid: _authWrapper.uid,
+              combinedIfSame: true);
       return mainView(context,
           appBarTitle: 'ALBUM DETAILS',
           appbarActions: [
@@ -163,36 +199,13 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                       context: context,
                       title: "ALBUM METADATA",
                       message:
-                          "Contains: ${albumData!.linkedObjects.length.toString()} ${albumData!.linkedObjects.length <= 1 ? 'item' : 'items'}\n$createdString\n$modifiedString"),
+                          "Contains: ${albumData!.linkedObjects.length.toString()} ${albumData!.linkedObjects.length <= 1 ? 'item' : 'items'}\n${modifiedString.isNotEmpty ? "$createdString\n$modifiedString" : createdString}"),
                   icon: const Icon(Icons.info_outline_rounded)),
-              // MoreActionsBtn(
-              //     actions: [
-              //       if (albumData!.linkedObjects.isNotEmpty)
-              //         ActionsBtnModel(
-              //             actionName: "Select items",
-              //             icon: const Icon(
-              //               Icons.check_circle_outline_outlined,
-              //             ),
-              //             onPressed: () => _onTouchedSelectItemsActionBtn()),
-              //       ActionsBtnModel(
-              //           actionName: "Delete Album",
-              //           actionDes: "Delete this album",
-              //           icon: const Icon(
-              //             Icons.delete,
-              //             color: Colors.redAccent,
-              //           ),
-              //           onPressed: () async =>
-              //               await _onTouchedDeleteSingleAlbumActionBtn(
-              //                   albumData!))
-              //     ],
-              //     displayIcon: const Icon(
-              //       Icons.menu_outlined,
-              //     )),
             ),
           ],
           showFloatingActionButton: true,
           floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-          floatingActionButtonIcon: _currentModeIs(PageMode.view)
+          floatingActionButtonIcon: _currentModeIs(PageMode.edit)
               ? Icons.edit
               : Icons.visibility_outlined,
           floatingActionButtonTooltip:
@@ -203,31 +216,39 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                 borderRadius: UiConsts.BorderRadiusCircular_medium),
           ),
           onFloatingActionButtonPressed: () => _toggleMode(),
-          bottomNavigationBar:
-              // BottomNavigationBar(
-              //     elevation: 16,
-              //     enableFeedback: true,
-              //     backgroundColor: Theme.of(context).unselectedWidgetColor,
-              //     unselectedIconTheme: Theme.of(context)
-              //         .bottomNavigationBarTheme
-              //         .unselectedIconTheme!
-              //         .copyWith(
-              //             color: Theme.of(context).colorScheme.tertiaryContainer),
-              //     unselectedItemColor:
-              //         Theme.of(context).colorScheme.tertiaryContainer,
-              //     items: [
-              //       BottomNavigationBarItem(
-              //           icon: const Icon(Icons.edit), label: 'Edit'),
-              //       BottomNavigationBarItem(
-              //           icon: const Icon(Icons.delete_outline_rounded),
-              //           label: 'Delete Album'),
-              //     ]),
-
-              Container(
+          bottomSheet: _isActivatedSelectionMode
+              ? Padding(
+                  padding: UiConsts.PaddingAll_small,
+                  child: TextButton.icon(
+                    icon: Icon(
+                      !_isSelectedAllItems
+                          ? Icons.select_all_outlined
+                          : Icons.deselect_outlined,
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        enableFeedback: true,
+                        backgroundColor: Colors.transparent,
+                        shape: RoundedSuperellipseBorder(
+                            borderRadius:
+                                UiConsts.BorderRadiusCircular_medium)),
+                    label: Text(
+                      _isSelectedAllItems ? "Deselect all" : "Select all",
+                      style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.inverseSurface),
+                    ),
+                    onPressed: () {
+                      _selectOrDeselectAllItems();
+                    },
+                  ),
+                )
+              : null,
+          bottomNavigationBar: Container(
             padding: UiConsts.PaddingAll_small,
             height: MediaQuery.sizeOf(context).height * 0.1,
             decoration: BoxDecoration(
                 color: Theme.of(context).unselectedWidgetColor,
+                borderRadius: UiConsts.BorderRadiusCircular_standard,
                 boxShadow: [
                   BoxShadow(
                       color: Theme.of(context).unselectedWidgetColor,
@@ -242,16 +263,19 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Flexible(
-                    flex: 2,
                     child: Padding(
-                      padding: UiConsts.PaddingAll_small,
-                      child: Text(
-                        "Current mode:\n${_mode.name}",
-                        softWrap: true,
-                        maxLines: 3,
-                        textAlign: TextAlign.start,
-                      ),
-                    )),
+                  padding: UiConsts.PaddingAll_small,
+                  child: Text(
+                    Utils.capitalizeFirstLetter(_mode.getIng),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall!
+                        .copyWith(color: Theme.of(context).cardColor),
+                    softWrap: true,
+                    maxLines: 2,
+                    textAlign: TextAlign.start,
+                  ),
+                )),
                 if (_currentModeIs(PageMode.edit))
                   ..._buildActionsForEditMode(),
                 if (_currentModeIs(PageMode.view))
@@ -320,43 +344,63 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
     }
   }
 
-  SizedBox _buildImageObject(String objectKey) {
-    return SizedBox(
-      width: MediaQuery.sizeOf(context).width * 0.4,
-      child: MediaItemContainer(
-        mimeType: FileUtils.detectMimeTypeFromFilepath(objectKey) ?? "image/*",
-        fetchSourceData: FetchSourceData(
-            fetchSourceMethod: FetchSourceMethod.server,
-            cloudFileObjectKey: Utils.getThumbnailKeyFromObjectKey(objectKey)),
-        imageRendererConfigs: ImageDisplayConfigsModel(
-            filterQuality: FilterQuality.low,
-            allowCache: widget.cloudImageAllowCache,
-            width: double.infinity,
-            height: double.infinity),
-        mediaAndDescriptionBarFlexValue: (8, 1),
-        descriptionTxtMaxLines: 1,
-        extraMapData: {"description": objectKey.split("/").last},
-        showActionWidget: true,
-        actionWidget: IconButton(
-          color: Colors.redAccent,
-          onPressed: () async {
-            await _deleteCurrentItem(objectKey);
-          },
-          icon: const Icon(
-            Icons.delete_forever_outlined,
-          ),
-          // const Icon(
-          //   Icons.more_vert_outlined,
-          // ),
-        ),
-        onLongPress: () async => await _onLongPressMediaItem(),
-        onDoubleTap: () async => await _onDoubleTapMediaItem(objectKey),
-        onTap: () => _onTapMediaItem(objectKey),
-      ),
-    );
+  Container _buildImageObject(String objectKey) {
+    return Container(
+        width: MediaQuery.sizeOf(context).width * 0.4,
+        foregroundDecoration: _isItemSelected(objectKey)
+            ? BoxDecoration(
+                borderRadius: UiConsts.BorderRadiusCircular_superLarge,
+                color: Theme.of(context)
+                    .colorScheme
+                    .tertiaryFixedDim
+                    .withAlpha(Color.getAlphaFromOpacity(0.4)))
+            : null,
+        child: MediaItemContainer(
+          mimeType: FileUtils.detectMimeTypeFromFilepath(objectKey) ?? "",
+          fetchSourceData: FetchSourceData(
+              fetchSourceMethod: FetchSourceMethod.server,
+              cloudFileObjectKey:
+                  Utils.getThumbnailKeyFromObjectKey(objectKey)),
+          imageRendererConfigs: ImageDisplayConfigsModel(
+              filterQuality: FilterQuality.low,
+              allowCache: widget.cloudImageAllowCache,
+              width: double.infinity,
+              height: double.infinity),
+          mediaAndDescriptionBarFlexValue: (8, 1),
+          descriptionTxtMaxLines: 1,
+          extraMapData: {"description": objectKey.split("/").last},
+          onLongPress: () async => await _onLongPressMediaItem(objectKey),
+          onDoubleTap: () async => await _onDoubleTapMediaItem(objectKey),
+          onTap: () => _onTapMediaItem(objectKey),
+          showActionWidget: true,
+          actionWidget: _getActionWidgetForMediaItem(objectKey),
+          actionWidgetPlace: _isActivatedSelectionMode
+              ? Alignment.topCenter
+              : Alignment.topRight,
+        ));
   }
 
-  Future<dynamic> _onTapMediaItem(String objectKey) {
+  Widget _getActionWidgetForMediaItem(String objectKey) {
+    return !_isActivatedSelectionMode
+        ? IconButton(
+            color: Colors.redAccent,
+            onPressed: () async {
+              await _deleteSelectedItems(objectKey);
+            },
+            icon: const Icon(
+              Icons.delete_forever_outlined,
+            ),
+          )
+        : Icon(
+            _isItemSelected(objectKey)
+                ? Icons.check_box_rounded
+                : Icons.check_box_outline_blank,
+            color: Colors.blue,
+            size: UiConsts.largeIconSize,
+          );
+  }
+
+  Future<dynamic> _toFullMediaViewPage(String objectKey) {
     return Navigator.push(
         context,
         MaterialPageRoute(
@@ -375,6 +419,42 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                 )));
   }
 
+  void _reportCurrentSelectedItems() {
+    _logger.d(
+        "Selected (${_isSelectedAllItems ? 'all,${_selectedItems.length}' : '${_selectedItems.length}'}) items: ${_selectedItems.join(", ")}");
+  }
+
+  void _selectOrDeselectItem(String objectKey) {
+    setState(() {
+      if (_selectedItems.contains(objectKey)) {
+        _selectedItems.remove(objectKey);
+      } else {
+        _selectedItems.add(objectKey);
+      }
+    });
+    _reportCurrentSelectedItems();
+  }
+
+  void _selectOrDeselectAllItems() {
+    _logger.d("${_isSelectedAllItems ? 'Deselecting' : 'Selecting'} all items");
+    setState(() {
+      if (_isSelectedAllItems) {
+        _selectedItems.clear();
+      } else {
+        _selectedItems.addAll(albumData!.linkedObjects.toSet());
+      }
+    });
+    _reportCurrentSelectedItems();
+  }
+
+  void _onTapMediaItem(String objectKey) {
+    if (!_isActivatedSelectionMode) {
+      _toFullMediaViewPage(objectKey);
+    } else {
+      _selectOrDeselectItem(objectKey);
+    }
+  }
+
   Future<void> _onDoubleTapMediaItem(String objectKey) async {
     await DialogService.showCustomDialog(
       context,
@@ -385,19 +465,26 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
     );
   }
 
-  void _onTouchedSelectItemsActionBtn() =>
-      _logger.d("select items action pressed");
-
-  Future<void> _onLongPressMediaItem() async {
+  Future<void> _onLongPressMediaItem(String objectKey) async {
     // await _deleteCurrentItem(context, objectKey);
-    await DialogService.showCustomDialog(context,
-        type: DialogType.information,
-        title: "Alert",
-        message: "You have long pressed the item.");
+    if (_isActivatedSelectionMode) {
+      await _toFullMediaViewPage(objectKey);
+    }
   }
 
-  Future<void> _deleteCurrentItem(String objectKey) async {
-    // TODO: convert to unlink from album action and add dedicated delete file action in the future
+  void _onTouchedSelectItemsActionBtn() {
+    _logger.d("select items action pressed");
+    setState(() {
+      _isActivatedSelectionMode = !_isActivatedSelectionMode;
+    });
+  }
+
+  Future<void> _unlinkSelectedItems(List<String> objectKeys) async {
+    _logger.d("unlinking selected items: $objectKeys");
+  }
+
+  Future<void> _deleteSelectedItems(String objectKey) async {
+    // TODO: convert to delete selected multiple items action
     // ! delete from server, files must be in the same folder to delete
     final bool? confirmation = await DialogService.showConfirmationDialog(
         context: context,
@@ -437,14 +524,17 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
   }
 
   Future<void> _onTouchedDeleteSingleAlbumActionBtn(
-      AlbumsModel albumData) async {
+      AlbumsModel? albumData) async {
+    _logger.d("delete single album action pressed");
+    if (albumData == null)
+      return; // TODO: add notification to user that album is not found
     final bool? result = await DialogService.showConfirmationDialog(
       context: context,
       title: 'Delete album',
       message: 'Are you sure you want to delete this album?',
     );
     if (result == true) {
-      _logger.i('Deleting album');
+      _logger.t('Deleting album');
       final List<String> objectsDataDocIds = await _firestoreWrapper
           .queryCollection(FirestoreCollections.objectsData, filters: [
             QueryFilter(
