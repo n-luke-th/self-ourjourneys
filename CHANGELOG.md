@@ -43,7 +43,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 
 ### Others
 
-- Upgrade dependency constraints: `go_router` to `^15.2.4`, `form_builder_validators` to `11.2.0`, `logger` to `2.6.0`, and `synchronized` to `3.4.0`.
+- Upgrade dependency constraints: `go_router` to `15.2.4`, `form_builder_validators` to `11.2.0`, `logger` to `2.6.0`, and `synchronized` to `3.4.0`.
 
 ## Initial Development: [`0.3.18`] - 2025-06-18
 
@@ -108,19 +108,17 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 ### Others
 
 - Version and build number retrieval adjustment for setting page and `main.dart` page.
-- Update dependency constraints: New dependency `marquee` added for the marquee text.
-
-# TODO: Complete the release history logs of the previous versions.
+- Update dependency constraints: new dependency `marquee` added for the marquee text.
 
 ## Initial Development: [`0.3.16`] - 2025-06-14
 
 ### Added
 
-- none
+- Dedicated 3 image providers `localFileImageProvider` for rendering file-based image and ensure no errors when building the application for platform dependent libraries.
 
 ### Changed
 
-- none
+- Ensure compatibility for image rendering system for web by rendering from bytes.
 
 ### Deprecated
 
@@ -136,4 +134,6 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 
 ### Others
 
-- New dependency `` added for the
+- Upgrade dependency constraints: `go_router` to `15.2.0`.
+
+# TODO: Complete the release history logs of the previous versions.
