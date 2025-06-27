@@ -2,8 +2,6 @@
 ///
 
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart' show Logger;
-import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
 import 'package:ourjourneys/models/storage/fetch_source_data.dart';
@@ -77,26 +75,8 @@ class MediaItemContainer extends StatelessWidget {
   });
 
   // bool _hovering = false;
-
-  bool get isImage =>
-      FileUtils.detectFileTypeFromMimeType(mimeType) == MediaObjectType.image;
-
-  bool get isVideo =>
-      FileUtils.detectFileTypeFromMimeType(mimeType) == MediaObjectType.video;
-
-  // FetchSourceData get fetchSourceData => fetchSourceData;
-
-  // ImageDisplayConfigsModel get imageRendererConfigs =>
-  //     imageRendererConfigs;
-
   Widget _handleBuildMediaError(BuildContext context, Object error,
       StackTrace? stackTrace, MediaObjectType mediaType) {
-    final Logger _logger = getIt<Logger>();
-    _logger.e(
-        "mimetype: $mimeType\tmediaType: $mediaType\tfetchSourceMethod: ${fetchSourceData.fetchSourceMethod.stringValue}\nError loading ${mediaType.stringValue} item in 'MediaItemContainer': ${error.toString()}",
-        error: error,
-        stackTrace: stackTrace);
-
     return Center(
       child: SizedBox(
         child: Column(
@@ -111,7 +91,8 @@ class MediaItemContainer extends StatelessWidget {
             Text(
               'Error loading ${mediaType.stringValue}: ${error.toString()}',
               softWrap: true,
-              maxLines: 3,
+              maxLines: 5,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart'
     show FieldValue, Timestamp;
 import 'package:extended_image/extended_image.dart' show ExtendedImageMode;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
@@ -22,6 +23,7 @@ import 'package:ourjourneys/models/storage/objects_data.dart'
     show MediaObjectType;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/services/cloud/cloud_file_service.dart';
+import 'package:ourjourneys/services/core/album_details_provider.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/common/page_mode_enum.dart';
@@ -29,14 +31,13 @@ import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 import 'package:ourjourneys/views/media/full_media_view.dart';
+import 'package:provider/provider.dart';
 
 /// a page to display the details of an album and a list of items associate with it
 class AlbumDetailsPage extends StatefulWidget {
-  final AlbumsModel? album;
   final bool cloudImageAllowCache;
 
-  const AlbumDetailsPage(
-      {super.key, required this.album, this.cloudImageAllowCache = true});
+  const AlbumDetailsPage({super.key, this.cloudImageAllowCache = true});
 
   @override
   State<AlbumDetailsPage> createState() => _AlbumDetailsPageState();
@@ -49,66 +50,49 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
   final Logger _logger = getIt<Logger>();
   final ScrollController _scrollController = ScrollController();
 
-  final Set<String> _selectedItems = {};
+  late final AlbumsModel? albumData;
 
-  late AlbumsModel? albumData;
-  late PageMode _mode;
-
-  bool _isActivatedSelectionMode = false;
-
-  bool get _isSelectedAllItems =>
-      _currentModeIs(PageMode.edit) &&
-      (_selectedItems.length == albumData?.linkedObjects.length);
-
-  bool get _isSelectingItems =>
-      _currentModeIs(PageMode.edit) &&
-      (_selectedItems.isNotEmpty) &&
-      _isActivatedSelectionMode;
+  late final ImageDisplayConfigsModel _displayConfigs;
 
   @override
   void initState() {
     super.initState();
-    albumData = widget.album;
-    _mode = PageMode.view;
+    albumData =
+        Provider.of<AlbumDetailsProvider>(context, listen: false).albumData;
+    _displayConfigs = ImageDisplayConfigsModel(
+        filterQuality: FilterQuality.low,
+        allowCache: widget.cloudImageAllowCache,
+        width: double.infinity,
+        height: double.infinity);
   }
 
   @override
   void dispose() {
     albumData = null;
-    _selectedItems.clear();
     _scrollController.dispose();
     super.dispose();
   }
 
-  /// check if the current active mode is the one passed as parameter [toCompareMode]
-  bool _currentModeIs(PageMode toCompareMode) {
-    return toCompareMode == _mode;
-  }
+  bool get _isSelectingItems =>
+      context.read<AlbumDetailsProvider>().isSelecting;
 
-  void _resetToViewMode() {
-    _selectedItems.clear();
-    _isActivatedSelectionMode = false;
-  }
+  bool get _isSelectedAllItems =>
+      context.read<AlbumDetailsProvider>().isSelectedAll;
 
   /// change the current active mode to either of the following:
   /// - [PageMode.view]
   /// - [PageMode.edit]
   void _toggleMode() {
-    if (albumData != null) {
-      setState(() {
-        _mode = _currentModeIs(PageMode.edit) ? PageMode.view : PageMode.edit;
-        _currentModeIs(PageMode.view) ? _resetToViewMode() : null;
-      });
-    }
-    _logger.d("mode now is ${_mode.name}");
+    context.read<AlbumDetailsProvider>().togglePageMode();
+    _logger.d(
+        "mode now is ${context.read<AlbumDetailsProvider>().currentPageMode.name}");
   }
 
-  bool _isItemSelected(String objectKey) {
-    if (_isActivatedSelectionMode && _currentModeIs(PageMode.edit)) {
-      return _selectedItems.contains(objectKey);
-    } else {
-      return false;
-    }
+  IconData _getFloatingActionBtnIcon() {
+    return context.watch<AlbumDetailsProvider>().currentPageMode ==
+            (PageMode.edit)
+        ? Icons.edit
+        : Icons.visibility_outlined;
   }
 
   /// build the bottom page widget for the edit mode
@@ -134,7 +118,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
             enableFeedback: true,
             tooltip: "Unlink from album",
             onPressed: () async {
-              await _unlinkSelectedItems(_selectedItems.toList());
+              await _unlinkSelectedItems();
             },
             icon: const Icon(
               Icons.do_disturb_outlined,
@@ -143,8 +127,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
       IconButton.outlined(
           enableFeedback: true,
           tooltip: _isSelectingItems ? "Delete selected items" : "Delete album",
-          onPressed: () async =>
-              await _onTouchedDeleteSingleAlbumActionBtn(albumData),
+          onPressed: () async => await _onTouchedDeleteSingleAlbumActionBtn(),
           icon: const Icon(
             Icons.delete,
             color: Colors.redAccent,
@@ -165,15 +148,19 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
           Icons.keyboard_arrow_up_outlined,
         ),
       ),
-      // TextButton.icon(onPressed: () async => await {}, label: label)
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final BackButton backBtn = BackButton(
+      onPressed: () => context.goNamed("AlbumsPage"),
+    );
+
     if (albumData == null) {
       return mainView(context,
           appBarTitle: 'ALBUM DETAILS',
+          appBarLeading: backBtn,
           body: Center(
               child: Padding(
             padding: UiConsts.PaddingAll_large,
@@ -190,6 +177,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
               combinedIfSame: true);
       return mainView(context,
           appBarTitle: 'ALBUM DETAILS',
+          appBarLeading: backBtn,
           appbarActions: [
             Padding(
               padding: UiConsts.PaddingAll_standard,
@@ -199,24 +187,24 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                       context: context,
                       title: "ALBUM METADATA",
                       message:
-                          "Contains: ${albumData!.linkedObjects.length.toString()} ${albumData!.linkedObjects.length <= 1 ? 'item' : 'items'}\n${modifiedString.isNotEmpty ? "$createdString\n$modifiedString" : createdString}"),
+                          "Contains: ${albumData!.linkedObjects.length} ${albumData!.linkedObjects.length <= 1 ? 'item' : 'items'}\n${modifiedString.isNotEmpty ? "$createdString\n$modifiedString" : createdString}"),
                   icon: const Icon(Icons.info_outline_rounded)),
             ),
           ],
           showFloatingActionButton: true,
           floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-          floatingActionButtonIcon: _currentModeIs(PageMode.edit)
-              ? Icons.edit
-              : Icons.visibility_outlined,
+          floatingActionButtonIcon: _getFloatingActionBtnIcon(),
           floatingActionButtonTooltip:
-              "Toggle to ${_currentModeIs(PageMode.view) ? 'Edit' : 'View'} mode",
+              "Toggle to ${context.read<AlbumDetailsProvider>().currentPageMode == PageMode.view ? 'Edit' : 'View'} mode",
           floatingActionButtonProps: FloatingActionButton(
             onPressed: () {},
             shape: RoundedSuperellipseBorder(
                 borderRadius: UiConsts.BorderRadiusCircular_medium),
           ),
           onFloatingActionButtonPressed: () => _toggleMode(),
-          bottomSheet: _isActivatedSelectionMode
+          bottomSheet: context
+                  .read<AlbumDetailsProvider>()
+                  .isActivatedSelectionMode
               ? Padding(
                   padding: UiConsts.PaddingAll_small,
                   child: TextButton.icon(
@@ -238,7 +226,9 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                           color: Theme.of(context).colorScheme.inverseSurface),
                     ),
                     onPressed: () {
-                      _selectOrDeselectAllItems();
+                      Provider.of<AlbumDetailsProvider>(context, listen: false)
+                          .autoSelectAllOrDeselectAll();
+                      _reportCurrentSelectedItems();
                     },
                   ),
                 )
@@ -266,7 +256,10 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                     child: Padding(
                   padding: UiConsts.PaddingAll_small,
                   child: Text(
-                    Utils.capitalizeFirstLetter(_mode.getIng),
+                    Utils.capitalizeFirstLetter(context
+                        .read<AlbumDetailsProvider>()
+                        .currentPageMode
+                        .getIng),
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall!
@@ -276,128 +269,213 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                     textAlign: TextAlign.start,
                   ),
                 )),
-                if (_currentModeIs(PageMode.edit))
+                if (context.read<AlbumDetailsProvider>().currentPageMode ==
+                    (PageMode.edit))
                   ..._buildActionsForEditMode(),
-                if (_currentModeIs(PageMode.view))
+                if (context.read<AlbumDetailsProvider>().currentPageMode ==
+                    (PageMode.view))
                   ..._buildActionsForViewMode(),
               ],
             ),
           ),
           body: Center(
               child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Flexible(
-                flex: 1,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: UiConsts.PaddingHorizontal_small,
-                  child: Text(
-                    albumData!.albumName,
-                    textAlign: TextAlign.center,
-                    style: InterfaceUtils.isBigScreen(context)
-                        ? Theme.of(context).primaryTextTheme.headlineLarge
-                        : Theme.of(context).primaryTextTheme.headlineSmall,
-                    softWrap: true,
-                    maxLines: 1,
-                    overflow: TextOverflow.visible,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                Flexible(
+                  flex: 1,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: UiConsts.PaddingHorizontal_small,
+                    child: Text(
+                      albumData!.albumName,
+                      textAlign: TextAlign.center,
+                      style: InterfaceUtils.isBigScreen(context)
+                          ? Theme.of(context).primaryTextTheme.headlineLarge
+                          : Theme.of(context).primaryTextTheme.headlineSmall,
+                      softWrap: true,
+                      maxLines: 1,
+                      overflow: TextOverflow.visible,
+                    ),
                   ),
                 ),
-              ),
-              const Divider(
-                height: 2,
-              ),
-              Expanded(
-                flex: 19,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  padding: UiConsts.PaddingVertical_large,
-                  child: Wrap(
-                    clipBehavior: Clip.antiAlias,
-                    spacing: 16,
-                    runSpacing: 8.0,
-                    children: albumData!.linkedObjects.map((objectKey) {
-                      switch (FileUtils.detectFileTypeFromFilepath(objectKey)) {
-                        case MediaObjectType.image:
-                          return _buildImageObject(objectKey);
-                        default:
-                          return SizedBox(
-                            width: MediaQuery.sizeOf(context).width * 0.3,
-                            child: MediaItemContainer(
-                              mimeType: "",
-                              fetchSourceData: FetchSourceData(
-                                  fetchSourceMethod: FetchSourceMethod.server,
-                                  cloudFileObjectKey:
-                                      Utils.getThumbnailKeyFromObjectKey(
-                                          objectKey)),
-                              extraMapData: {"description": objectKey},
-                            ),
-                          );
-                      }
-                    }).toList(),
+                const Divider(
+                  height: 2,
+                ),
+                Expanded(
+                  flex: 19,
+                  child: GridView.builder(
+                    controller: _scrollController,
+                    padding: UiConsts.PaddingAll_standard,
+                    addAutomaticKeepAlives: true, // <-- keep tiles alive
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 8,
+                      childAspectRatio:
+                          InterfaceUtils.isBigScreen(context) ? 2 : 0.9,
+                    ),
+                    itemCount: albumData!.linkedObjects.length,
+                    itemBuilder: (_, index) {
+                      final key = albumData!.linkedObjects[index];
+                      return AlbumMediaItem(
+                        key: ValueKey(key),
+                        objectKey: key,
+                        imageRendererConfigs: _displayConfigs,
+                        selectionModeActive: context
+                            .read<AlbumDetailsProvider>()
+                            .isActivatedSelectionMode,
+                        onTapCompleted: () => _reportCurrentSelectedItems(),
+                      );
+                    },
                   ),
                 ),
-              ),
-            ],
-          )));
+              ])));
     }
   }
 
-  Container _buildImageObject(String objectKey) {
-    return Container(
-        width: MediaQuery.sizeOf(context).width * 0.4,
-        foregroundDecoration: _isItemSelected(objectKey)
-            ? BoxDecoration(
-                borderRadius: UiConsts.BorderRadiusCircular_superLarge,
-                color: Theme.of(context)
-                    .colorScheme
-                    .tertiaryFixedDim
-                    .withAlpha(Color.getAlphaFromOpacity(0.4)))
-            : null,
-        child: MediaItemContainer(
-          mimeType: FileUtils.detectMimeTypeFromFilepath(objectKey) ?? "",
-          fetchSourceData: FetchSourceData(
-              fetchSourceMethod: FetchSourceMethod.server,
-              cloudFileObjectKey:
-                  Utils.getThumbnailKeyFromObjectKey(objectKey)),
-          imageRendererConfigs: ImageDisplayConfigsModel(
-              filterQuality: FilterQuality.low,
-              allowCache: widget.cloudImageAllowCache,
-              width: double.infinity,
-              height: double.infinity),
-          mediaAndDescriptionBarFlexValue: (8, 1),
-          descriptionTxtMaxLines: 1,
-          extraMapData: {"description": objectKey.split("/").last},
-          onLongPress: () async => await _onLongPressMediaItem(objectKey),
-          onDoubleTap: () async => await _onDoubleTapMediaItem(objectKey),
-          onTap: () => _onTapMediaItem(objectKey),
-          showActionWidget: true,
-          actionWidget: _getActionWidgetForMediaItem(objectKey),
-          actionWidgetPlace: _isActivatedSelectionMode
-              ? Alignment.topCenter
-              : Alignment.topRight,
-        ));
+  void _reportCurrentSelectedItems() {
+    final Set<String> selectedItems =
+        context.read<AlbumDetailsProvider>().selectedItems;
+    _logger.d(
+        "Selected (${_isSelectedAllItems ? 'all,${selectedItems.length}' : '${selectedItems.length}'}) items: ${selectedItems.join(", ")}");
   }
 
-  Widget _getActionWidgetForMediaItem(String objectKey) {
-    return !_isActivatedSelectionMode
-        ? IconButton(
-            color: Colors.redAccent,
-            onPressed: () async {
-              await _deleteSelectedItems(objectKey);
-            },
-            icon: const Icon(
-              Icons.delete_forever_outlined,
-            ),
-          )
-        : Icon(
-            _isItemSelected(objectKey)
-                ? Icons.check_box_rounded
-                : Icons.check_box_outline_blank,
-            color: Colors.blue,
-            size: UiConsts.largeIconSize,
-          );
+  void _onTouchedSelectItemsActionBtn() {
+    _logger.d("select items action pressed");
+    setState(() {
+      context.read<AlbumDetailsProvider>().toggleSelectionMode();
+    });
+  }
+
+  Future<void> _unlinkSelectedItems() async {}
+
+  void _toAddMoreMediaToAlbumPage() {}
+
+  Future<void> _onTouchedDeleteSingleAlbumActionBtn() async {}
+}
+
+/// internal class to handle media item rendering on album page.
+///
+/// act as the wrapper of [MediaItemContainer] and [Container] widget.
+///
+/// as well as customizing media item rendering.
+///
+/// importantly, ensures identity is stable by passing `[key]: ValueKey(<unique_key_string_value>)`.
+
+class AlbumMediaItem extends StatefulWidget {
+  const AlbumMediaItem({
+    super.key,
+    required this.objectKey,
+    required this.imageRendererConfigs,
+    required this.selectionModeActive,
+    this.onTapCompleted,
+  });
+
+  final String objectKey;
+  final ImageDisplayConfigsModel imageRendererConfigs;
+  final bool selectionModeActive;
+  final VoidCallback? onTapCompleted;
+
+  @override
+  State<AlbumMediaItem> createState() => _AlbumMediaItemState();
+}
+
+class _AlbumMediaItemState extends State<AlbumMediaItem>
+    with AutomaticKeepAliveClientMixin {
+  late final Widget _mediaTile;
+
+  @override
+  void initState() {
+    super.initState();
+    // final album = context.read<AlbumDetailsProvider>();
+    // Immutable part: MediaItemContainer (never rebuilt)
+    _mediaTile = MediaItemContainer(
+      key: ValueKey(widget.objectKey),
+      mimeType: FileUtils.detectMimeTypeFromFilepath(widget.objectKey) ?? '',
+      fetchSourceData:
+          context.read<AlbumDetailsProvider>().getItem(widget.objectKey),
+      imageRendererConfigs: widget.imageRendererConfigs,
+      showActionWidget: false,
+      onTap: () => _handleTap(context),
+      onLongPress: () => _handleLongPress(context),
+      onDoubleTap: () async => await _handleDoubleTap(widget.objectKey),
+      showDescriptionBar: false,
+      descriptionTxtMaxLines: 0,
+      extraMapData: {'description': widget.objectKey.split('/').last},
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    // The overlay reacts to selection changes only
+    return Selector<AlbumDetailsProvider, bool>(
+      selector: (_, p) => p.isSelected(widget.objectKey),
+      builder: (_, isSelected, child) {
+        final shouldShowOverlay = widget.selectionModeActive && isSelected;
+        return Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            child!, // <-- the immutable MediaItemContainer, never rebuilt
+            if (shouldShowOverlay)
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => _handleTap(context),
+                  onLongPress: () => _handleLongPress(context),
+                  onDoubleTap: () async =>
+                      await _handleDoubleTap(widget.objectKey),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.amberAccent
+                          .withAlpha(Color.getAlphaFromOpacity(0.5)),
+                      borderRadius: UiConsts.BorderRadiusCircular_superLarge,
+                    ),
+                    child: const Icon(
+                      Icons.check_box_rounded,
+                      color: Colors.blue,
+                      size: UiConsts.largeIconSize,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+      child: Positioned.fill(child: _mediaTile),
+    );
+  }
+
+  void _handleTap(BuildContext ctx) {
+    final album = ctx.read<AlbumDetailsProvider>();
+    if (!album.isActivatedSelectionMode) {
+      _toFullMediaViewPage(widget.objectKey);
+    } else {
+      album.toggleSelect(widget.objectKey);
+    }
+
+    widget.onTapCompleted?.call();
+  }
+
+  void _handleLongPress(BuildContext ctx) {
+    if (ctx.read<AlbumDetailsProvider>().isActivatedSelectionMode) {
+      _toFullMediaViewPage(widget.objectKey);
+    } else {}
+  }
+
+  Future<void> _handleDoubleTap(String objectKey) async {
+    await DialogService.showCustomDialog(
+      context,
+      type: DialogType.information,
+      title: "Information",
+      message:
+          "Media type: ${FileUtils.detectFileTypeFromFilepath(objectKey).stringValue}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
+    );
   }
 
   Future<dynamic> _toFullMediaViewPage(String objectKey) {
@@ -418,152 +496,99 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                   objectType: MediaObjectType.image,
                 )));
   }
-
-  void _reportCurrentSelectedItems() {
-    _logger.d(
-        "Selected (${_isSelectedAllItems ? 'all,${_selectedItems.length}' : '${_selectedItems.length}'}) items: ${_selectedItems.join(", ")}");
-  }
-
-  void _selectOrDeselectItem(String objectKey) {
-    setState(() {
-      if (_selectedItems.contains(objectKey)) {
-        _selectedItems.remove(objectKey);
-      } else {
-        _selectedItems.add(objectKey);
-      }
-    });
-    _reportCurrentSelectedItems();
-  }
-
-  void _selectOrDeselectAllItems() {
-    _logger.d("${_isSelectedAllItems ? 'Deselecting' : 'Selecting'} all items");
-    setState(() {
-      if (_isSelectedAllItems) {
-        _selectedItems.clear();
-      } else {
-        _selectedItems.addAll(albumData!.linkedObjects.toSet());
-      }
-    });
-    _reportCurrentSelectedItems();
-  }
-
-  void _onTapMediaItem(String objectKey) {
-    if (!_isActivatedSelectionMode) {
-      _toFullMediaViewPage(objectKey);
-    } else {
-      _selectOrDeselectItem(objectKey);
-    }
-  }
-
-  Future<void> _onDoubleTapMediaItem(String objectKey) async {
-    await DialogService.showCustomDialog(
-      context,
-      type: DialogType.information,
-      title: "Information",
-      message:
-          "Media type: ${FileUtils.detectFileTypeFromFilepath(objectKey).stringValue}\nName: ${objectKey.split("/").last}\nObject key: $objectKey",
-    );
-  }
-
-  Future<void> _onLongPressMediaItem(String objectKey) async {
-    // await _deleteCurrentItem(context, objectKey);
-    if (_isActivatedSelectionMode) {
-      await _toFullMediaViewPage(objectKey);
-    }
-  }
-
-  void _onTouchedSelectItemsActionBtn() {
-    _logger.d("select items action pressed");
-    setState(() {
-      _isActivatedSelectionMode = !_isActivatedSelectionMode;
-    });
-  }
-
-  Future<void> _unlinkSelectedItems(List<String> objectKeys) async {
-    _logger.d("unlinking selected items: $objectKeys");
-  }
-
-  Future<void> _deleteSelectedItems(String objectKey) async {
-    // TODO: convert to delete selected multiple items action
-    // ! delete from server, files must be in the same folder to delete
-    final bool? confirmation = await DialogService.showConfirmationDialog(
-        context: context,
-        title: "Delete file?",
-        message: "Are you sure to delete '${objectKey.split("/").last}'?",
-        confirmText: "DELETE");
-    if (confirmation == true) {
-      if (_authWrapper.uid == "") _authWrapper.refreshUid();
-      if (albumData is Map<String, dynamic>) {
-        final ModificationData modificationData = albumData!.modificationData
-            .copyWith(
-                lastModifiedAt: Timestamp.now(),
-                lastModifiedByUserId: _authWrapper.uid);
-        final AlbumsModel updatedAlbumData = albumData!.copyWith(
-          modificationData: modificationData,
-          linkedObjects: albumData!.linkedObjects
-              .where((obj) => obj != objectKey)
-              .toList(),
-        );
-        _logger.d("updatedAlbumData: ${updatedAlbumData.toMap()}");
-        setState(() {
-          albumData = updatedAlbumData;
-        });
-        await _firestoreWrapper.handleUpdateDocument(context,
-            collectionName: FirestoreCollections.albums,
-            data: updatedAlbumData.toMap(),
-            docId: updatedAlbumData.id,
-            suppressNotification: true);
-      }
-
-      final String? folder = FileUtils.getFolderPathFromObjectKey(objectKey);
-      if (folder != null) {
-        await _cloudFileService.deleteObjectsSameFolder(context,
-            objectKeys: [objectKey], folder: folder);
-      }
-    }
-  }
-
-  Future<void> _onTouchedDeleteSingleAlbumActionBtn(
-      AlbumsModel? albumData) async {
-    _logger.d("delete single album action pressed");
-    if (albumData == null)
-      return; // TODO: add notification to user that album is not found
-    final bool? result = await DialogService.showConfirmationDialog(
-      context: context,
-      title: 'Delete album',
-      message: 'Are you sure you want to delete this album?',
-    );
-    if (result == true) {
-      _logger.t('Deleting album');
-      final List<String> objectsDataDocIds = await _firestoreWrapper
-          .queryCollection(FirestoreCollections.objectsData, filters: [
-            QueryFilter(
-                "linkedAlbums", albumData.id, QueryCondition.arrayContains)
-          ])
-          .get()
-          .then((result) => result.docs.map((doc) => doc.id).toList());
-      _logger.d("objectsDataDocIds to be edited: $objectsDataDocIds");
-
-      for (String docId in objectsDataDocIds) {
-        _logger.d("Editing objectData docId: $docId");
-        await _firestoreWrapper.handleUpdateDocument(context,
-            collectionName: FirestoreCollections.objectsData,
-            docId: docId,
-            suppressNotification: true,
-            data: {
-              "linkedAlbums": FieldValue.arrayRemove([albumData.id])
-            });
-      }
-
-      await _firestoreWrapper.handleDeleteDocument(
-          context, FirestoreCollections.albums, albumData.id,
-          suppressNotification: true);
-      Navigator.pop(context);
-    } else {
-      // Navigator.pop(context);
-      return;
-    }
-  }
-
-  void _toAddMoreMediaToAlbumPage() {}
 }
+
+/// -- METHODS TEMP
+
+
+  // Future<void> _deleteSelectedItems(String objectKey) async {
+  //   // TODO: convert to delete selected multiple items action
+  //   // ! delete from server, files must be in the same folder to delete
+  //   final bool? confirmation = await DialogService.showConfirmationDialog(
+  //       context: context,
+  //       title: "Delete file?",
+  //       message: "Are you sure to delete '${objectKey.split("/").last}'?",
+  //       confirmText: "DELETE");
+  //   if (confirmation == true) {
+  //     if (_authWrapper.uid == "") _authWrapper.refreshUid();
+  //     if (albumData is Map<String, dynamic>) {
+  //       final ModificationData modificationData = albumData!.modificationData
+  //           .copyWith(
+  //               lastModifiedAt: Timestamp.now(),
+  //               lastModifiedByUserId: _authWrapper.uid);
+  //       final AlbumsModel updatedAlbumData = albumData!.copyWith(
+  //         modificationData: modificationData,
+  //         linkedObjects: albumData!.linkedObjects
+  //             .where((obj) => obj != objectKey)
+  //             .toList(),
+  //       );
+  //       _logger.d("updatedAlbumData: ${updatedAlbumData.toMap()}");
+
+  //       await _firestoreWrapper.handleUpdateDocument(context,
+  //           collectionName: FirestoreCollections.albums,
+  //           data: updatedAlbumData.toMap(),
+  //           docId: updatedAlbumData.id,
+  //           suppressNotification: true);
+  //     }
+
+  //     final String? folder = FileUtils.getFolderPathFromObjectKey(objectKey);
+  //     if (folder != null) {
+  //       await _cloudFileService.deleteObjectsSameFolder(context,
+  //           objectKeys: [objectKey], folder: folder);
+  //     }
+  //   }
+  // }
+
+
+
+  // Future<void> _unlinkSelectedItems() async {
+  //   final List<String> objectKeys =
+  //       Provider.of<AlbumDetailsProvider>(context, listen: false)
+  //           .selectedItemsAsList;
+  //   _logger.d("unlinking selected items: $objectKeys");
+  // }
+
+  // Future<void> _onTouchedDeleteSingleAlbumActionBtn() async {
+  //   _logger.d("delete single album action pressed");
+  //   final AlbumsModel? albumData =
+  //       Provider.of<AlbumDetailsProvider>(context, listen: false).albumData;
+  //   if (albumData == null)
+  //     return; // TODO: add notification to user that album is not found
+  //   final bool? result = await DialogService.showConfirmationDialog(
+  //     context: context,
+  //     title: 'Delete album',
+  //     message: 'Are you sure you want to delete this album?',
+  //   );
+  //   if (result == true) {
+  //     _logger.t('Deleting album');
+  //     final List<String> objectsDataDocIds = await _firestoreWrapper
+  //         .queryCollection(FirestoreCollections.objectsData, filters: [
+  //           QueryFilter(
+  //               "linkedAlbums", albumData.id, QueryCondition.arrayContains)
+  //         ])
+  //         .get()
+  //         .then((result) => result.docs.map((doc) => doc.id).toList());
+  //     _logger.d("objectsDataDocIds to be edited: $objectsDataDocIds");
+
+  //     for (String docId in objectsDataDocIds) {
+  //       _logger.d("Editing objectData docId: $docId");
+  //       await _firestoreWrapper.handleUpdateDocument(context,
+  //           collectionName: FirestoreCollections.objectsData,
+  //           docId: docId,
+  //           suppressNotification: true,
+  //           data: {
+  //             "linkedAlbums": FieldValue.arrayRemove([albumData.id])
+  //           });
+  //     }
+
+  //     await _firestoreWrapper.handleDeleteDocument(
+  //         context, FirestoreCollections.albums, albumData.id,
+  //         suppressNotification: true);
+  //     Navigator.pop(context);
+  //   } else {
+  //     // Navigator.pop(context);
+  //     return;
+  //   }
+  // }
+
+  // void _toAddMoreMediaToAlbumPage() {}

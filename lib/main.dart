@@ -9,6 +9,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart' show Logger;
+import 'package:ourjourneys/services/core/image_provider_cache.dart';
 import 'package:ourjourneys/shared/helpers/platform_enum.dart';
 import 'package:provider/provider.dart';
 
@@ -58,6 +59,13 @@ void _main() async {
           ),
           // setting page service
           ChangeNotifierProvider.value(value: settingsService),
+          // one global cache of ImageProvider instances
+          //    – every ImageRenderer on any pages reuses them.
+          ChangeNotifierProvider<ImageProviderCache>(
+            create: (_) => ImageProviderCache(),
+            // `lazy: false` eagerly warms the cache; omit if prefer on-demand.
+            lazy: false,
+          ),
           // notification service
           ProxyProvider<SettingsService, NotificationManager>(
             update: (_, settings, __) => NotificationManager(settings),

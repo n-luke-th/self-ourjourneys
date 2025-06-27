@@ -3,10 +3,13 @@
 // TODO: add ability to fetch the object data from server and display
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/components/media_item_container.dart'
     show MediaItemContainer;
+import 'package:ourjourneys/components/more_actions_btn.dart';
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
+import 'package:ourjourneys/models/interface/actions_btn_model.dart';
 import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
 import 'package:ourjourneys/models/storage/fetch_source_data.dart';
 import 'package:ourjourneys/models/storage/objects_data.dart'
@@ -44,48 +47,58 @@ class FullMediaView extends StatelessWidget {
     final String? fileName =
         fetchSourceData.cloudFileObjectKey?.split("/").last ??
             fetchSourceData.localFile?.name;
-    final String appBarTitle =
-        "FULL ${FileUtils.detectFileTypeFromFilepath(fileName ?? "OurJourneys File").stringValue.toUpperCase()} VIEW";
+    final String mediaTypeString =
+        FileUtils.detectFileTypeFromFilepath(fileName ?? "OurJourneys File")
+            .stringValue;
+    final String appBarTitle = "FULL ${mediaTypeString.toUpperCase()} VIEW";
 
-    return mainView(context,
-        appBarTitle: appBarTitle,
-        backgroundColor: Colors.transparent,
-        appbarActions: [
-          IconButton(
-            icon: const Icon(Icons.edit_document),
-            onPressed: () => _onPressedEditMediaFile(),
+    return PopScope(
+      canPop: false,
+      child: mainView(context,
+          appBarTitle: appBarTitle,
+          backgroundColor: Colors.transparent,
+          appBarLeading: BackButton(
+            onPressed: () => context.canPop()
+                ? context.pop()
+                : context.goNamed("AlbumsPage"),
           ),
-          if (allowShare)
-            // TODO: implement share feature
-            Padding(
-              padding: UiConsts.PaddingAll_small,
-              child: IconButton.filled(
-                  onPressed: () => _onPressShareMediaFile(),
-                  icon: const Icon(Icons.share_outlined)),
+          appbarActions: [
+            MoreActionsBtn(actions: [
+              ActionsBtnModel(
+                  actionName: "Edit this ${mediaTypeString.toLowerCase()}",
+                  icon: const Icon(Icons.edit_document),
+                  onPressed: () => _onPressedEditMediaFile()),
+              if (allowShare) // TODO: implement share feature
+                ActionsBtnModel(
+                    actionName:
+                        "Share this ${mediaTypeString.toLowerCase()} to...",
+                    icon: const Icon(Icons.share_outlined),
+                    onPressed: () => _onPressShareMediaFile())
+            ]),
+          ],
+          body: Center(
+            child: SingleChildScrollView(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                runAlignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                runSpacing: 10,
+                children: [
+                  _mediaView(),
+                  Padding(
+                    padding: UiConsts.PaddingAll_small,
+                    child: Text(
+                      "Media type:\t\t${objectType.stringValue}\nFile extension:\t\t${fileName!.split(".").last}\nName:\t\t$fileName\nSize:\t\t${_getFileSizeInBytes()} bytes ${_getFileSizeInUnit()}\nInitial origin:\t\t${fetchSourceData.fetchSourceMethod.stringValue}\n${extraMapData?['objectTags'] ?? ""}",
+                      maxLines: 8,
+                      softWrap: true,
+                      textAlign: TextAlign.start,
+                    ),
+                  )
+                ],
+              ),
             ),
-        ],
-        body: Center(
-          child: SingleChildScrollView(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              runAlignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              runSpacing: 10,
-              children: [
-                _mediaView(),
-                Padding(
-                  padding: UiConsts.PaddingAll_small,
-                  child: Text(
-                    "Media type:\t\t${objectType.stringValue}\nFile extension:\t\t${fileName!.split(".").last}\nName:\t\t$fileName\nSize:\t\t${_getFileSizeInBytes()} bytes ${_getFileSizeInUnit()}\nInitial origin:\t\t${fetchSourceData.fetchSourceMethod.stringValue}\n${extraMapData?['objectTags'] ?? ""}",
-                    maxLines: 8,
-                    softWrap: true,
-                    textAlign: TextAlign.start,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ));
+          )),
+    );
   }
 
   Widget _mediaView() {

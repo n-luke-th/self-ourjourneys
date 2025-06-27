@@ -8,6 +8,7 @@ import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/navigation/nav_bar.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
+import 'package:ourjourneys/services/core/album_details_provider.dart';
 import 'package:ourjourneys/views/albums/album_details_page.dart';
 import 'package:ourjourneys/views/albums/albums_page.dart';
 import 'package:ourjourneys/views/media/all_files_page.dart';
@@ -23,6 +24,7 @@ import 'package:ourjourneys/views/collections/collections_page.dart';
 import 'package:ourjourneys/views/memories/memories_page.dart';
 import 'package:ourjourneys/views/memories/new_memory_page.dart';
 import 'package:ourjourneys/views/settings_page.dart';
+import 'package:provider/provider.dart' show ChangeNotifierProvider;
 
 final AuthService _auth = getIt<AuthService>();
 
@@ -191,8 +193,14 @@ final router = GoRouter(
                 path: 'album-details',
                 name: 'AlbumDetailsPage',
                 builder: (context, state) => ProtectedAuthViewWrapper(
-                    child: AlbumDetailsPage(
-                  album: state.extra as AlbumsModel?,
+                    child:
+                        // Album state & selection
+                        ChangeNotifierProvider<AlbumDetailsProvider>(
+                  create: (_) =>
+                      AlbumDetailsProvider(state.extra as AlbumsModel?),
+
+                  // UI subtree that can read / watch required provider(s).
+                  builder: (_, child) => const AlbumDetailsPage(),
                 )),
               ),
             ]),

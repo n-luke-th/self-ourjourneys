@@ -9,11 +9,41 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 ## [Unreleased]
 
 - Upcoming major features can be found in the [roadmap](#roadmap).
+- Complete the possible method actions on `album_details_page.dart`.
 - Adjustment of UI/UX for **Album** feature page.
-- Combined the all the actions on `full_media_view.dart` into the `MoreActionsBtn` widget.
 - New dialog and toast system (notification) for the application.
 - Reordered bottom navigation bar items, and the new home page for the application that shows the available function menus.
 - Add checksum verification between each to be uploaded selected local files to ensure the integrity of the files.
+
+## Initial Development: [`0.3.19`] - 2025-06-27
+
+### Added
+
+- `MediaRenderingException` class and related error enums are added for handling the media rendering exception.
+- `ImageProviderCache` as the provider class for the internal image rendering system.
+- `AlbumDetailsProvider` as the state tracking and data provider for `album_details_page.dart`.
+
+### Changed
+
+- Improved the image rendering system which enchanced the performance.
+- Combined the all the actions on `full_media_view.dart` into the `MoreActionsBtn` widget.
+- Improved internal code for the `album_details_page.dart` page.
+
+### Deprecated
+
+- none
+
+### Removed
+
+- none
+
+### Fixed
+
+- none
+
+### Others
+
+- Upgrade dependency constraints: `go_router` to `^15.2.4`, `form_builder_validators` to `11.2.0`, `logger` to `2.6.0`, and `synchronized` to `3.4.0`.
 
 ## Initial Development: [`0.3.18`] - 2025-06-18
 
@@ -37,7 +67,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 
 ### Removed
 
-- `ActionWidgetPlace` enum is removed and replaced with Flutter's `Alignment` class.
+- `ActionWidgetPlace` enum is removed and replaced with Flutter's `Alignment` class in `MediaItemContainer` class.
 - `MediaItemContainer`'s `onHover` callback is unavailable as well as hovering effects.
 
 ### Fixed
@@ -46,7 +76,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 
 ### Others
 
-- Converted `crypto` from transitive dependency to direct dependency
+- Update dependency constraints: converted `crypto` from transitive dependency to direct dependency.
 
 ## Initial Development: [`0.3.17`] - 2025-06-16
 
@@ -78,7 +108,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 ### Others
 
 - Version and build number retrieval adjustment for setting page and `main.dart` page.
-- New dependency `marquee` added for the marquee text.
+- Update dependency constraints: New dependency `marquee` added for the marquee text.
 
 # TODO: Complete the release history logs of the previous versions.
 

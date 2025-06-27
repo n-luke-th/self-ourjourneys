@@ -136,42 +136,40 @@ class _PaginatedFilesGridState extends State<PaginatedFilesGrid> {
 
         final objectsData =
             ObjectsData.fromMap(_docs[index].data() as Map<String, dynamic>);
-        if (FileUtils.detectFileTypeFromMimeType(objectsData.contentType) ==
-            MediaObjectType.image) {
-          final objectKey = objectsData.objectKey;
-          return SizedBox(
-            width: MediaQuery.of(context).size.width * 0.2,
-            child: MediaItemContainer(
-              showDescriptionBar: false,
-              fetchSourceData: FetchSourceData(
-                  fetchSourceMethod: FetchSourceMethod.server,
-                  cloudFileObjectKey: objectsData.objectThumbnailKey),
-              imageRendererConfigs: ImageDisplayConfigsModel(
-                  filterQuality: FilterQuality.low,
-                  allowCache: widget.cloudImageAllowCache),
-              mimeType: objectsData.contentType,
-              mediaAndDescriptionBarFlexValue: (18, 1),
-              descriptionTxtMaxLines: 1,
-              extraMapData: {"description": objectKey.split("/").last},
-              onLongPress: () async {
-                await _handleOnLongPressItem(objectKey);
-              },
-              onDoubleTap: () async {
-                await _onDoubleTapItem(objectKey);
-              },
-              onTap: () => _onTapItem(objectsData),
-            ),
-          );
-        } else if (FileUtils.detectFileTypeFromMimeType(
-                objectsData.contentType) ==
-            MediaObjectType.video) {
-          return const Icon(Icons.videocam, size: 48);
-        } else {
-          // return const Icon(Icons.insert_drive_file, size: 48);
-          return ListTile(
-            leading: Text((index + 1).toString()),
-            title: Text(objectsData.toMap().toString()),
-          );
+        switch (FileUtils.detectFileTypeFromMimeType(objectsData.contentType)) {
+          case MediaObjectType.image:
+            final objectKey = objectsData.objectKey;
+            return SizedBox(
+              width: MediaQuery.of(context).size.width * 0.2,
+              child: MediaItemContainer(
+                showDescriptionBar: false,
+                fetchSourceData: FetchSourceData(
+                    fetchSourceMethod: FetchSourceMethod.server,
+                    cloudFileObjectKey: objectsData.objectThumbnailKey),
+                imageRendererConfigs: ImageDisplayConfigsModel(
+                    filterQuality: FilterQuality.low,
+                    allowCache: widget.cloudImageAllowCache),
+                mimeType: objectsData.contentType,
+                mediaAndDescriptionBarFlexValue: (18, 1),
+                descriptionTxtMaxLines: 1,
+                extraMapData: {"description": objectKey.split("/").last},
+                onLongPress: () async {
+                  await _handleOnLongPressItem(objectKey);
+                },
+                onDoubleTap: () async {
+                  await _onDoubleTapItem(objectKey);
+                },
+                onTap: () => _onTapItem(objectsData),
+              ),
+            );
+          case MediaObjectType.video:
+            return const Icon(Icons.videocam, size: 48);
+          default:
+            // return const Icon(Icons.insert_drive_file, size: 48);
+            return ListTile(
+              leading: Text((index + 1).toString()),
+              title: Text(objectsData.toMap().toString()),
+            );
         }
       },
     );

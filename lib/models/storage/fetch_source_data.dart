@@ -2,6 +2,7 @@
 import 'dart:typed_data' show Uint8List;
 
 import 'package:image_picker/image_picker.dart' show XFile;
+import 'package:ourjourneys/helpers/utils.dart' show FileUtils;
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 
 /// A model class to hold data for fetching media source
@@ -32,6 +33,20 @@ class FetchSourceData {
       case FetchSourceMethod.server:
         assert(cloudFileObjectKey != null);
         break;
+    }
+  }
+
+  /// get the unique identity key for the source
+  String get uniqueIdentityKey {
+    switch (fetchSourceMethod) {
+      case FetchSourceMethod.local:
+        if (localFile != null) {
+          return localFile!.path;
+        } else {
+          return FileUtils.generateChecksum(localFileBytes!);
+        }
+      case FetchSourceMethod.server:
+        return cloudFileObjectKey!;
     }
   }
 
