@@ -28,6 +28,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 - Improved the image rendering system which enchanced the performance.
 - Combined the all the actions on `full_media_view.dart` into the `MoreActionsBtn` widget.
 - Improved internal code for the `album_details_page.dart` page.
+- General improvements.
 
 ### Deprecated
 
@@ -60,6 +61,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 - Used the error builder for `MediaItemContainer` when there is error loading image instead of default error widget from `ImageDisplayConfigsModel`.
 - UI/UX adjustment for `album_details_page.dart` as well as implementing its sub functions: selecting items, adding items, removing items, permanently delete items from the album and server.
 - Converted `MediaItemContainer` to be a stateless widget.
+- General improvements.
 
 ### Deprecated
 
@@ -92,6 +94,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 - Improving the UI/UX of the **Album** feature pages.
 - Adjusting the internal data gathering for albums page and album details page for **Album** feature pages.
 - Code refactored for settings page for improvements and readability.
+- General improvements.
 
 ### Deprecated
 
@@ -118,7 +121,35 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 
 ### Changed
 
+- General improvements.
+
+### Deprecated
+
+- none
+
+### Removed
+
+- none
+
+### Fixed
+
 - Ensure compatibility for image rendering system for web by rendering from bytes.
+
+### Others
+
+- Upgrade dependency constraints: `go_router` to `15.2.0`.
+
+# TODO: Complete the release history logs of the previous versions.
+
+## Initial Development: [`0.3.15`] - 2025-06-12
+
+### Added
+
+- none
+
+### Changed
+
+- General improvements.
 
 ### Deprecated
 
@@ -134,6 +165,30 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 
 ### Others
 
-- Upgrade dependency constraints: `go_router` to `15.2.0`.
+- Update dependency constraints: .
 
-# TODO: Complete the release history logs of the previous versions.
+## Initial Development: [`0.3.14`] - 2025-06-12
+
+### Added
+
+- none
+
+### Changed
+
+- General improvements.
+
+### Deprecated
+
+- none
+
+### Removed
+
+- none
+
+### Fixed
+
+- none
+
+### Others
+
+- none
