@@ -1,6 +1,6 @@
 /// lib/shared/common/page_mode_enum.dart
 ///
-/// a enum to indicate the page mode
+/// an enum to indicate the page mode
 ///
 /// - [view]: the page is in view mode
 /// - [edit]: the page is in edit mode

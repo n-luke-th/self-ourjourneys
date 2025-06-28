@@ -47,7 +47,7 @@ class ImageProviderCache extends ChangeNotifier {
           cacheKey: source.cloudFileObjectKey.hashCode.toString(),
           cache: cfg.allowCache,
           cacheMaxAge: const Duration(days: 15),
-          timeRetry: const Duration(milliseconds: 500),
+          timeRetry: const Duration(milliseconds: 650),
         );
         break;
 

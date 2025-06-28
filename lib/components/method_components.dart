@@ -116,10 +116,9 @@ class MethodsComponents {
       double? width,
       ShimmerDirection effectDirection = ShimmerDirection.ltr}) {
     return Shimmer.fromColors(
-      baseColor: baseColor.withValues(
-          alpha: Color.getAlphaFromOpacity(shimmerBaseOpacity).toDouble()),
-      highlightColor: highlightColor.withValues(
-          alpha: Color.getAlphaFromOpacity(shimmerBaseOpacity).toDouble()),
+      baseColor:
+          baseColor.withAlpha(Color.getAlphaFromOpacity(shimmerBaseOpacity)),
+      highlightColor: highlightColor,
       direction: effectDirection,
       child: Container(
         width: width,

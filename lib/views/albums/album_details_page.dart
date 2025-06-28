@@ -50,7 +50,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
   final Logger _logger = getIt<Logger>();
   final ScrollController _scrollController = ScrollController();
 
-  late final AlbumsModel? albumData;
+  late AlbumsModel? albumData;
 
   late final ImageDisplayConfigsModel _displayConfigs;
 
@@ -68,7 +68,6 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
 
   @override
   void dispose() {
-    albumData = null;
     _scrollController.dispose();
     super.dispose();
   }
@@ -309,13 +308,7 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
                     controller: _scrollController,
                     padding: UiConsts.PaddingAll_standard,
                     addAutomaticKeepAlives: true, // <-- keep tiles alive
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 8,
-                      childAspectRatio:
-                          InterfaceUtils.isBigScreen(context) ? 2 : 0.9,
-                    ),
+                    gridDelegate: UiConsts.getSliverGridDelegate(context),
                     itemCount: albumData!.linkedObjects.length,
                     itemBuilder: (_, index) {
                       final key = albumData!.linkedObjects[index];
@@ -349,7 +342,11 @@ class _AlbumDetailsPageState extends State<AlbumDetailsPage> {
     });
   }
 
-  Future<void> _unlinkSelectedItems() async {}
+  Future<void> _unlinkSelectedItems() async {
+    await context
+        .watch<AlbumDetailsProvider>()
+        .unlinkSelectedFromAlbum(context);
+  }
 
   void _toAddMoreMediaToAlbumPage() {}
 
@@ -537,15 +534,6 @@ class _AlbumMediaItemState extends State<AlbumMediaItem>
   //           objectKeys: [objectKey], folder: folder);
   //     }
   //   }
-  // }
-
-
-
-  // Future<void> _unlinkSelectedItems() async {
-  //   final List<String> objectKeys =
-  //       Provider.of<AlbumDetailsProvider>(context, listen: false)
-  //           .selectedItemsAsList;
-  //   _logger.d("unlinking selected items: $objectKeys");
   // }
 
   // Future<void> _onTouchedDeleteSingleAlbumActionBtn() async {

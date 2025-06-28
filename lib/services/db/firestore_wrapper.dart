@@ -71,6 +71,8 @@ class FirestoreWrapper {
       try {
         final doc =
             await _firestoreService.addDocument(collectionName.value, data);
+        _logger.d(
+            "Document in ${collectionName.value} with Id '${doc.id}' created");
         _showSuccessNotification(
             context, 'Document created', suppressNotification,
             overrideNotiData: overrideNotiData);
@@ -103,7 +105,7 @@ class FirestoreWrapper {
       bool suppressNotification = false,
       NotificationData? overrideNotiData,
       NotificationData? overrideErrorNotiData}) async {
-    _logger.i(
+    _logger.t(
         "Updating document '$docId' in '${collectionName.value}' with data: $data");
     try {
       if (docId != "_") {
@@ -129,6 +131,7 @@ class FirestoreWrapper {
     try {
       if (docId != "_") {
         await _firestoreService.deleteDocument(collection.value, docId);
+        _logger.d('Document "$docId" in "${collection.value}" deleted!');
         _showSuccessNotification(
             context, 'Document deleted', suppressNotification,
             overrideNotiData: overrideNotiData);
@@ -156,7 +159,7 @@ class FirestoreWrapper {
       if (result.hasError) {
         throw result.error!;
       }
-
+      _logger.d('Created ${documents.length} documents in ${collection.value}');
       _showSuccessNotification(context,
           'Created ${result.successCount} documents', suppressNotification,
           overrideNotiData: overrideNotiData);
@@ -186,7 +189,8 @@ class FirestoreWrapper {
       if (result.hasError) {
         throw result.error!;
       }
-
+      _logger.d(
+          "Updated ${updates.length} documents in ${collection.value} with Ids: '${updates.keys}'");
       _showSuccessNotification(context,
           'Updated ${result.successCount} documents', suppressNotification,
           overrideNotiData: overrideNotiData);
@@ -214,7 +218,8 @@ class FirestoreWrapper {
       if (result.hasError) {
         throw result.error!;
       }
-
+      _logger.d(
+          "Deleted ${result.successCount} documents in ${collection.value} with Ids: '${result.successful.map((items) => items.id).toList()}'");
       _showSuccessNotification(context,
           'Deleted ${result.successCount} documents', suppressNotification,
           overrideNotiData: overrideNotiData);
@@ -229,7 +234,6 @@ class FirestoreWrapper {
   void _showSuccessNotification(
       BuildContext context, String message, bool suppressNotification,
       {NotificationData? overrideNotiData}) {
-    _logger.d(message);
     if (!suppressNotification) {
       context.read<NotificationManager>().showNotification(
             context,

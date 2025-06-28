@@ -171,13 +171,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                 : GridView.builder(
                     controller: _scrollController,
                     padding: UiConsts.PaddingAll_small,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 8,
-                      childAspectRatio:
-                          InterfaceUtils.isBigScreen(context) ? 2 : 0.9,
-                    ),
+                    gridDelegate: UiConsts.getSliverGridDelegate(context),
                     itemCount: _docs.length + (_hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == _docs.length) {

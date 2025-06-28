@@ -43,6 +43,12 @@ class ImageDisplayConfigsModel {
   /// the mode that the image would be in the image viewer
   final ExtendedImageMode displayImageMode;
 
+  /// whether to show the retry button or not
+  final bool shouldShowRetryButton;
+
+  /// the retry button to show if [shouldShowRetryButton] is true
+  final Widget? retryButton;
+
   /// the widget to be displayed when there is an error fetching the image.
   /// ignored if [errorBuilder] is provided
   final Widget errorWidget;
@@ -62,6 +68,8 @@ class ImageDisplayConfigsModel {
     this.filterQuality = FilterQuality.medium,
     this.allowCache = true,
     this.displayImageMode = ExtendedImageMode.none,
+    this.shouldShowRetryButton = true,
+    this.retryButton,
     this.errorWidget = const Center(
         child: Icon(
       Icons.error_outline,
@@ -72,16 +80,18 @@ class ImageDisplayConfigsModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'fit': fit.toString(),
+      'fit': fit,
       'width': width,
       'height': height,
       'shimmerBaseOpacity': shimmerBaseOpacity,
-      'shimmerColor': shimmerColor.toString(),
-      'filterQuality': filterQuality.toString(),
+      'shimmerColor': shimmerColor,
+      'filterQuality': filterQuality,
       'allowCache': allowCache,
-      'displayImageMode': displayImageMode.toString(),
-      'errorWidget': errorWidget.toString(),
-      'errorBuilder': errorBuilder.toString(),
+      'displayImageMode': displayImageMode,
+      'shouldShowRetryButton': shouldShowRetryButton,
+      'retryButton': retryButton,
+      'errorWidget': errorWidget,
+      'errorBuilder': errorBuilder,
     };
   }
 
@@ -94,6 +104,8 @@ class ImageDisplayConfigsModel {
     FilterQuality? filterQuality,
     bool? allowCache,
     ExtendedImageMode? displayImageMode,
+    bool? shouldShowRetryButton,
+    Widget? retryButton,
     Widget? errorWidget,
     Widget Function(BuildContext context, Object error, StackTrace? stackTrace)?
         errorBuilder,
@@ -107,6 +119,9 @@ class ImageDisplayConfigsModel {
       filterQuality: filterQuality ?? this.filterQuality,
       allowCache: allowCache ?? this.allowCache,
       displayImageMode: displayImageMode ?? this.displayImageMode,
+      shouldShowRetryButton:
+          shouldShowRetryButton ?? this.shouldShowRetryButton,
+      retryButton: retryButton ?? this.retryButton,
       errorWidget: errorWidget ?? this.errorWidget,
       errorBuilder: errorBuilder ?? this.errorBuilder,
     );

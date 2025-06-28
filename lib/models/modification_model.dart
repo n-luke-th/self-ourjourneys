@@ -1,6 +1,6 @@
 /// lib/models/modification_model.dart
 
-import 'dart:convert';
+import 'dart:convert' show json;
 
 import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:ourjourneys/helpers/utils.dart' show DateTimeUtils;

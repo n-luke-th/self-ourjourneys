@@ -2,6 +2,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 /// TODO: edit this page
 import 'package:flutter/widgets.dart';
+import 'package:ourjourneys/helpers/utils.dart' show InterfaceUtils;
 
 /// for consistent design and user interface of the app.
 /// define the spacing or things that might be reusable here
@@ -121,4 +122,20 @@ class UiConsts {
 
   /// Duration(milliseconds: 500);
   static const animationDuration = Duration(milliseconds: 500);
+
+  /// `SliverGridDelegateWithFixedCrossAxisCount(
+  ///   crossAxisCount: 2,
+  ///   mainAxisSpacing: 12,
+  ///   crossAxisSpacing: 8,
+  ///   childAspectRatio:
+  ///       InterfaceUtils.isBigScreen(context) ? 2 : 0.9,
+  /// );`
+  static SliverGridDelegateWithFixedCrossAxisCount getSliverGridDelegate(
+          BuildContext context) =>
+      SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 8,
+        childAspectRatio: InterfaceUtils.isBigScreen(context) ? 2 : 0.9,
+      );
 }

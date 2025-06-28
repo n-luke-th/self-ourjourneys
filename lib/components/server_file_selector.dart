@@ -1,4 +1,6 @@
 /// lib/components/server_file_selector.dart
+/// TODO: will move to `views/media` and no longer be a component
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:ourjourneys/components/main_view.dart';
@@ -10,163 +12,230 @@ import 'package:ourjourneys/models/storage/fetch_source_data.dart'
 import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart';
-import 'package:ourjourneys/shared/services/firestore_commons.dart';
+import 'package:ourjourneys/shared/services/firestore_commons.dart'
+    show FirestoreCollections;
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
+import 'package:provider/provider.dart'
+    show ChangeNotifierProvider, ReadContext, Selector;
 
+///
+/// Selection state shared by every tile
+class ServerFileSelectionProvider extends ChangeNotifier {
+  final Set<String> _selectedKeys;
+  ServerFileSelectionProvider({required List<ObjectsData> preset})
+      : _selectedKeys = preset.map((e) => e.objectKey).toSet();
+
+  bool isSelected(String key) => _selectedKeys.contains(key);
+
+  List<String> get selectedKeysAsList => _selectedKeys.toList(growable: false);
+
+  void toggle(String key) {
+    if (!_selectedKeys.add(key)) _selectedKeys.remove(key);
+    notifyListeners();
+  }
+}
+
+/// internal widget to display a single file as a tile
+class _ServerFileTile extends StatefulWidget {
+  const _ServerFileTile({
+    required this.obj,
+    required this.cfg,
+    super.key,
+  });
+
+  final ObjectsData obj;
+  final ImageDisplayConfigsModel cfg;
+
+  @override
+  State<_ServerFileTile> createState() => _ServerFileTileState();
+}
+
+class _ServerFileTileState extends State<_ServerFileTile>
+    with AutomaticKeepAliveClientMixin {
+  late final Widget _mediaTile; // heavy part - built once
+
+  @override
+  void initState() {
+    super.initState();
+    _mediaTile = MediaItemContainer(
+      key: ValueKey(widget.obj.objectKey),
+      mimeType: widget.obj.contentType,
+      widgetRatio: 1,
+      fetchSourceData: FetchSourceData(
+        fetchSourceMethod: FetchSourceMethod.server,
+        cloudFileObjectKey: widget.obj.objectThumbnailKey,
+      ),
+      imageRendererConfigs: widget.cfg,
+      showActionWidget: false,
+      showWidgetBorder: false,
+      showDescriptionBar: false,
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    return Selector<ServerFileSelectionProvider, bool>(
+      selector: (_, sel) => sel.isSelected(widget.obj.objectKey),
+      builder: (_, isSel, child) => ChoiceChip.elevated(
+        key: ValueKey(widget.obj.objectKey),
+        selected: isSel,
+        showCheckmark: false,
+        selectedColor: Theme.of(context).colorScheme.tertiaryContainer,
+        tooltip: widget.obj.fileName,
+        shape: RoundedRectangleBorder(
+          borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
+        ),
+        labelPadding: UiConsts.PaddingVertical_small,
+        label: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            child!, // the cached MediaItemContainer
+            Padding(
+              padding: UiConsts.PaddingAll_small,
+              child: Icon(
+                isSel ? Icons.check_box : Icons.check_box_outline_blank,
+                color: isSel ? Colors.green : Colors.grey,
+              ),
+            ),
+          ],
+        ),
+        onSelected: (_) => context
+            .read<ServerFileSelectionProvider>()
+            .toggle(widget.obj.objectKey),
+      ),
+      child: _mediaTile,
+    );
+  }
+}
+
+/// a page to select files from the server to add to the collection or album
 class ServerFileSelector extends StatefulWidget {
-  final void Function(List<ObjectsData>) onSelectionChanged;
-  final List<ObjectsData> selectedFiles;
-  final bool cloudImageAllowCache;
+  const ServerFileSelector({
+    super.key,
+    this.cloudImageAllowCache = true,
+    required this.onSelectionChanged,
+    required this.preselectedFiles,
+  });
 
-  const ServerFileSelector(
-      {super.key,
-      this.cloudImageAllowCache = true,
-      required this.onSelectionChanged,
-      required this.selectedFiles});
+  final void Function(List<ObjectsData>) onSelectionChanged;
+  final List<ObjectsData> preselectedFiles;
+  final bool cloudImageAllowCache;
 
   @override
   State<ServerFileSelector> createState() => _ServerFileSelectorState();
 }
 
 class _ServerFileSelectorState extends State<ServerFileSelector> {
-  final FirestoreWrapper _firestoreWrapper = getIt<FirestoreWrapper>();
-  List<ObjectsData> _allFiles = [];
+  final FirestoreWrapper _firestore = getIt<FirestoreWrapper>();
+  final TextEditingController _search = TextEditingController();
 
-  late List<ObjectsData> _selected;
-  String _searchText = '';
+  List<ObjectsData> _all = [];
+
+  late final ImageDisplayConfigsModel _cfg = ImageDisplayConfigsModel(
+    filterQuality: FilterQuality.low,
+    allowCache: widget.cloudImageAllowCache,
+    fit: BoxFit.contain,
+    shouldShowRetryButton: false,
+  );
+
+  List<ObjectsData> get _filtered => _all
+      .where(
+          (f) => f.fileName.toLowerCase().contains(_search.text.toLowerCase()))
+      .toList(growable: false);
 
   @override
   void initState() {
     super.initState();
     _loadFiles();
-    _selected = widget.selectedFiles;
   }
 
-  void _loadFiles() async {
-    final data = await _firestoreWrapper
-        .queryCollection(FirestoreCollections.objectsData,
-            filters: [],
-            limit: 100,
-            orderBy: 'objectUploadRequestedAt',
-            descending: false)
+  Future<void> _loadFiles() async {
+    final snap = await _firestore
+        .queryCollection(
+          FirestoreCollections.objectsData,
+          limit: 100,
+          orderBy: 'objectUploadRequestedAt',
+          descending: false,
+        )
         .get();
 
     setState(() {
-      _allFiles = data.docs
-          .map((doc) {
-            if (doc.id == "_") {
-              return null;
-            } else {
-              return ObjectsData.fromMap(doc.data() as Map<String, dynamic>);
-            }
-          })
-          .whereType<ObjectsData>()
+      _all = snap.docs
+          .where((d) => d.id != '_')
+          .map((d) => ObjectsData.fromMap(d.data() as Map<String, dynamic>))
           .toList();
     });
-  }
 
-  void _toggleSelection(ObjectsData obj) {
-    setState(() {
-      if (_selected.any((o) => o.objectKey == obj.objectKey)) {
-        _selected.removeWhere((o) => o.objectKey == obj.objectKey);
-      } else {
-        _selected.add(obj);
-      }
-    });
-    widget.onSelectionChanged(_selected);
+    // pre-select any preset files
+    final select = context.read<ServerFileSelectionProvider>();
+    for (final o in widget.preselectedFiles) {
+      select.toggle(o.objectKey);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _allFiles
-        .where(
-            (f) => f.fileName.toLowerCase().contains(_searchText.toLowerCase()))
-        .toList();
-
-    return mainView(
-      context,
-      appBarTitle: "Edit Selected Server files",
-      body: Padding(
-        padding: UiConsts.PaddingAll_large,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            UiConsts.SizedBoxGapVertical_standard,
-            TextField(
-              onChanged: (value) => setState(() => _searchText = value),
-              decoration: InputDecoration(
-                hintText: "Search files...",
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
+    return ChangeNotifierProvider(
+      create: (_) =>
+          ServerFileSelectionProvider(preset: widget.preselectedFiles)
+            ..addListener(() {
+              final selKeys = context
+                  .read<ServerFileSelectionProvider>()
+                  .selectedKeysAsList;
+              widget.onSelectionChanged(
+                _all.where((o) => selKeys.contains(o.objectKey)).toList(),
+              );
+            }),
+      child: mainView(
+        context,
+        appBarTitle: 'Edit Selected Server Files',
+        body: Padding(
+          padding: UiConsts.PaddingHorizontal_standard,
+          child: Column(
+            children: [
+              UiConsts.SizedBoxGapVertical_standard,
+              TextField(
+                controller: _search,
+                decoration: InputDecoration(
+                  hintText: 'Search files...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
+                  ),
                 ),
+                onChanged: (_) => setState(() {
+                  // widget.onSelectionChanged(
+                  //   _all
+                  //       .where((o) => context
+                  //           .read<ServerFileSelectionProvider>()
+                  //           .selectedKeysAsList
+                  //           .contains(o.objectKey))
+                  //       .toList(),
+                  // );
+                }),
               ),
-            ),
-            UiConsts.SizedBoxGapVertical_large,
-            _allFiles.isEmpty
-                ? const Text("No files found.")
-                : Expanded(
-                    child: SingleChildScrollView(
-                      child: Center(
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          alignment: WrapAlignment.center,
-                          runAlignment: WrapAlignment.spaceAround,
-                          spacing: 16,
-                          runSpacing: 8,
-                          children: filtered.map((obj) {
-                            final isSelected = _selected
-                                .any((o) => o.objectKey == obj.objectKey);
-                            return SizedBox(
-                              width: MediaQuery.sizeOf(context).width * 0.4,
-                              child: ChoiceChip.elevated(
-                                selectedColor: Theme.of(context)
-                                    .colorScheme
-                                    .tertiaryContainer,
-                                showCheckmark: false,
-                                selected: isSelected,
-                                onSelected: (_) => _toggleSelection(obj),
-                                tooltip: obj.fileName,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: UiConsts
-                                        .BorderRadiusCircular_mediumLarge),
-                                // avatar: const Icon(Icons.open_in_full_rounded),
-                                // avatarBoxConstraints:
-                                //     BoxConstraints.tightFor(width: 20),
-                                labelPadding: UiConsts.PaddingVertical_small,
-                                label: MediaItemContainer(
-                                  showDescriptionBar: false,
-                                  showWidgetBorder: false,
-                                  showActionWidget: true,
-                                  actionWidget: Icon(
-                                    isSelected
-                                        ? Icons.check_box
-                                        : Icons.check_box_outline_blank,
-                                    color:
-                                        isSelected ? Colors.green : Colors.grey,
-                                  ),
-                                  mimeType: obj.contentType,
-                                  widgetRatio: 1,
-                                  fetchSourceData: FetchSourceData(
-                                      fetchSourceMethod:
-                                          FetchSourceMethod.server,
-                                      cloudFileObjectKey:
-                                          obj.objectThumbnailKey),
-                                  imageRendererConfigs:
-                                      ImageDisplayConfigsModel(
-                                    filterQuality: FilterQuality.low,
-                                    allowCache: widget.cloudImageAllowCache,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+              Expanded(
+                child: _all.isEmpty
+                    ? const Center(child: Text('No files found.'))
+                    : GridView.builder(
+                        padding: UiConsts.PaddingAll_standard,
+                        addAutomaticKeepAlives: true,
+                        gridDelegate: UiConsts.getSliverGridDelegate(context),
+                        itemCount: _filtered.length,
+                        itemBuilder: (_, i) => _ServerFileTile(
+                          key: ValueKey(_filtered[i].objectKey),
+                          obj: _filtered[i],
+                          cfg: _cfg,
                         ),
                       ),
-                    ),
-                  ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

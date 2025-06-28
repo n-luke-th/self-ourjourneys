@@ -77,25 +77,23 @@ class MediaItemContainer extends StatelessWidget {
   // bool _hovering = false;
   Widget _handleBuildMediaError(BuildContext context, Object error,
       StackTrace? stackTrace, MediaObjectType mediaType) {
-    return Center(
-      child: SizedBox(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 8,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              color: Colors.red,
-            ),
-            Text(
-              'Error loading ${mediaType.stringValue}: ${error.toString()}',
-              softWrap: true,
-              maxLines: 5,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
+    return SizedBox(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        spacing: 4,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            color: Colors.red,
+          ),
+          Text(
+            'Error loading ${mediaType.stringValue}: ${error.toString()}',
+            softWrap: true,
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

@@ -9,11 +9,39 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 ## [Unreleased]
 
 - Upcoming major features can be found in the [roadmap](#roadmap).
-- Complete the possible method actions on `album_details_page.dart`.
+- Complete the possible method actions on `album_details_page.dart` such as adding items, unlinking items, permanently delete items from the album and server are now efficiently implemented.
 - Adjustment of UI/UX for **Album** feature page.
 - New dialog and toast system (notification) for the application.
 - Reordered bottom navigation bar items, and the new home page for the application that shows the available function menus.
 - Add checksum verification between each to be uploaded selected local files to ensure the integrity of the files.
+
+## Initial Development: [`0.3.20`] - 2025-06-28
+
+### Added
+
+- Method action on `album_details_page.dart` for unlinking items is implemented but still needed to be improved and optimized for UI/UX.
+- Ability to on-demand retry loading the media items from the server.
+
+### Changed
+
+- General improvements.
+- Server files selector is now in the enchancement process on the rendering system.
+
+### Deprecated
+
+- none
+
+### Removed
+
+- none
+
+### Fixed
+
+- none
+
+### Others
+
+- Upgrade dependency constraints: [transitive] `posix` to `6.0.3`.
 
 ## Initial Development: [`0.3.19`] - 2025-06-27
 
@@ -28,6 +56,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 - Improved the image rendering system which enchanced the performance.
 - Combined the all the actions on `full_media_view.dart` into the `MoreActionsBtn` widget.
 - Improved internal code for the `album_details_page.dart` page.
+- On `album_details_page.dart` can now efficiently selecting/deselecting items for further actions.
 - General improvements.
 
 ### Deprecated
@@ -44,7 +73,7 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 
 ### Others
 
-- Upgrade dependency constraints: `go_router` to `15.2.4`, `form_builder_validators` to `11.2.0`, `logger` to `2.6.0`, and `synchronized` to `3.4.0`.
+- Upgrade dependency constraints: `go_router` to `15.2.4`, `form_builder_validators` to `11.2.0`, `logger` to `2.6.0`, and [transitive] `synchronized` to `3.4.0`.
 
 ## Initial Development: [`0.3.18`] - 2025-06-18
 

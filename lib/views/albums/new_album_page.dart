@@ -247,7 +247,7 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         context,
         MaterialPageRoute(
           builder: (context) => ServerFileSelector(
-              selectedFiles: [..._selectedServerObjects],
+              preselectedFiles: [..._selectedServerObjects],
               onSelectionChanged: (List<ObjectsData> selectedObjects) {
                 setState(() {
                   _selectedServerObjects = selectedObjects;

@@ -48,17 +48,45 @@ class ImageRenderer extends StatelessWidget {
         switch (state.extendedImageLoadState) {
           case LoadState.loading:
             // _logger.i("image is loading...");
-            return MethodsComponents.renderShimmerEffect(
-              baseColor: imageRendererConfigs.shimmerColor,
-              shimmerBaseOpacity: imageRendererConfigs.shimmerBaseOpacity,
-              height: imageRendererConfigs.height,
-              width: imageRendererConfigs.width,
+            return Container(
+              alignment: Alignment.center,
+              child: MethodsComponents.renderShimmerEffect(
+                baseColor: imageRendererConfigs.shimmerColor,
+                shimmerBaseOpacity: imageRendererConfigs.shimmerBaseOpacity,
+                height: imageRendererConfigs.height,
+                width: imageRendererConfigs.width,
+              ),
             );
           case LoadState.completed:
             // _logger.i("image is loaded");
             return state.completedWidget;
           case LoadState.failed:
             // _logger.e("image loading failed");
+            if (imageRendererConfigs.shouldShowRetryButton) {
+              return Builder(builder: (ctx) {
+                return Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    imageRendererConfigs.errorBuilder?.call(
+                          ctx,
+                          state.lastException!,
+                          state.lastStack,
+                        ) ??
+                        imageRendererConfigs.errorWidget,
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: GestureDetector(
+                          onTap: () => state.reLoadImage(),
+                          child: imageRendererConfigs.retryButton ??
+                              TextButton.icon(
+                                  icon: const Icon(Icons.refresh_outlined),
+                                  onPressed: () => state.reLoadImage(),
+                                  label: const Text("Retry"))),
+                    ),
+                  ],
+                );
+              });
+            }
             return imageRendererConfigs.errorBuilder?.call(
                   ctx,
                   state.lastException!,
