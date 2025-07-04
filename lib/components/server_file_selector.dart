@@ -10,6 +10,7 @@ import 'package:ourjourneys/models/interface/image_display_configs_model.dart';
 import 'package:ourjourneys/models/storage/fetch_source_data.dart'
     show FetchSourceData;
 import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
+import 'package:ourjourneys/services/core/local_and_server_file_selection_provider.dart';
 import 'package:ourjourneys/services/db/firestore_wrapper.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart';
 import 'package:ourjourneys/shared/services/firestore_commons.dart'
@@ -17,23 +18,6 @@ import 'package:ourjourneys/shared/services/firestore_commons.dart'
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
 import 'package:provider/provider.dart'
     show ChangeNotifierProvider, ReadContext, Selector;
-
-///
-/// Selection state shared by every tile
-class ServerFileSelectionProvider extends ChangeNotifier {
-  final Set<String> _selectedKeys;
-  ServerFileSelectionProvider({required List<ObjectsData> preset})
-      : _selectedKeys = preset.map((e) => e.objectKey).toSet();
-
-  bool isSelected(String key) => _selectedKeys.contains(key);
-
-  List<String> get selectedKeysAsList => _selectedKeys.toList(growable: false);
-
-  void toggle(String key) {
-    if (!_selectedKeys.add(key)) _selectedKeys.remove(key);
-    notifyListeners();
-  }
-}
 
 /// internal widget to display a single file as a tile
 class _ServerFileTile extends StatefulWidget {
@@ -79,8 +63,8 @@ class _ServerFileTileState extends State<_ServerFileTile>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Selector<ServerFileSelectionProvider, bool>(
-      selector: (_, sel) => sel.isSelected(widget.obj.objectKey),
+    return Selector<LocalAndServerFileSelectionProvider, bool>(
+      selector: (_, sel) => sel.isSelectedServerFile(widget.obj),
       builder: (_, isSel, child) => ChoiceChip.elevated(
         key: ValueKey(widget.obj.objectKey),
         selected: isSel,
@@ -105,8 +89,8 @@ class _ServerFileTileState extends State<_ServerFileTile>
           ],
         ),
         onSelected: (_) => context
-            .read<ServerFileSelectionProvider>()
-            .toggle(widget.obj.objectKey),
+            .read<LocalAndServerFileSelectionProvider>()
+            .updateSelectedServerObjs(widget.obj),
       ),
       child: _mediaTile,
     );
@@ -115,15 +99,13 @@ class _ServerFileTileState extends State<_ServerFileTile>
 
 /// a page to select files from the server to add to the collection or album
 class ServerFileSelector extends StatefulWidget {
+  final LocalAndServerFileSelectionProvider provider;
   const ServerFileSelector({
     super.key,
     this.cloudImageAllowCache = true,
-    required this.onSelectionChanged,
-    required this.preselectedFiles,
+    required this.provider,
   });
 
-  final void Function(List<ObjectsData>) onSelectionChanged;
-  final List<ObjectsData> preselectedFiles;
   final bool cloudImageAllowCache;
 
   @override
@@ -170,28 +152,13 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
           .map((d) => ObjectsData.fromMap(d.data() as Map<String, dynamic>))
           .toList();
     });
-
-    // pre-select any preset files
-    final select = context.read<ServerFileSelectionProvider>();
-    for (final o in widget.preselectedFiles) {
-      select.toggle(o.objectKey);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) =>
-          ServerFileSelectionProvider(preset: widget.preselectedFiles)
-            ..addListener(() {
-              final selKeys = context
-                  .read<ServerFileSelectionProvider>()
-                  .selectedKeysAsList;
-              widget.onSelectionChanged(
-                _all.where((o) => selKeys.contains(o.objectKey)).toList(),
-              );
-            }),
-      child: mainView(
+    return ChangeNotifierProvider<LocalAndServerFileSelectionProvider>.value(
+      value: widget.provider,
+      builder: (_, __) => mainView(
         context,
         appBarTitle: 'Edit Selected Server Files',
         body: Padding(
@@ -200,25 +167,15 @@ class _ServerFileSelectorState extends State<ServerFileSelector> {
             children: [
               UiConsts.SizedBoxGapVertical_standard,
               TextField(
-                controller: _search,
-                decoration: InputDecoration(
-                  hintText: 'Search files...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
+                  controller: _search,
+                  decoration: InputDecoration(
+                    hintText: 'Search files...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: UiConsts.BorderRadiusCircular_mediumLarge,
+                    ),
                   ),
-                ),
-                onChanged: (_) => setState(() {
-                  // widget.onSelectionChanged(
-                  //   _all
-                  //       .where((o) => context
-                  //           .read<ServerFileSelectionProvider>()
-                  //           .selectedKeysAsList
-                  //           .contains(o.objectKey))
-                  //       .toList(),
-                  // );
-                }),
-              ),
+                  onChanged: (_) => setState(() {})),
               Expanded(
                 child: _all.isEmpty
                     ? const Center(child: Text('No files found.'))

@@ -4,11 +4,14 @@
 
 import 'package:flutter/material.dart' show GlobalKey, NavigatorState;
 import 'package:go_router/go_router.dart';
+import 'package:ourjourneys/components/server_file_selector.dart'
+    show ServerFileSelector;
 import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/models/db/albums_model.dart';
 import 'package:ourjourneys/navigation/nav_bar.dart';
 import 'package:ourjourneys/services/auth/acc/auth_service.dart';
 import 'package:ourjourneys/services/core/album_details_provider.dart';
+import 'package:ourjourneys/services/core/local_and_server_file_selection_provider.dart';
 import 'package:ourjourneys/views/albums/album_details_page.dart';
 import 'package:ourjourneys/views/albums/albums_page.dart';
 import 'package:ourjourneys/views/media/all_files_page.dart';
@@ -182,12 +185,26 @@ final router = GoRouter(
                 ProtectedAuthViewWrapper(child: const AlbumsPage()),
             routes: [
               GoRoute(
-                /// '/albums/new/album'
-                path: 'new/album',
-                name: 'NewAlbumPage',
-                builder: (context, state) =>
-                    ProtectedAuthViewWrapper(child: const NewAlbumPage()),
-              ),
+
+                  /// '/albums/new/album'
+                  path: 'new/album',
+                  name: 'NewAlbumPage',
+                  builder: (context, state) => ProtectedAuthViewWrapper(
+                      child: ChangeNotifierProvider(
+                          create: (_) => LocalAndServerFileSelectionProvider(),
+                          builder: (_, child) => const NewAlbumPage())),
+                  routes: [
+                    GoRoute(
+                      /// '/albums/new/album/server-file-selection'
+                      path: 'server-file-selection',
+                      name: 'NewAlbumServerFileSelectionPage',
+                      builder: (context, state) => ProtectedAuthViewWrapper(
+                          child: ServerFileSelector(
+                        provider:
+                            state.extra as LocalAndServerFileSelectionProvider,
+                      )),
+                    ),
+                  ]),
               GoRoute(
                 /// '/albums/album-details'
                 path: 'album-details',

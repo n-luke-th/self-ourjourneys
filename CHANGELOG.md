@@ -9,11 +9,40 @@ Starting with version **`0.3.18`** (2025-06-18), the release history is adapting
 ## [Unreleased]
 
 - Upcoming major features can be found in the [roadmap](#roadmap).
+- Refactor the codebase to use `Riverpod` as well as to be more readable and maintainable.
 - Complete the possible method actions on `album_details_page.dart` such as adding items, unlinking items, permanently delete items from the album and server are now efficiently implemented.
 - Adjustment of UI/UX for **Album** feature page.
 - New dialog and toast system (notification) for the application.
 - Reordered bottom navigation bar items, and the new home page for the application that shows the available function menus.
 - Add checksum verification between each to be uploaded selected local files to ensure the integrity of the files.
+
+## Initial Development: [`0.3.21`] - 2025-07-04
+
+### Added
+
+- `LocalAndServerFileSelectionProvider` as the state tracking and data provider for editing the selected files for associated further actions like create new albums with the selected files and uploading the selected files.
+
+### Changed
+
+- General improvements.
+- Enchanced `server_file_selector.dart`.
+- Refactored to use `Provider` for create new album process.
+
+### Deprecated
+
+- none
+
+### Removed
+
+- none
+
+### Fixed
+
+- none
+
+### Others
+
+- Upgrade dependency constraints: new dependency `flutter_riverpod` added for upcoming codebase refactor to use `Riverpod`, `go_router` to `16.0.0`, `get_time_ago` to `2.3.2`, `firebase_core` to `3.15.1`, `cloud_firestore` to `5.6.11`, `firebase_auth` to `5.6.2`, ,`firebase_messaging` to `15.2.9`, `chewie` to `1.12.1`,`permission_handler` to `12.0.1` , and other transitive dependencies.
 
 ## Initial Development: [`0.3.20`] - 2025-06-28
 

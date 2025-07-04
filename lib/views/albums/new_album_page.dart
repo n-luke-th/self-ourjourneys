@@ -6,21 +6,23 @@
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart'
     show FormBuilderValidators;
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:logger/logger.dart' show Logger;
 import 'package:ourjourneys/components/file_picker_preview.dart';
 import 'package:ourjourneys/components/method_components.dart';
 import 'package:ourjourneys/helpers/get_platform_service.dart';
 import 'package:ourjourneys/models/storage/selected_file.dart';
+import 'package:ourjourneys/services/core/local_and_server_file_selection_provider.dart';
 import 'package:ourjourneys/services/dialog/dialog_service.dart';
 import 'package:ourjourneys/shared/helpers/misc.dart' show FetchSourceMethod;
 import 'package:ourjourneys/views/albums/album_creation_live_result_page.dart';
-import 'package:ourjourneys/components/server_file_selector.dart';
 import 'package:ourjourneys/components/main_view.dart';
 import 'package:ourjourneys/helpers/dependencies_injection.dart' show getIt;
 import 'package:ourjourneys/helpers/utils.dart' show FileUtils, Utils;
 import 'package:ourjourneys/models/storage/objects_data.dart' show ObjectsData;
 import 'package:ourjourneys/services/auth/acc/auth_wrapper.dart';
 import 'package:ourjourneys/shared/views/ui_consts.dart' show UiConsts;
+import 'package:provider/provider.dart' show ReadContext, WatchContext;
 
 /// a page where is meant to create new album
 class NewAlbumPage extends StatefulWidget {
@@ -38,56 +40,55 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
   final _nameKey = GlobalKey<FormFieldState>();
   final _nameController = TextEditingController();
 
-  Set<SelectedFile> _selectedLocalFiles = {};
-  List<ObjectsData> _selectedServerObjects = [];
+  List<SelectedFile> get _selectedItems =>
+      context.read<LocalAndServerFileSelectionProvider>().selectedAsList;
 
-  void _onLocalFilesSelected(List<SelectedFile> files,
-      {bool isReplacing = false}) {
+  void _reportTrackingItems() {
+    _logger.i(
+        "Tracked files (${_selectedItems.length}): [${_selectedItems.map((i) => i.localFile?.name ?? i.cloudObjectData?.objectKey).join(', ')}]");
+  }
+
+  void _onLocalFilesSelected(
+    List<SelectedFile> files,
+  ) {
     _logger.d(
         "Picked local files: [${files.map((i) => i.localFile?.name).join(', ')}]");
-    setState(() {
-      if (!isReplacing) {
-        if (_selectedLocalFiles.isNotEmpty) {
-          _selectedLocalFiles.addAll(files.where((f) => _selectedLocalFiles
-              .where((i) => i.localFile?.name == f.localFile?.name)
-              .isEmpty));
-        } else {
-          _selectedLocalFiles.addAll(files);
-        }
-      } else {
-        _selectedLocalFiles = files.toSet();
-      }
-    });
-    _logger.i(
-        "Tracked files (${_selectedLocalFiles.length}): [${_selectedLocalFiles.map((i) => i.localFile?.name).join(', ')}]");
+
+    context
+        .read<LocalAndServerFileSelectionProvider>()
+        .updateSelectedLocalFiles(files);
+    _reportTrackingItems();
   }
 
   void _onServerObjectDeleted(ObjectsData object) {
-    setState(() {
-      _selectedServerObjects
-          .removeWhere((o) => o.objectKey == object.objectKey);
-    });
+    context
+        .read<LocalAndServerFileSelectionProvider>()
+        .removeGivenServerObjectFromSelection(object);
     _logger.d(
         "Deleted server object: [${object.objectKey}] from selected server objects");
+    _reportTrackingItems();
   }
 
   void _onClearServerObject() {
-    setState(() {
-      _selectedServerObjects.clear();
-    });
+    context
+        .read<LocalAndServerFileSelectionProvider>()
+        .clearSelectedServerObjects();
+
     _logger.d("Cleared selected server objects");
+    _reportTrackingItems();
   }
 
   void _onClearSelectedLocalFiles() {
-    setState(() {
-      _selectedLocalFiles.clear();
-    });
+    context
+        .read<LocalAndServerFileSelectionProvider>()
+        .clearSelectedLocalFiles();
     _logger.d("Cleared selected local files");
+    _reportTrackingItems();
   }
 
   Future<void> _createAlbum() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedLocalFiles.isEmpty && _selectedServerObjects.isEmpty) {
+    if (_selectedItems.isEmpty) {
       final bool? result = await DialogService.showConfirmationDialog(
           context: context,
           title: "Create empty album?",
@@ -108,9 +109,22 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
       }
     } else {
       _logger.i(
-          "Creating album: '${_nameController.text}' with files: [${_selectedLocalFiles.map((i) => i.localFile?.name).join(', ')}, ${_selectedServerObjects.map((i) => i.objectKey).join(', ')}]");
-      final List<String> fileNames =
-          _selectedLocalFiles.map((e) => e.localFile!.name).toList();
+          "Creating album: '${_nameController.text}' with files: [${_selectedItems.map((i) => i.localFile?.name).join(', ')}, ${_selectedItems.map((i) => i.cloudObjectData?.objectKey).join(', ')}]");
+      final List<String> fileNames = context
+          .read<LocalAndServerFileSelectionProvider>()
+          .selectedLocalFilesAsList
+          .map((e) => e.localFile!.name)
+          .toList();
+      final xFiles = context
+          .read<LocalAndServerFileSelectionProvider>()
+          .selectedLocalFilesAsList
+          .map((e) => e.localFile!)
+          .toList();
+      final List<String> selectedExistingObjectKeys = context
+          .read<LocalAndServerFileSelectionProvider>()
+          .selectedServerItemsAsList
+          .map((e) => e.cloudObjectData!.objectKey)
+          .toList();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -118,9 +132,8 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
             isNoNeedNewUpload: fileNames.isEmpty ? true : false,
             albumName: _nameController.text.trim(),
             folderPath: Utils.getFolderPath(_authWrapper.uid),
-            listOfXFiles: _selectedLocalFiles.map((f) => f.localFile!).toList(),
-            selectedExistingObjectKeys:
-                _selectedServerObjects.map((e) => e.objectKey).toList(),
+            listOfXFiles: xFiles,
+            selectedExistingObjectKeys: selectedExistingObjectKeys,
           ),
         ),
       );
@@ -178,7 +191,8 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
           ),
           onFloatingActionButtonPressed: () async =>
               await MethodsComponents.showUploadSourceSelector(context,
-                  onServerSourceSelected: () => _onServerSourceSelected(),
+                  onServerSourceSelected: () async =>
+                      await _onServerSourceSelected(),
                   onLocalSourceSelected: () async =>
                       await _onLocalSourceSelected()),
           body: Form(
@@ -239,21 +253,13 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
     }
   }
 
-  void _onServerSourceSelected() {
+  Future<void> _onServerSourceSelected() async {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ServerFileSelector(
-              preselectedFiles: [..._selectedServerObjects],
-              onSelectionChanged: (List<ObjectsData> selectedObjects) {
-                setState(() {
-                  _selectedServerObjects = selectedObjects;
-                });
-              }),
-        ));
+    await context.pushNamed("NewAlbumServerFileSelectionPage",
+        extra: context.read<LocalAndServerFileSelectionProvider>());
+    _reportTrackingItems();
   }
 
   Widget _buildSelectedServerFiles() {
@@ -291,10 +297,13 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         FilePickerPreview(
             imageAllowCache: true,
             onServerObjectDeleted: (obj) => _onServerObjectDeleted(obj),
-            files: _selectedServerObjects.map((objD) {
+            files: context
+                .watch<LocalAndServerFileSelectionProvider>()
+                .selectedServerItemsAsList
+                .map((i) {
               return SelectedFile(
                   fetchSourceMethod: FetchSourceMethod.server,
-                  cloudObjectData: objD);
+                  cloudObjectData: i.cloudObjectData);
             }).toList()),
       ]),
     );
@@ -334,9 +343,10 @@ class _NewAlbumPageState extends State<NewAlbumPage> {
         UiConsts.SizedBoxGapVertical_small,
         FilePickerPreview(
           imageAllowCache: false,
-          files: [..._selectedLocalFiles],
-          onLocalSelectedFilesChanged: (files, {bool isReplacing = false}) =>
-              _onLocalFilesSelected(files, isReplacing: isReplacing),
+          files: context
+              .watch<LocalAndServerFileSelectionProvider>()
+              .selectedLocalFilesAsList,
+          onLocalSelectedFilesChanged: (files) => _onLocalFilesSelected(files),
         ),
       ]),
     );

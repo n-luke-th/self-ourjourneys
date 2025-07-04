@@ -6,6 +6,7 @@
 import 'dart:async' show Future, FutureOr;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:ourjourneys/services/bottom_sheet/bottom_sheet_service.dart'
     show BottomSheetService;
 import 'package:ourjourneys/services/dialog/dialog_service.dart'
@@ -94,8 +95,8 @@ class MethodsComponents {
             cancelText: "CANCEL")
         .then((value) async {
       if (value == true) {
-        if (Navigator.canPop(context)) {
-          Navigator.of(context).pop();
+        if (context.canPop()) {
+          context.pop();
         }
       }
     });

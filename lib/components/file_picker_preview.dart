@@ -18,8 +18,7 @@ import 'package:ourjourneys/views/media/full_media_view.dart';
 /// a widget that shows a preview of selected local/cloud files
 class FilePickerPreview extends StatelessWidget {
   final List<SelectedFile> files;
-  final void Function(List<SelectedFile>, {bool isReplacing})?
-      onLocalSelectedFilesChanged;
+  final void Function(List<SelectedFile>)? onLocalSelectedFilesChanged;
   final void Function(ObjectsData)? onServerObjectDeleted;
   final bool imageAllowCache;
 
@@ -89,8 +88,9 @@ class FilePickerPreview extends StatelessWidget {
                   onPressed: () {
                     if (onLocalSelectedFilesChanged != null &&
                         file.fetchSourceMethod == FetchSourceMethod.local) {
-                      onLocalSelectedFilesChanged!([...files]..remove(file),
-                          isReplacing: true);
+                      onLocalSelectedFilesChanged!(
+                        [...files]..remove(file),
+                      );
                     } else if (onServerObjectDeleted != null &&
                         file.cloudObjectData != null) {
                       onServerObjectDeleted!(file.cloudObjectData!);
