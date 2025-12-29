@@ -2,11 +2,17 @@
 
 ## Features
 
-- TODO
+- `Memories` feature: Enable user to post their **memories** in social media post like style where in each post can included photos of the memory, location, and any other information they'd love to add.
+- `Albums` feature: Focusing on collaborative collection of photos or videos.
+- `Anniversaries` feature: Keeping track of important date of a pair of user.
+- `Collections` feature: Allow user to add or manage their anything on the list in the way they like.
+- [Click here for more](https://github.com/n-luke-th/self-ourjourneys/issues/1)
 
 ## Tech Stack & System Architecture
 
-- TODO
+- Flutter
+- Firebase: Firestore, Authen
+- AWS: API Gatway, S3, Cloudfront, Lambda
 
 ## Getting Started
 

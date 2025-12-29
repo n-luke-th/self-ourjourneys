@@ -1,0 +1,165 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "api.ourjourneys.lukecreated.com",
+    "description" : "the api gateway for interacting with system backend of the OurJouneys app",
+    "version" : "2025-05-31 06:49:04UTC"
+  },
+  "servers" : [ {
+    "url" : "https://api.ourjourneys.lukecreated.com/{basePath}",
+    "variables" : {
+      "basePath" : {
+        "default" : ""
+      }
+    },
+    "x-amazon-apigateway-endpoint-configuration" : {
+      "disableExecuteApiEndpoint" : true
+    }
+  } ],
+  "paths" : {
+    "/v2/delete-objects/by-keys" : {
+      "delete" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for DELETE /v2/delete-objects/by-keys"
+          }
+        },
+        "security" : [ {
+          "check_firebase_token" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "2.0",
+          "type" : "aws_proxy",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:delete_objects_from_s3_ourjourneys_bykeys/invocations",
+          "connectionType" : "INTERNET"
+        }
+      }
+    },
+    "/v2/delete-objects/by-names" : {
+      "delete" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for DELETE /v2/delete-objects/by-names"
+          }
+        },
+        "security" : [ {
+          "check_firebase_token" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "2.0",
+          "type" : "aws_proxy",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:delete_objects_from_s3_ourjourneys/invocations",
+          "connectionType" : "INTERNET"
+        }
+      }
+    },
+    "/check" : {
+      "get" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for GET /check"
+          }
+        },
+        "security" : [ {
+          "check_firebase_token" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "2.0",
+          "type" : "aws_proxy",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:health_check_py/invocations",
+          "connectionType" : "INTERNET",
+          "timeoutInMillis" : 30000
+        }
+      }
+    },
+    "/v2/gen-thumb" : {
+      "post" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for POST /v2/gen-thumb"
+          }
+        },
+        "security" : [ {
+          "check_firebase_token" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "2.0",
+          "type" : "aws_proxy",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:flex_thum_gen/invocations",
+          "connectionType" : "INTERNET"
+        }
+      }
+    },
+    "/v2/gen-upload-urls" : {
+      "post" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for POST /v2/gen-upload-urls"
+          }
+        },
+        "security" : [ {
+          "check_firebase_token" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "2.0",
+          "type" : "aws_proxy",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:gen_upload_urls_s3_ourjourneys/invocations",
+          "connectionType" : "INTERNET"
+        }
+      }
+    }
+  },
+  "components" : {
+    "securitySchemes" : {
+      "check_firebase_token" : {
+        "type" : "apiKey",
+        "name" : "Authorization",
+        "in" : "header",
+        "x-amazon-apigateway-authorizer" : {
+          "identitySource" : "$request.header.Authorization",
+          "authorizerUri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:verify_firebase_token/invocations",
+          "authorizerPayloadFormatVersion" : "2.0",
+          "authorizerResultTtlInSeconds" : 3600,
+          "type" : "request",
+          "enableSimpleResponses" : true
+        }
+      }
+    },
+    "x-amazon-apigateway-integrations" : {
+      "unusedIntegration_gawhmn6" : {
+        "payloadFormatVersion" : "2.0",
+        "type" : "aws_proxy",
+        "httpMethod" : "POST",
+        "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:delete_files_from_bucket/invocations",
+        "connectionType" : "INTERNET"
+      },
+      "unusedIntegration_lsrdhfg" : {
+        "payloadFormatVersion" : "2.0",
+        "type" : "aws_proxy",
+        "httpMethod" : "POST",
+        "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:gen_upload_url_to_bucket/invocations",
+        "connectionType" : "INTERNET"
+      },
+      "unusedIntegration_40lp11l" : {
+        "payloadFormatVersion" : "2.0",
+        "type" : "aws_proxy",
+        "httpMethod" : "POST",
+        "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:918615256357:function:download_file_from_bucket/invocations",
+        "connectionType" : "INTERNET"
+      }
+    }
+  },
+  "x-amazon-apigateway-cors" : {
+    "allowMethods" : [ "DELETE", "GET", "OPTIONS", "POST" ],
+    "allowHeaders" : [ "authorization", "content-type" ],
+    "maxAge" : 300,
+    "allowCredentials" : false,
+    "allowOrigins" : [ "http://localhost:5555", "https://ourjourneys.lukecreated.com" ]
+  },
+  "x-amazon-apigateway-importexport-version" : "1.0"
+}
